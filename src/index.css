@@ -1,0 +1,50 @@
+/* ১. গুগল ফন্ট ইমপোর্ট (Outfit এবং Poppins) */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #02050A;
+    @apply text-slate-300;
+    
+    /* ২. ডিফল্ট বডি ফন্ট Poppins সেট করা হলো */
+    font-family: 'Poppins', sans-serif !important;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ৩. হেডিংগুলোর জন্য ডিফল্ট স্টাইল */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-white font-bold tracking-tight;
+    font-family: 'Outfit', sans-serif; /* হেডিং এ Outfit দিলে লুক বেশি প্রিমিয়াম আসে */
+  }
+
+  /* ৪. Outfit ফন্ট ক্লাস সেটআপ */
+  .font-outfit {
+    font-family: 'Outfit', sans-serif !important;
+  }
+  
+  /* ৫. Poppins ফন্ট ক্লাস সেটআপ (প্রয়োজন হলে ব্যবহারের জন্য) */
+  .font-poppins {
+    font-family: 'Poppins', sans-serif !important;
+  }
+}
+
+/* ৬. কাস্টম স্ক্রলবার (ঐচ্ছিক কিন্তু ডার্ক মোডে সুন্দর দেখায়) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #02050A;
+}
+::-webkit-scrollbar-thumb {
+  background: #F7A400;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d68e00;
+}
