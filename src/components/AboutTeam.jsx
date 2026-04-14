@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const AboutTeam = () => {
   const [data, setData] = useState(null);
@@ -7,7 +7,9 @@ const AboutTeam = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/about-team');
+        const res = await axios.get(
+          "https://api.campaignsquat.com/api/about-team",
+        );
         if (res.data) setData(res.data);
       } catch (err) {
         console.error("Error fetching CEO data:", err);
@@ -23,19 +25,17 @@ const AboutTeam = () => {
       {/* Container with max-w, white background, and rounded corners */}
       <div className="max-w-[1350px] mx-auto bg-white rounded-[5px] px-6 md:px-16 lg:px-24 py-10 md:py-16">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
-          
           {/* Left Side: Image Section */}
           <div className="relative w-full max-w-[340px] md:max-w-[400px] shrink-0 pt-10 pl-10">
-            
             {/* 1. Background Light Green Shape */}
             <div className="absolute top-0 left-0 w-[100%] h-[100%] bg-[#d3f1d5] rounded-[5px] z-0"></div>
-            
+
             {/* 2. Main CEO Image with White Border */}
             <div className="relative z-10 aspect-[4/5] w-full overflow-hidden rounded-[5px] border border-white shadow-xl">
-              <img 
-                src={`http://localhost:5000${data.image}`} 
-                alt={data.ceoName} 
-                className="w-full h-full object-cover" 
+              <img
+                src={`https://api.campaignsquat.com${data.image}`}
+                alt={data.ceoName}
+                className="w-full h-full object-cover"
               />
             </div>
 
@@ -62,7 +62,8 @@ const AboutTeam = () => {
             </div>
 
             <h2 className="text-[#1A1A1A] text-[22px] md:text-[30px] lg:text-[32px] font-bold leading-tight mb-6">
-              {data.mainTitle} <span className="text-[#F7A400]"> {data.highlightTitle}</span>
+              {data.mainTitle}{" "}
+              <span className="text-[#F7A400]"> {data.highlightTitle}</span>
             </h2>
 
             <div className="mb-6 flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 border-b border-gray-100 pb-6">
@@ -88,7 +89,6 @@ const AboutTeam = () => {
               </p>
             </div>
           </div>
-
         </div>
       </div>
     </section>

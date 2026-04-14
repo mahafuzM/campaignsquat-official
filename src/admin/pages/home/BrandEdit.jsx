@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Trash2, UploadCloud } from 'lucide-react'; // আইকন এর জন্য
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Trash2, UploadCloud } from "lucide-react"; // আইকন এর জন্য
 
 const BrandEdit = () => {
   const [brands, setBrands] = useState([]);
@@ -10,7 +10,7 @@ const BrandEdit = () => {
   // ১. ডাটাবেস থেকে সব লোগো আনা (History)
   const fetchBrands = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/brands');
+      const res = await axios.get("https://api.campaignsquat.com/api/brands");
       setBrands(res.data);
     } catch (err) {
       console.error("Fetch error:", err);
@@ -27,12 +27,12 @@ const BrandEdit = () => {
     if (!file) return alert("আগে একটি ইমেজ ফাইল সিলেক্ট করুন!");
 
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append("image", file);
 
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/brands', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      await axios.post("https://api.campaignsquat.com/api/brands", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
       alert("সফলভাবে আপলোড হয়েছে!");
       setFile(null);
@@ -49,7 +49,7 @@ const BrandEdit = () => {
   const handleDelete = async (id) => {
     if (window.confirm("আপনি কি নিশ্চিত যে এই লোগোটি ডিলিট করতে চান?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/brands/${id}`);
+        await axios.delete(`https://api.campaignsquat.com/api/brands/${id}`);
         fetchBrands(); // ডিলিট হওয়ার পর লিস্ট আপডেট
       } catch (err) {
         alert("ডিলিট করা সম্ভব হয়নি!");
@@ -67,21 +67,21 @@ const BrandEdit = () => {
         {/* --- Upload Section --- */}
         <div className="bg-gray-50 p-8 rounded-[5px] border-2 border-dashed border-gray-200 mb-10 text-center">
           <form onSubmit={handleUpload} className="flex flex-col items-center">
-            <input 
-              type="file" 
-              accept="image/*" 
+            <input
+              type="file"
+              accept="image/*"
               id="fileInput"
-              className="hidden" 
+              className="hidden"
               onChange={(e) => setFile(e.target.files[0])}
             />
-            <label 
-              htmlFor="fileInput" 
+            <label
+              htmlFor="fileInput"
               className="cursor-pointer bg-white px-6 py-3 rounded-[5px] shadow-sm border border-gray-200 hover:bg-gray-100 transition-all mb-4 text-sm font-semibold"
             >
               {file ? file.name : "select your logo"}
             </label>
-            
-            <button 
+
+            <button
               disabled={loading}
               className={`bg-[#F7A400] text-black text-[14px] md:text-[15px] hover:text-white hover:bg-[#02050A] font-semibold py-2 px-8 rounded-[5px] border-2 border-[#F7A400] transition-all duration-300 flex items-center gap-2'}`}
             >
@@ -91,16 +91,25 @@ const BrandEdit = () => {
         </div>
 
         {/* --- History / List Section --- */}
-        <h2 className="text-xl font-bold mb-4 border-l-4 border-[#F7A400] pl-3">Upload History</h2>
+        <h2 className="text-xl font-bold mb-4 border-l-4 border-[#F7A400] pl-3">
+          Upload History
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {brands.map((brand) => (
-            <div key={brand._id} className="relative group bg-white border border-gray-100 rounded-[5px] p-4 shadow-sm hover:shadow-md transition-all">
+            <div
+              key={brand._id}
+              className="relative group bg-white border border-gray-100 rounded-[5px] p-4 shadow-sm hover:shadow-md transition-all"
+            >
               <div className="h-24 flex items-center justify-center overflow-hidden mb-2">
-                <img src={brand.url} alt="Brand" className="max-h-full max-w-full object-contain" />
+                <img
+                  src={brand.url}
+                  alt="Brand"
+                  className="max-h-full max-w-full object-contain"
+                />
               </div>
-              
+
               {/* Delete Button */}
-              <button 
+              <button
                 onClick={() => handleDelete(brand._id)}
                 className="absolute -top-2 -right-2 bg-red-500 text-white p-2 rounded-[5px] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
               >

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const BrandSlider = () => {
   const [brands, setBrands] = useState([]);
@@ -8,7 +8,7 @@ const BrandSlider = () => {
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/brands');
+        const res = await axios.get("https://api.campaignsquat.com/api/brands");
         setBrands(res.data);
       } catch (err) {
         console.error("স্লাইডার ডাটা লোড হচ্ছে না:", err);
@@ -28,22 +28,20 @@ const BrandSlider = () => {
   return (
     <section className="w-full bg-[#02050A] md:py-4 overflow-hidden font-poppins relative z-10">
       <div className="w-full py-10 md:py-16">
-        
         <div className="relative w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_10%,_black_90%,transparent_100%)] flex flex-col gap-3 md:gap-10">
-          
           {/* Row 1: Left to Right (Admin থেকে আসা লোগো) */}
           <div className="flex overflow-hidden">
             <div className="flex animate-scroll-right whitespace-nowrap items-center pause-on-hover">
               {/* ডিজাইন স্মুথ রাখতে ডাটা ৩ বার রিপিট করা হয়েছে */}
               {[...firstRow, ...firstRow, ...firstRow].map((brand, index) => (
-                <div 
-                  key={`row1-${index}`} 
+                <div
+                  key={`row1-${index}`}
                   className="flex-shrink-0 w-[140px] md:w-[180px] lg:w-[250px] h-16 md:h-24 flex items-center justify-center px-3 md:px-12"
                 >
-                  <img 
-                    src={brand.url} 
-                    alt="Brand" 
-                    className="w-full h-full object-contain brightness-110 filter grayscale hover:grayscale-0 transition-all duration-300" 
+                  <img
+                    src={brand.url}
+                    alt="Brand"
+                    className="w-full h-full object-contain brightness-110 filter grayscale hover:grayscale-0 transition-all duration-300"
                   />
                 </div>
               ))}
@@ -53,18 +51,20 @@ const BrandSlider = () => {
           {/* Row 2: Right to Left (Admin থেকে আসা লোগো) */}
           <div className="flex overflow-hidden">
             <div className="flex animate-scroll-left whitespace-nowrap items-center pause-on-hover">
-              {[...secondRow, ...secondRow, ...secondRow, ...secondRow].map((brand, index) => (
-                <div 
-                  key={`row2-${index}`} 
-                  className="flex-shrink-0 w-[140px] md:w-[180px] lg:w-[250px] h-16 md:h-24 flex items-center justify-center px-3 md:px-12"
-                >
-                  <img 
-                    src={brand.url} 
-                    alt="Brand" 
-                    className="w-full h-full object-contain brightness-110 filter grayscale hover:grayscale-0 transition-all duration-300" 
-                  />
-                </div>
-              ))}
+              {[...secondRow, ...secondRow, ...secondRow, ...secondRow].map(
+                (brand, index) => (
+                  <div
+                    key={`row2-${index}`}
+                    className="flex-shrink-0 w-[140px] md:w-[180px] lg:w-[250px] h-16 md:h-24 flex items-center justify-center px-3 md:px-12"
+                  >
+                    <img
+                      src={brand.url}
+                      alt="Brand"
+                      className="w-full h-full object-contain brightness-110 filter grayscale hover:grayscale-0 transition-all duration-300"
+                    />
+                  </div>
+                ),
+              )}
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-const Hero = require('../models/Hero');
+const Hero = require("../models/Hero");
 
 // --- Hero Section Logic ---
 
@@ -6,21 +6,19 @@ const Hero = require('../models/Hero');
 exports.getHero = async (req, res) => {
   try {
     let data = await Hero.findOne();
-    
-    // ডাটা থাকলে কিন্তু iconHistory না থাকলে (পুরোনো ডাটা ফিক্স করার জন্য)
+
     if (data && !data.iconHistory) {
       data.iconHistory = [{ name: "zap" }];
       await data.save();
     }
 
     if (!data) {
-      // যদি ডাটা না থাকে তবে ডিফল্ট হিসেবে একটা তৈরি হবে
-      data = await Hero.create({ 
-        badge: "zap", 
+      data = await Hero.create({
+        badge: "zap",
         iconHistory: [{ name: "zap" }],
         heading: "Default Heading",
         paragraph: "Default Paragraph",
-        vimeoId: "1153559168"
+        vimeoId: "1153559168",
       });
     }
     res.status(200).json(data);
@@ -33,23 +31,24 @@ exports.getHero = async (req, res) => {
 exports.updateHero = async (req, res) => {
   try {
     const { badge, heading, paragraph, vimeoId } = req.body;
-    let updateData = { 
+    let updateData = {
       badge: badge ? badge.toLowerCase().trim() : "zap",
-      heading, 
-      paragraph, 
-      vimeoId 
+      heading,
+      paragraph,
+      vimeoId,
     };
 
-    // যদি নতুন ফাইল আপলোড হয় তবেই imageUrl আপডেট হবে
+    // যদি নতুন ফাইল আপলোড হয় তবেই imageUrl আপডেট হবে
     if (req.file) {
-      updateData.imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+      // লোকালহোস্টের বদলে .env থেকে BASE_URL ব্যবহার করা হয়েছে
+      const baseUrl = process.env.BASE_URL || "http://localhost:5000";
+      updateData.imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
     }
 
-    const updatedHero = await Hero.findOneAndUpdate(
-      {}, 
-      updateData,
-      { upsert: true, new: true }
-    );
+    const updatedHero = await Hero.findOneAndUpdate({}, updateData, {
+      upsert: true,
+      new: true,
+    });
 
     res.status(200).json(updatedHero);
   } catch (err) {
@@ -63,7 +62,6 @@ exports.updateHero = async (req, res) => {
 exports.getAllIcons = async (req, res) => {
   try {
     const hero = await Hero.findOne();
-    // হিরো ডাটার ভেতর যে iconHistory অ্যারে আছে সেটা পাঠানো হচ্ছে
     res.status(200).json(hero ? hero.iconHistory : []);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch icons" });
@@ -81,15 +79,15 @@ exports.addIcon = async (req, res) => {
 
     if (!hero) return res.status(404).json({ error: "Hero data not found" });
 
-    // চেক করা হচ্ছে অ্যারেতে এই নাম অলরেডি আছে কি না
-    const isExist = hero.iconHistory.find(icon => icon.name === cleanName);
-    if (isExist) return res.status(400).json({ error: "This icon already exists in history" });
+    const isExist = hero.iconHistory.find((icon) => icon.name === cleanName);
+    if (isExist)
+      return res
+        .status(400)
+        .json({ error: "This icon already exists in history" });
 
-    // অ্যারেতে নতুন আইকন পুশ করা
     hero.iconHistory.push({ name: cleanName });
     await hero.save();
 
-    // মাত্র অ্যাড হওয়া আইকনটি পাঠানো
     res.status(201).json(hero.iconHistory[hero.iconHistory.length - 1]);
   } catch (err) {
     res.status(500).json({ error: "Failed to add icon" });
@@ -102,11 +100,10 @@ exports.deleteIcon = async (req, res) => {
     const hero = await Hero.findOne();
     if (!hero) return res.status(404).json({ error: "Hero not found" });
 
-    // অ্যারে থেকে নির্দিষ্ট আইডি বাদ দেওয়া
     hero.iconHistory = hero.iconHistory.filter(
-      icon => icon._id.toString() !== req.params.id
+      (icon) => icon._id.toString() !== req.params.id,
     );
-    
+
     await hero.save();
     res.status(200).json({ message: "Icon deleted from history" });
   } catch (err) {

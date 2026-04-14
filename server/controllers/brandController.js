@@ -1,4 +1,4 @@
-const Brand = require('../models/Brand');
+const Brand = require("../models/Brand");
 
 // সব লোগো গেট করা
 exports.getBrands = async (req, res) => {
@@ -17,8 +17,9 @@ exports.addBrand = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // ফাইলটি সার্ভারের কোন পাথে সেভ হলো তার URL তৈরি
-    const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+    // লোকালহোস্টের বদলে .env থেকে BASE_URL ব্যবহার করা হয়েছে
+    const baseUrl = process.env.BASE_URL || "http://localhost:5000";
+    const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
 
     const newBrand = new Brand({ url: imageUrl });
     await newBrand.save();

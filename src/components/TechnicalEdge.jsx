@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import * as LucideIcons from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import * as LucideIcons from "lucide-react";
 
 const TechnicalEdge = () => {
   // ১. মেমোরি থেকে ইনস্ট্যান্ট ডেটা লোড
   const [data, setData] = useState(() => {
-    const saved = sessionStorage.getItem('cached_tech_edge');
+    const saved = sessionStorage.getItem("cached_tech_edge");
     return saved ? JSON.parse(saved) : null;
   });
 
   const [loading, setLoading] = useState(!data);
-  const BASE_URL = 'http://localhost:5000';
+  const BASE_URL = "https://api.campaignsquat.com";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,7 +18,7 @@ const TechnicalEdge = () => {
         const res = await axios.get(`${BASE_URL}/api/technical-edge`);
         if (res.data) {
           setData(res.data);
-          sessionStorage.setItem('cached_tech_edge', JSON.stringify(res.data));
+          sessionStorage.setItem("cached_tech_edge", JSON.stringify(res.data));
         }
       } catch (err) {
         console.error("Fetch Error:", err);
@@ -35,13 +35,13 @@ const TechnicalEdge = () => {
 
     // ১. 'shield-check' কে 'ShieldCheck' বানানোর ম্যাজিক লজিক
     const formattedName = name
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join('');
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join("");
 
     // ২. চেক করা যে এই নামে কোনো আইকন Lucide এ আছে কি না
     const IconComponent = LucideIcons[formattedName] || LucideIcons.Box;
-    
+
     return <IconComponent size={size} strokeWidth={2.5} />;
   };
 
@@ -50,18 +50,14 @@ const TechnicalEdge = () => {
 
   return (
     <section className="bg-[#02050A] py-24 relative overflow-hidden font-Inter selection:bg-[#F7A400] selection:text-black">
-      
       {/* --- Ambient Background Glows --- */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#F7A400]/10 rounded-full blur-[120px] pointer-events-none opacity-50"></div>
       <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-white/5 rounded-full blur-[140px] pointer-events-none opacity-30"></div>
 
       {/* --- Main Sentinel Frame Container (Max Width 1440 with equal padding) --- */}
       <div className="max-w-[1440px] mx-auto px-2 md:px-12 lg:px-16 relative z-10">
-        
         <div className="p-[1px] rounded-[5px] bg-gradient-to-r from-[#F7A400]/60 via-white/20 to-[#F7A400]/40 overflow-hidden group">
-          
           <div className="bg-[#06080E] rounded-[25px] p-10 md:p-16 relative overflow-hidden">
-            
             <div className="absolute -top-24 -right-24 w-[500px] h-[500px] bg-[#F7A400]/10 rounded-full blur-[120px] pointer-events-none group-hover:bg-[#F7A400]/20 transition-all duration-1000"></div>
 
             {/* Header Section */}
@@ -71,7 +67,8 @@ const TechnicalEdge = () => {
               </h2>
               <h3 className="text-[16px] md:text-[18px] lg:text-[20px] font-bold tracking-tight">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F7A400] via-white to-[#F7A400]/80">
-                  {data?.subTitle || "Strategic Assets included with every partnership"}
+                  {data?.subTitle ||
+                    "Strategic Assets included with every partnership"}
                 </span>
               </h3>
             </div>
@@ -79,7 +76,7 @@ const TechnicalEdge = () => {
             {/* Content Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 relative z-10">
               {data?.assets?.map((asset, index) => (
-                <div 
+                <div
                   key={index}
                   className="bg-[#04060B]/90 backdrop-blur-md border border-white p-8 rounded-[5px] flex flex-col transition-all duration-500 hover:border-[#F7A400]/40 group/card min-h-[280px]"
                 >
@@ -105,14 +102,15 @@ const TechnicalEdge = () => {
                 </div>
               ))}
             </div>
-
           </div>
         </div>
       </div>
 
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap');
-        .font-Inter { font-family: 'Inter', sans-serif; }
+        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap");
+        .font-Inter {
+          font-family: "Inter", sans-serif;
+        }
       `}</style>
     </section>
   );
