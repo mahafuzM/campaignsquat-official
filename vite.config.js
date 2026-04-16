@@ -6,12 +6,27 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // যখনই ফ্রন্টএন্ডে '/api' দিয়ে কোনো রিকোয়েস্ট হবে
+      // Matches any request starting with /api
       "/api": {
-        target: "/api", // সেটি এই ঠিকানায় পাঠিয়ে দাও
+        // Change this to your actual backend server port
+        target: "http://localhost:5000", 
         changeOrigin: true,
         secure: false,
+        // Optional: removes /api from the path before sending to backend
+        // rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
+  },
+  build: {
+    // Optimization for those large chunks we saw in your build log
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "lucide-vendor": ["lucide-react"],
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
   },
 });
