@@ -9,6 +9,8 @@ import {
   X,
   LayoutDashboard,
   Type,
+  ShieldCheck,
+  Zap
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -22,7 +24,12 @@ const AgencyComparisonAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const API_URL = "https://api.campaignsquat.com/api/agency-comparison";
+  // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ অটোমেটিক হ্যান্ডেল করবে)
+  const BASE_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
+    
+  const API_URL = `${BASE_URL}/api/agency-comparison`;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +40,9 @@ const AgencyComparisonAdmin = () => {
           setBrandName(res.data.brandName || "");
           setCompetitorLabel(res.data.competitorLabel || "");
           setComparisonList(
-            res.data.comparisonList || [{ label: "", othersHasIt: false }],
+            res.data.comparisonList?.length > 0
+              ? res.data.comparisonList
+              : [{ label: "", othersHasIt: false }],
           );
         }
       } catch (err) {
@@ -44,18 +53,45 @@ const AgencyComparisonAdmin = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [API_URL]);
 
   const addItem = () =>
     setComparisonList([...comparisonList, { label: "", othersHasIt: false }]);
 
-  // ✅ Fix: removeItem function updated with functional state logic
-  const removeItem = (index) => {
+  // ✅ সংশোধিত removeItem ফাংশন
+  const removeItem = async (index) => {
     if (comparisonList.length <= 1) {
       return toast.error("At least one item required!");
     }
-    setComparisonList((prev) => prev.filter((_, i) => i !== index));
-    toast.success("Feature removed!");
+
+    const confirmDelete = window.confirm("Are you sure you want to remove this feature? 🗑️");
+    
+    if (confirmDelete) {
+      // ১. প্রথমে স্টেট থেকে ফিল্টার করে নতুন লিস্ট তৈরি করা
+      const updatedList = comparisonList.filter((_, i) => i !== index);
+      
+      // ২. স্টেট আপডেট করা
+      setComparisonList(updatedList);
+
+      // ৩. সাইলেন্টলি সার্ভারে আপডেট পাঠানো (যাতে ডিলিট পার্মানেন্ট হয়)
+      try {
+        setSaving(true);
+        await axios.post(API_URL, {
+          titlePart1,
+          brandName,
+          competitorLabel,
+          comparisonList: updatedList, // আপডেট করা লিস্ট পাঠানো হচ্ছে
+        });
+        toast.success("Feature removed permanently! 🚀");
+      } catch (err) {
+        console.error("Delete Sync Error:", err);
+        toast.error("Failed to sync with server. Reloading data...");
+        // যদি সার্ভারে সেভ না হয়, তবে ডাটা আবার আগের অবস্থায় ফিরিয়ে আনা (Optional)
+        window.location.reload(); 
+      } finally {
+        setSaving(false);
+      }
+    }
   };
 
   const handleInputChange = (index, value) => {
@@ -89,8 +125,9 @@ const AgencyComparisonAdmin = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-black" />
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-black mb-4" />
+        <p className="text-[10px] font-black uppercase tracking-[3px] text-gray-400 font-['Poppins']">Syncing Tactical Matrix...</p>
       </div>
     );
 

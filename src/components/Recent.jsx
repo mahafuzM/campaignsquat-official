@@ -4,14 +4,13 @@ import { Play, X } from "lucide-react";
 
 const Recent = () => {
   const [data, setData] = useState({ title: "", subtitle: "", projects: [] });
-  const [activeVideo, setActiveVideo] = useState(null); // পপআপ কন্ট্রোল করার জন্য
+  const [activeVideo, setActiveVideo] = useState(null); 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          "https://api.campaignsquat.com/api/recent-projects",
-        );
+        // ✅ শুধু এন্ডপয়েন্ট ব্যবহার করা হয়েছে
+        const res = await axios.get("/api/recent-projects");
         if (res.data) setData(res.data);
       } catch (err) {
         console.error(err);
@@ -39,14 +38,15 @@ const Recent = () => {
               <div
                 key={index}
                 className="relative group cursor-pointer overflow-hidden rounded-[5px] border border-white/10 aspect-[16/10] md:aspect-[16/9.5] lg:aspect-[16/10]"
-                onClick={() => setActiveVideo(project)} // ক্লিক করলে ভিডিও পপআপ হবে
+                onClick={() => setActiveVideo(project)} 
               >
                 <img
+                  // ✅ ডাইনামিক ইমেজ পাথ লজিক
                   src={
                     project.image
                       ? project.image.startsWith("http")
                         ? project.image
-                        : `https://api.campaignsquat.com${project.image.startsWith("/") ? "" : "/"}${project.image}`
+                        : `${axios.defaults.baseURL}${project.image.startsWith("/") ? "" : "/"}${project.image}`
                       : `https://vumbnail.com/${project.videoId}.jpg`
                   }
                   alt={project.alt || "Recent Project"}
@@ -70,7 +70,6 @@ const Recent = () => {
       {/* --- ফুল স্ক্রিন ভিডিও মোডাল (পপআপ) --- */}
       {activeVideo && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 p-4 md:p-10 backdrop-blur-md">
-          {/* ক্লোজ বাটন */}
           <button
             onClick={() => setActiveVideo(null)}
             className="absolute top-5 right-5 text-white hover:text-[#f7a400] transition-colors z-[10000]"
@@ -78,7 +77,6 @@ const Recent = () => {
             <X size={40} />
           </button>
 
-          {/* ভিডিও কন্টেইনার */}
           <div className="w-full max-w-6xl aspect-video relative shadow-2xl border border-white/20">
             <iframe
               src={`https://player.vimeo.com/video/${activeVideo.videoId}?autoplay=1&badge=0&autopause=0`}
@@ -88,7 +86,6 @@ const Recent = () => {
             ></iframe>
           </div>
 
-          {/* বাইরে ক্লিক করলে বন্ধ হবে */}
           <div
             className="absolute inset-0 -z-10"
             onClick={() => setActiveVideo(null)}

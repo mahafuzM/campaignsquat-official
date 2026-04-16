@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import { Search, SearchX, ArrowRight } from "lucide-react";
+import { Search, SearchX, ArrowRight, Calendar, Tag, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const BlogContent = () => {
-  // ১. মেমোরি (sessionStorage) থেকে সাথে সাথে ডেটা নিয়ে আসা
+  // ১. মেমোরি (sessionStorage) থেকে ডেটা নিয়ে আসা (আপনার লজিক)
   const [allPosts, setAllPosts] = useState(() => {
     const saved = sessionStorage.getItem("cached_blogs");
     return saved ? JSON.parse(saved) : [];
@@ -22,7 +22,11 @@ const BlogContent = () => {
     "Software Development",
     "Mobile Apps Development",
   ];
-  const BASE_URL = "https://api.campaignsquat.com";
+
+  // ✅ ডাইনামিক বেস ইউআরএল
+  const BASE_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -46,16 +50,14 @@ const BlogContent = () => {
       }
     };
     fetchBlogs();
-  }, []);
+  }, [BASE_URL]);
 
-  // ২. ফিল্টারিং লজিক (তোমার অরিজিনাল ডিজাইন ডেটা অনুযায়ী)
+  // ২. ফিল্টারিং লজিক (আপনার অরিজিনাল লজিক অক্ষুণ্ণ রাখা হয়েছে)
   const filteredPosts = useMemo(() => {
     return allPosts.filter((post) => {
-      // ক্যাটাগরি ম্যাচিং
       const matchesCategory =
         activeCategory === "All" || post.category === activeCategory;
 
-      // সার্চ কোয়েরি ম্যাচিং (টাইটেল, ডেসক্রিপশন এবং ক্যাটাগরি এর মধ্যে খুঁজবে)
       const query = searchQuery.toLowerCase();
       const matchesSearch =
         (post.title?.toLowerCase() || "").includes(query) ||
@@ -79,14 +81,14 @@ const BlogContent = () => {
     if (!path) return "https://via.placeholder.com/800x400";
     let cleanPath = path.replace(/\\/g, "/");
     if (cleanPath.startsWith("/")) cleanPath = cleanPath.substring(1);
-    return `${BASE_URL}/${cleanPath}`;
+    return path.startsWith("http") ? path : `${BASE_URL}/${cleanPath}`;
   };
 
   if (loading && allPosts.length === 0) {
     return (
-      <div className="bg-[#02030a] min-h-screen flex flex-col items-center justify-center text-white font-poppins">
+      <div className="bg-[#02030a] min-h-screen flex flex-col items-center justify-center text-white font-['Poppins']">
         <div className="w-12 h-12 border-4 border-[#F7A400] border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-[10px] uppercase tracking-[4px] font-bold">
+        <p className="text-[10px] uppercase tracking-[4px] font-black italic">
           Syncing Campaignsquat Insights...
         </p>
       </div>

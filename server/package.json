@@ -1,15 +1,17 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Campaignsquat Ltd Backend",
   "main": "index.js",
+  "type": "commonjs", 
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Md. Maharab Biswas Api",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",

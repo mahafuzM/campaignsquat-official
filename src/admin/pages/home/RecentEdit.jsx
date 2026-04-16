@@ -18,9 +18,8 @@ const RecentEdit = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(
-        "https://api.campaignsquat.com/api/recent-projects",
-      );
+      // ✅ Dynamic URL
+      const res = await axios.get("/api/recent-projects");
       if (res.data) {
         setFormData({
           title: res.data.title || "",
@@ -43,10 +42,8 @@ const RecentEdit = () => {
 
     setUploading(true);
     try {
-      const res = await axios.post(
-        "https://api.campaignsquat.com/api/upload",
-        uploadData,
-      );
+      // ✅ Dynamic URL for Upload
+      const res = await axios.post("/api/upload", uploadData);
       const updatedProjects = [...formData.projects];
       updatedProjects[index].image = res.data.url;
       setFormData({ ...formData, projects: updatedProjects });
@@ -67,25 +64,20 @@ const RecentEdit = () => {
     });
   };
 
-  // ডিলিট ফাংশন (কনফার্মেশন এবং অটো-সেভ সহ)
   const deleteProject = async (index) => {
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete this project card?",
+      "Are you sure you want to delete this project card?"
     );
 
     if (confirmDelete) {
       const updatedProjects = formData.projects.filter((_, i) => i !== index);
       const newFormData = { ...formData, projects: updatedProjects };
 
-      // UI থেকে সাথে সাথে রিমুভ হবে
       setFormData(newFormData);
 
-      // ডাটাবেসে আপডেট পাঠানো যাতে মেইন সাইট থেকেও ডিলিট হয়
       try {
-        const res = await axios.post(
-          "https://api.campaignsquat.com/api/recent-projects/update",
-          newFormData,
-        );
+        // ✅ Dynamic URL for Delete/Update
+        const res = await axios.post("/api/recent-projects/update", newFormData);
         if (res.data) {
           setHistory(res.data.history || []);
           alert("✅ Project deleted and synced with database!");
@@ -99,10 +91,8 @@ const RecentEdit = () => {
 
   const handleSync = async () => {
     try {
-      const res = await axios.post(
-        "https://api.campaignsquat.com/api/recent-projects/update",
-        formData,
-      );
+      // ✅ Dynamic URL for Sync
+      const res = await axios.post("/api/recent-projects/update", formData);
       if (res.data) {
         setFormData({
           title: res.data.title,
@@ -124,7 +114,7 @@ const RecentEdit = () => {
       <div className="w-full space-y-8">
         {/* Header Control */}
         <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm">
-          <h2 className="text-black text-2xl font-bold mb-6    tracking-wider">
+          <h2 className="text-black text-2xl font-bold mb-6 tracking-wider">
             Main Content Control
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -172,11 +162,11 @@ const RecentEdit = () => {
                   <div className="relative h-32 w-full bg-white border-2 border-dashed border-gray-300 rounded overflow-hidden flex items-center justify-center group cursor-pointer">
                     {project.image ? (
                       <img
-                        /* কন্ডিশনাল স্লাশ চেক: যদি পাথ / দিয়ে শুরু না হয়, তবে একটি স্লাশ যোগ করবে */
+                        // ✅ Dynamic BaseURL and Slash Handling
                         src={
                           project.image.startsWith("http")
                             ? project.image
-                            : `https://api.campaignsquat.com${project.image.startsWith("/") ? "" : "/"}${project.image}`
+                            : `${axios.defaults.baseURL}${project.image.startsWith("/") ? "" : "/"}${project.image}`
                         }
                         className="w-full h-full object-cover"
                         alt="Preview"

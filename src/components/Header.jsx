@@ -16,17 +16,33 @@ const Header = () => {
     imageUrl: "",
   });
 
+ // ১. ডাইনামিক API_BASE সেট করুন (লোকাল এবং লাইভ দুইটার জন্যই)
+  const API_BASE = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
+
   useEffect(() => {
     const fetchHeroData = async () => {
       try {
-        const res = await axios.get("https://api.campaignsquat.com/api/hero");
+        // ✅ ২. হার্ডকোডেড ইউআরএল এর বদলে API_BASE ব্যবহার
+        const res = await axios.get(`${API_BASE}/api/hero`);
         if (res.data) {
-          setContent(res.data);
+          // ইমেজ পাথ ঠিক করা (যদি ডাটাবেসে শুধু নাম থাকে তবে ফুল ইউআরএল তৈরি করবে)
+          const formattedData = {
+            ...res.data,
+            imageUrl: res.data.imageUrl 
+              ? (res.data.imageUrl.startsWith('http') 
+                  ? res.data.imageUrl 
+                  : `${API_BASE}/${res.data.imageUrl.replace(/\\/g, "/")}`)
+              : ""
+          };
+
+          setContent(formattedData);
 
           // --- Fast Loading Hack: Image Preloading ---
-          if (res.data.imageUrl) {
+          if (formattedData.imageUrl) {
             const img = new Image();
-            img.src = res.data.imageUrl;
+            img.src = formattedData.imageUrl;
           }
         }
       } catch (err) {
@@ -34,7 +50,7 @@ const Header = () => {
       }
     };
     fetchHeroData();
-  }, []);
+  }, [API_BASE]);
 
   useEffect(() => {
     document.body.style.overflow = isVideoOpen ? "hidden" : "auto";
@@ -290,7 +306,7 @@ const Header = () => {
         <div className="w-full flex justify-center mb-6 md:mb-8 text-center">
           <h1
             className="font-outfit text-white font-bold tracking-tight leading-[1.1] md:leading-[1.15] text-[28px] sm:text-[38px] md:text-[50px] lg:text-[50px] xl:text-[70px] custom-typewriter px-2 drop-shadow-2xl max-w-[100%] md:max-w-[1000px] lg:max-w-[1200px] xl:max-w-[1400px]"
-            dangerouslySetInnerHTML={{ __html: content.heading }}
+            dangerouslySetInnerHTML={{ __html: content.heading || "" }} // এখানে || "" যোগ করা নিরাপদ
           />
         </div>
 

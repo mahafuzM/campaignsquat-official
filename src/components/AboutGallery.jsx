@@ -4,13 +4,16 @@ import axios from "axios";
 const AboutGallery = () => {
   const [dbImages, setDbImages] = useState([]);
 
+  // app.jsx থেকে আসা বেইজ URL
+  const API_BASE = axios.defaults.baseURL;
+
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const res = await axios.get(
-          "https://api.campaignsquat.com/api/about-gallery",
-        );
-        // ✅ ডাটা ফরম্যাট চেক করা হচ্ছে
+        // সরাসরি এন্ডপয়েন্ট ব্যবহার করা হয়েছে
+        const res = await axios.get("/api/about-gallery");
+        
+        // ডাটা ফরম্যাট চেক করা
         const imageData = res.data.images || res.data;
         if (Array.isArray(imageData) && imageData.length > 0) {
           setDbImages(imageData);
@@ -39,13 +42,16 @@ const AboutGallery = () => {
           <div className="animate-marquee-infinite items-center">
             {/* দুইবার ম্যাপ করা হয়েছে যাতে লুপটা সিমেলেস হয় */}
             {[...dbImages, ...dbImages].map((item, index) => {
-              // ✅ ইমেজ পাথ হ্যান্ডেলিং: item স্ট্রিং হতে পারে বা অবজেক্ট {url: '...'} হতে পারে
+              // ইমেজ পাথ হ্যান্ডেলিং
               const imgPath = typeof item === "string" ? item : item.url;
-
-              // ✅ ফুল ইউআরএল তৈরি
+              
+              // ক্লিনিং স্লাশ
+              const cleanPath = imgPath?.startsWith("/") ? imgPath : `/${imgPath}`;
+              
+              // ফুল ইউআরএল তৈরি
               const fullUrl = imgPath?.startsWith("http")
                 ? imgPath
-                : `https://api.campaignsquat.com${imgPath?.startsWith("/") ? "" : "/"}${imgPath}`;
+                : `${API_BASE}${cleanPath}`;
 
               return (
                 <div
@@ -62,7 +68,7 @@ const AboutGallery = () => {
                     className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     onError={(e) => {
                       e.target.src =
-                        "https://via.placeholder.com/300x400?text=Campaignsquat+Image"; // ইমেজ এরর হলে প্লেসহোল্ডার
+                        "https://via.placeholder.com/300x400?text=Campaignsquat+Image";
                     }}
                   />
                 </div>

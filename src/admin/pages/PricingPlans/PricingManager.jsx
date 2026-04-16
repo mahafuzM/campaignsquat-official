@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Plus, Trash2, Edit, Save, X, CheckCircle } from "lucide-react";
 
+// ✅ ডাইনামিক বেস ইউআরএল সেটআপ
+const BASE_URL = window.location.hostname === "localhost" 
+  ? "http://localhost:5000" 
+  : "https://api.campaignsquat.com";
+
 const PricingManager = () => {
   const [plans, setPlans] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -29,11 +34,10 @@ const PricingManager = () => {
     fetchPlans();
   }, []);
 
+  // ১. সকল প্ল্যান ফেচ করা
   const fetchPlans = async () => {
     try {
-      const res = await axios.get(
-        "https://api.campaignsquat.com/api/pricing/all",
-      );
+      const res = await axios.get(`${BASE_URL}/api/pricing/all`);
       setPlans(res.data);
     } catch (err) {
       console.error("Fetch Error:", err);
@@ -51,6 +55,7 @@ const PricingManager = () => {
   const removeFeatureField = (index) =>
     setFeatures(features.filter((_, i) => i !== index));
 
+  // ২. সাবমিট করা (Add এবং Update দুটিই হ্যান্ডেল করবে)
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -60,22 +65,19 @@ const PricingManager = () => {
 
     try {
       if (isEditing) {
-        await axios.put(
-          `https://api.campaignsquat.com/api/pricing/${currentId}`,
-          payload,
-        );
-        alert("Plan Updated!");
+        // আপডেট করার জন্য PUT রিকোয়েস্ট
+        await axios.put(`${BASE_URL}/api/pricing/${currentId}`, payload);
+        alert("Plan Updated Successfully!");
       } else {
-        await axios.post(
-          "https://api.campaignsquat.com/api/pricing/add",
-          payload,
-        );
-        alert("New Plan Added!");
+        // নতুন প্ল্যান যোগ করার জন্য POST রিকোয়েস্ট
+        await axios.post(`${BASE_URL}/api/pricing/add`, payload);
+        alert("New Plan Added Successfully!");
       }
       resetForm();
       fetchPlans();
     } catch (err) {
-      alert("Operation Failed!");
+      console.error("Submit Error:", err);
+      alert(err.response?.data?.message || "Operation Failed!");
     }
   };
 
@@ -93,10 +95,16 @@ const PricingManager = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // ৩. ডিলিট করা
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure?")) {
-      await axios.delete(`https://api.campaignsquat.com/api/pricing/${id}`);
-      fetchPlans();
+    if (window.confirm("Are you sure you want to delete this plan?")) {
+      try {
+        await axios.delete(`${BASE_URL}/api/pricing/${id}`);
+        fetchPlans();
+        alert("Deleted Successfully!");
+      } catch (err) {
+        alert("Delete Failed!");
+      }
     }
   };
 
@@ -110,6 +118,7 @@ const PricingManager = () => {
     });
     setFeatures([""]);
     setIsEditing(false);
+    setCurrentId(null);
   };
 
   return (

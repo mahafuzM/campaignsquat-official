@@ -62,26 +62,35 @@ const AdminCareers = () => {
     { type: "list", items: [""] },
   ]);
 
-  const BASE_URL = "https://api.campaignsquat.com";
+  // ✅ Local vs Live Dynamic URL Logic
+  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
 
   // --- API Interactions ---
   const fetchJobs = useCallback(async () => {
     setLoading(true);
     try {
+      // Axios-er default config thakle valo, na thakle ekhane BASE_URL force kora hoyeche
       const res = await axios.get(`${BASE_URL}/api/jobs`);
-      setJobs(res.data);
+
+      if (Array.isArray(res.data)) {
+        setJobs(res.data);
+      } else if (res.data && Array.isArray(res.data.data)) {
+        setJobs(res.data.data);
+      }
     } catch (err) {
-      console.error("Error fetching jobs", err);
+      console.error("Error fetching jobs:", err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [BASE_URL]);
 
   useEffect(() => {
     fetchJobs();
   }, [fetchJobs]);
 
-  // --- Builder Logic (CRUD for Form Sections) ---
+  // --- Builder Logic ---
   const addSection = (type) => {
     let newSection;
     if (type === "requirements") {
@@ -111,25 +120,10 @@ const AdminCareers = () => {
   };
 
   const updateRequirementItem = (sIdx, lIdx, field, val) => {
-    // ১. মূল সেকশন অ্যারের একটি কপি তৈরি করা
     const newSections = [...sections];
-
-    // ২. নির্দিষ্ট সেকশনের items অ্যারের একটি কপি তৈরি করা
     const newItems = [...newSections[sIdx].items];
-
-    // ৩. নির্দিষ্ট ইনডেক্সের অবজেক্টটি কপি করে ভ্যালু আপডেট করা
-    newItems[lIdx] = {
-      ...newItems[lIdx],
-      [field]: val,
-    };
-
-    // ৪. আপডেট হওয়া আইটেমগুলো মেইন সেকশনে সেট করা
-    newSections[sIdx] = {
-      ...newSections[sIdx],
-      items: newItems,
-    };
-
-    // ৫. স্টেট আপডেট করা
+    newItems[lIdx] = { ...newItems[lIdx], [field]: val };
+    newSections[sIdx] = { ...newSections[sIdx], items: newItems };
     setSections(newSections);
   };
 
@@ -156,18 +150,13 @@ const AdminCareers = () => {
       setSections(sections.filter((_, i) => i !== index));
     }
   };
+
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
-    console.log("🛠️ Submit Mode:", editingId ? "EDITING" : "NEW POST");
-    console.log("🆔 Current Editing ID:", editingId);
-    // ... বাকি কোড
-
     setLoading(true);
 
-    // আপনার মডেল অনুযায়ী sections ফরম্যাট করা
     const preparedSections = sections.map((section) => {
       const base = { type: section.type, value: section.value || "" };
-
       if (section.type === "requirements") {
         return {
           ...base,
@@ -175,14 +164,10 @@ const AdminCareers = () => {
             label: typeof it === "object" ? it.label || "" : "",
             desc: typeof it === "object" ? it.desc || "" : "",
           })),
-          items: [], // Requirements এর জন্য items খালি থাকবে
+          items: [], 
         };
       }
-
-      return {
-        ...base,
-        items: Array.isArray(section.items) ? section.items : [],
-      };
+      return { ...base, items: Array.isArray(section.items) ? section.items : [] };
     });
 
     const payload = {
@@ -196,48 +181,36 @@ const AdminCareers = () => {
     };
 
     try {
-      // ডাইনামিক URL এবং Method হ্যান্ডেল করা
       let response;
       if (editingId) {
-        // Edit Mode (PUT)
-        response = await axios.put(
-          `${BASE_URL}/api/jobs/${editingId}`,
-          payload,
-        );
+        response = await axios.put(`${BASE_URL}/api/jobs/${editingId}`, payload);
       } else {
-        // Create Mode (POST)
         response = await axios.post(`${BASE_URL}/api/jobs`, payload);
       }
 
       if (response.status === 200 || response.status === 201) {
-        alert(
-          editingId
-            ? "✅ Job Updated Successfully!"
-            : "✅ Job Published Successfully!",
-        );
+        alert(editingId ? "✅ Job Updated!" : "✅ Job Published!");
         resetForm();
         fetchJobs();
       }
     } catch (err) {
       console.error("Submission Error:", err.response?.data || err.message);
-      alert(
-        err.response?.data?.error || "Edit failed! Check if Server is running.",
-      );
+      alert(err.response?.data?.message || "Action failed!");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete this job? This action cannot be undone.",
-      )
-    ) {
+    if (window.confirm("Are you sure?")) {
       try {
-        await axios.delete(`${BASE_URL}/api/jobs/${id}`);
-        fetchJobs();
+        const res = await axios.delete(`${BASE_URL}/api/jobs/${id}`);
+        if (res.status === 200) {
+          alert("Job deleted!");
+          fetchJobs();
+        }
       } catch (err) {
+        console.error("Delete Error:", err);
         alert("Delete failed.");
       }
     }
@@ -245,25 +218,18 @@ const AdminCareers = () => {
 
   const handleEdit = (job) => {
     if (!job) return;
-
-    // ১. বেসিক ফিল্ড সেট করা
     setEditingId(job._id);
     setTitle(job.title || "");
     setLocation(job.location || "On-site");
     setJobType(job.jobType || "Full Time");
     setSalary(job.salary || "Negotiable");
     setShift(job.shift || "Day Shift");
-
-    // ব্যাকএন্ডে iconName অথবা legacy icon থাকলে সেটা হ্যান্ডেল করা
     setIconName(job.iconName || job.icon || "Code");
 
-    // ২. সেকশন রিস্টোর করা (Mapping Logic সহ)
-    // কারণ আপনার Builder UI 'items' প্রপার্টি ব্যবহার করে ইনপুট রেন্ডার করে
     const restoredSections = (job.sections || []).map((sec) => {
       if (sec.type === "requirements") {
         return {
           ...sec,
-          // requirementItems কে আবার items এ রূপান্তর যাতে UI ফিল্ডে ডেটা দেখায়
           items: (sec.requirementItems || []).map((ri) => ({
             label: ri.label || "",
             desc: ri.desc || "",
@@ -274,10 +240,9 @@ const AdminCareers = () => {
     });
 
     setSections(restoredSections);
-
-    // ৩. স্মুথ স্ক্রল টু টপ
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   const resetForm = () => {
     setEditingId(null);
     setTitle("");

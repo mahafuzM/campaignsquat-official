@@ -12,6 +12,11 @@ import {
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 
+// ✅ ডাইনামিক বেস ইউআরএল সেটআপ
+const BASE_URL = window.location.hostname === "localhost" 
+  ? "http://localhost:5000" 
+  : "https://api.campaignsquat.com";
+
 const TechnicalEdgeAdmin = () => {
   const [mainHeader, setMainHeader] = useState("");
   const [subTitle, setSubTitle] = useState("");
@@ -20,22 +25,13 @@ const TechnicalEdgeAdmin = () => {
   ]);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+
   const commonIcons = [
-    "zap",
-    "shield",
-    "layers",
-    "map",
-    "cpu",
-    "database",
-    "code",
-    "globe",
-    "smartphone",
-    "server",
+    "zap", "shield", "layers", "map", "cpu", 
+    "database", "code", "globe", "smartphone", "server"
   ];
 
-  const BASE_URL = "https://api.campaignsquat.com";
-
-  // ১. আগের ডাটা লোড করা
+  // ১. আগের ডাটা লোড করা (Fetch Data)
   const fetchData = useCallback(async () => {
     try {
       const res = await axios.get(`${BASE_URL}/api/technical-edge`);
@@ -43,7 +39,7 @@ const TechnicalEdgeAdmin = () => {
         setMainHeader(res.data.mainHeader || "");
         setSubTitle(res.data.subTitle || "");
         setAssets(
-          res.data.assets || [{ icon: "zap", title: "", description: "" }],
+          res.data.assets || [{ icon: "zap", title: "", description: "" }]
         );
       }
     } catch (err) {
@@ -51,7 +47,7 @@ const TechnicalEdgeAdmin = () => {
     } finally {
       setFetching(false);
     }
-  }, [BASE_URL]);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -74,11 +70,12 @@ const TechnicalEdgeAdmin = () => {
     setAssets(newAssets);
   };
 
-  // ৫. ডাটা সেভ করা (POST or PUT লজিক ব্যাকএন্ড অনুযায়ী)
+  // ৫. ডাটা সেভ করা (Submit Data)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // ✅ এখানেও ডাইনামিক BASE_URL কাজ করবে
       await axios.post(`${BASE_URL}/api/technical-edge`, {
         mainHeader,
         subTitle,
@@ -86,7 +83,8 @@ const TechnicalEdgeAdmin = () => {
       });
       alert("Technical Edge Updated Successfully! 🔥");
     } catch (err) {
-      alert("Update failed. Check console.");
+      console.error("Update Error:", err);
+      alert(err.response?.data?.message || "Update failed. Check console.");
     } finally {
       setLoading(false);
     }
@@ -94,17 +92,18 @@ const TechnicalEdgeAdmin = () => {
 
   // আইকন প্রিভিউ ফাংশন
   const IconPreview = ({ name }) => {
-    const iconName = name
-      ? name.charAt(0).toUpperCase() + name.slice(1)
-      : "Box";
+    if (!name) return <LucideIcons.Box size={20} />;
+    const iconName = name.charAt(0).toUpperCase() + name.slice(1);
     const IconComponent = LucideIcons[iconName] || LucideIcons.Box;
     return <IconComponent size={20} />;
   };
 
   if (fetching)
     return (
-      <div className="p-20 text-center font-bold">Syncing Tactical Data...</div>
-    );
+      <div className="p-20 text-center font-black text-[#F7A400] tracking-widest animate-pulse">
+        Syncing Tactical Data...
+      </div>
+    )
 
   return (
     <div className="bg-[#f8f9fa] min-h-screen font-Inter pb-20">

@@ -9,6 +9,8 @@ import {
   Save,
   Edit,
   Trash,
+  Image as ImageIcon,
+  Loader2
 } from "lucide-react";
 
 const BlogManager = () => {
@@ -19,12 +21,16 @@ const BlogManager = () => {
   const [image, setImage] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [sections, setSections] = useState([
     { type: "text", value: "", items: [] },
   ]);
 
-  const BASE_URL = "https://api.campaignsquat.com";
+  // ✅ ডাইনামিক বেস ইউআরএল সেটআপ
+  const BASE_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
 
   // 🔥 ১০০% পারফেক্ট স্লাগ জেনারেটর লজিক
   const generateSlug = (text) => {
@@ -32,18 +38,16 @@ const BlogManager = () => {
       .toString()
       .toLowerCase()
       .trim()
-      .replace(/\s+/g, "-") // স্পেসকে হাইফেন দিয়ে রিপ্লেস করবে
-      .replace(/[^\w-]+/g, "") // স্পেশাল ক্যারেক্টার রিমুভ করবে
-      .replace(/--+/g, "-") // ডাবল হাইফেন রিমুভ করবে
-      .replace(/^-+/, "") // শুরুর হাইফেন রিমুভ করবে
-      .replace(/-+$/, ""); // শেষের হাইফেন রিমুভ করবে
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]+/g, "")
+      .replace(/--+/g, "-")
+      .replace(/^-+/, "")
+      .replace(/-+$/, "");
   };
 
-  // টাইটেল চেঞ্জ হলে অটো ইউআরএল সেট হবে
   const handleTitleChange = (e) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    // যদি এডিট মোডে না থাকো, তবেই অটো স্লাগ হবে (অথবা তোমার প্রয়োজন অনুযায়ী এডিট মোডেও দিতে পারো)
     if (!editingId) {
       setUrl(generateSlug(newTitle));
     }
@@ -113,6 +117,7 @@ const BlogManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const formData = new FormData();
     formData.append("title", title);
     formData.append("url", url);
@@ -128,22 +133,25 @@ const BlogManager = () => {
     try {
       if (editingId) {
         await axios.put(`${BASE_URL}/api/blogs/${editingId}`, formData);
-        alert("Blog Updated Successfully!");
+        alert("Blog Updated Successfully! 🔥");
       } else {
         await axios.post(`${BASE_URL}/api/blogs`, formData);
-        alert("Blog Published Successfully!");
+        alert("Blog Published Successfully! 🚀");
       }
       setEditingId(null);
       fetchBlogs();
+      // ফর্ম রিসেট করার জন্য রিলোড দিতে পারেন অথবা ম্যানুয়ালি স্টেট ক্লিয়ার করতে পারেন
       window.location.reload();
     } catch (err) {
       console.error("Error submitting:", err.response?.data);
       alert(err.response?.data?.message || "Submission failed.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this blog?")) {
+    if (window.confirm("Are you sure you want to delete this blog? 🗑️")) {
       try {
         await axios.delete(`${BASE_URL}/api/blogs/${id}`);
         setBlogs(blogs.filter((blog) => blog._id !== id));

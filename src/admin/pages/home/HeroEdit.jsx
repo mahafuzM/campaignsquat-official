@@ -18,35 +18,42 @@ const HeroEdit = () => {
     imageUrl: "",
   });
 
-  useEffect(() => {
+  // ১. ডাইনামিক API_BASE (বাকি কোডের সুবিধার্থে এটি যোগ করা হয়েছে)
+  const API_BASE = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
+
+ useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("https://api.campaignsquat.com/api/hero");
+        // ✅ হার্ডকোডেড ইউআরএল এর বদলে ডাইনামিক API_BASE ব্যবহার
+        const res = await axios.get(`${API_BASE}/api/hero`);
         if (res.data) {
           setContent(res.data);
-          if (res.data.imageUrl) setPreviewUrl(res.data.imageUrl);
+          // ইমেজ প্রিভিউ লজিক: যদি ইমেজ থাকে তবে ফুল পাথ তৈরি করবে
+          if (res.data.imageUrl) {
+             const fullImgPath = res.data.imageUrl.startsWith("http") 
+               ? res.data.imageUrl 
+               : `${API_BASE}/${res.data.imageUrl.replace(/\\/g, "/")}`;
+             setPreviewUrl(fullImgPath);
+          }
         }
 
-        const iconRes = await axios.get(
-          "https://api.campaignsquat.com/api/hero/icons",
-        );
+        const iconRes = await axios.get(`${API_BASE}/api/hero/icons`);
         setAvailableIcons(iconRes.data);
       } catch (err) {
         console.log("Error loading data:", err);
       }
     };
     fetchData();
-  }, []);
+  }, [API_BASE]);
 
   const handleAddIcon = async () => {
     if (!newIconName) return;
     try {
-      const res = await axios.post(
-        "https://api.campaignsquat.com/api/hero/icons/add",
-        {
-          name: newIconName.toLowerCase().trim(),
-        },
-      );
+      const res = await axios.post(`${API_BASE}/api/hero/icons/add`, {
+        name: newIconName.toLowerCase().trim(),
+      });
       setAvailableIcons([...availableIcons, res.data]);
       setNewIconName("");
     } catch (err) {
@@ -58,7 +65,7 @@ const HeroEdit = () => {
     e.stopPropagation();
     if (!window.confirm("Remove this icon from history?")) return;
     try {
-      await axios.delete(`https://api.campaignsquat.com/api/hero/icons/${id}`);
+      await axios.delete(`${API_BASE}/api/hero/icons/${id}`);
       setAvailableIcons(availableIcons.filter((icon) => icon._id !== id));
       if (availableIcons.find((i) => i._id === id)?.name === content.badge) {
         setContent({ ...content, badge: "" });
@@ -70,8 +77,10 @@ const HeroEdit = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -86,7 +95,7 @@ const HeroEdit = () => {
     if (selectedFile) formData.append("heroImage", selectedFile);
 
     try {
-      await axios.post("https://api.campaignsquat.com/api/hero", formData, {
+      await axios.post(`${API_BASE}/api/hero`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("Hero Section Updated Successfully! 🎉");

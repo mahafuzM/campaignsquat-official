@@ -10,10 +10,10 @@ const Questions = () => {
   useEffect(() => {
     const fetchFaqs = async () => {
       try {
-        // API URL আপনার লোকাল সার্ভার অনুযায়ী ঠিক আছে
-        const res = await axios.get("https://api.campaignsquat.com/api/faqs");
+        // ✅ ডোমেইন সরিয়ে শুধু এন্ডপয়েন্ট ব্যবহার করা হয়েছে
+        const res = await axios.get("/api/faqs");
         if (res.data) {
-          // সিরিয়াল মেইনটেইন করে স্টেটে সেট করা
+          // সিরিয়াল মেইনটেইন করে স্টেটে সেট করা
           const sortedFaqs = res.data.sort(
             (a, b) => (a.order || 0) - (b.order || 0),
           );
@@ -32,7 +32,7 @@ const Questions = () => {
 
   return (
     <section className="w-full bg-[#02050A] py-8 md:py-10 overflow-hidden font-poppins">
-      <div className="max-w-[1445px] mx-auto px- sm:px-10 md:px-16">
+      <div className="max-w-[1445px] mx-auto px-4 sm:px-10 md:px-16">
         {/* Header Section */}
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-[26px] md:text-[32px] lg:text-[40px] font-semibold text-white mb-4 md:mb-8 leading-[1.2]">
@@ -47,7 +47,6 @@ const Questions = () => {
         <div className="space-y-4 md:space-y-4">
           {faqs.map((faq, index) => (
             <div
-              // key হিসেবে _id ব্যবহার করা বেস্ট, না থাকলে ইনডেক্স
               key={faq._id || index}
               className={`border transition-all duration-300 rounded-[5px] md:rounded-[5px] ${
                 openIndex === index

@@ -1,4 +1,5 @@
 const Application = require("../models/Application");
+const fs = require("fs"); // File delete korar jonno
 
 // ১. অ্যাপ্লিকেশন সাবমিট করা
 exports.submitApplication = async (req, res) => {
@@ -14,11 +15,10 @@ exports.submitApplication = async (req, res) => {
       applied_for,
     } = req.body;
 
+    // ✅ Best Practice: Database-e sudhu filename ba relative path save kora
     let cvPath = "";
     if (req.file) {
-      // লোকালহোস্টের বদলে .env থেকে BASE_URL ব্যবহার করা হয়েছে
-      const baseUrl = process.env.BASE_URL || "http://localhost:5000";
-      cvPath = `${baseUrl}/uploads/${req.file.filename}`;
+      cvPath = `/uploads/${req.file.filename}`; 
     }
 
     const newApplication = new Application({
@@ -38,12 +38,14 @@ exports.submitApplication = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Application submitted and saved successfully!",
+      data: newApplication
     });
   } catch (error) {
     console.error("MongoDB Save Error:", error);
     res.status(500).json({
       success: false,
       message: "Database error! Could not save application.",
+      error: error.message
     });
   }
 };
@@ -52,19 +54,39 @@ exports.submitApplication = async (req, res) => {
 exports.getAllApplications = async (req, res) => {
   try {
     const applications = await Application.find().sort({ createdAt: -1 });
-    res.status(200).json(applications);
+    res.status(200).json({
+      success: true,
+      count: applications.length,
+      data: applications
+    });
   } catch (error) {
     console.error("Fetch Error:", error);
-    res.status(500).json({ message: "Error fetching applications" });
+    res.status(500).json({ success: false, message: "Error fetching applications" });
   }
 };
 
-// ৩. সিঙ্গেল অ্যাপ্লিকেশন ডিলিট করা
+// ৩. সিঙ্গেল অ্যাপ্লিকেশন ডিলিট করা (Sathe File-o delete hobe)
 exports.deleteApplication = async (req, res) => {
   try {
+    const application = await Application.findById(req.params.id);
+    
+    if (!application) {
+      return res.status(404).json({ success: false, message: "Application not found" });
+    }
+
+    // ✅ Extra Step: Database theke delete korar sathe physical file-ta delete kora
+    if (application.cv_file) {
+      const filePath = `./${application.cv_file}`; // Relative path structure
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
     await Application.findByIdAndDelete(req.params.id);
-    res.status(200).json({ success: true, message: "Application deleted successfully" });
+    
+    res.status(200).json({ success: true, message: "Application and CV deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting application" });
+    console.error("Delete Error:", error);
+    res.status(500).json({ success: false, message: "Error deleting application" });
   }
 };

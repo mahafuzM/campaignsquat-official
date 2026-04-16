@@ -69,14 +69,16 @@ const MegaMenuAdmin = () => {
   const [contentImage, setContentImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  const fetchMenus = async () => {
-    try {
-      const res = await axios.get(`${API_BASE}/api/megamenu`);
-      setMenus(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+const fetchMenus = async () => {
+  try {
+    // axios.defaults.baseURL সেট করা থাকলে শুধু পাথ দিলেই হবে
+    const res = await axios.get("/api/megamenu"); 
+    console.log("Data from backend:", res.data); // কনসোলে চেক করুন ডাটা আসছে কি না
+    setMenus(res.data);
+  } catch (err) {
+    console.error("Fetch Error:", err.response?.data || err.message);
+  }
+};
 
   useEffect(() => {
     fetchMenus();
@@ -1130,12 +1132,15 @@ const MegaMenuAdmin = () => {
                 {/* Left Side: Image & Core Info */}
                 <div className="flex items-center gap-6">
                   {item.image && (
-                    <img
-                      src={`${API_BASE}/${item.image}`}
-                      className="w-20 h-20 object-cover rounded-[5px] border border-black"
-                      alt={item.title}
-                    />
-                  )}
+  <img
+    // এখানে URL-টি ডাইনামিক করে দিন যাতে লোকাল এবং লাইভ দুই জায়গাতেই পায়
+    src={`${window.location.hostname === "localhost" ? "http://localhost:5000" : "https://api.campaignsquat.com"}/${item.image}`}
+    className="w-20 h-20 object-cover rounded-[5px] border border-black"
+    alt={item.title}
+    // যদি ইমেজ লোড হতে ফেইল করে তবে কনসোলে এরর দেখাবে
+    onError={(e) => console.log("Image Load Failed:", e.target.src)} 
+  />
+)}
 
                   <div>
                     {/* ১. ক্যাটাগরি (e.g., UI/UX Design) */}

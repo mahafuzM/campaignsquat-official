@@ -9,7 +9,8 @@ import {
   Loader2,
   AlertCircle,
   PlusCircle,
-} from "lucide-react";
+  LayoutGrid
+} from "lucide-react"; // ✅ Fixed here
 import { toast } from "react-hot-toast";
 
 const ServiceEcosystemAdmin = () => {
@@ -18,7 +19,11 @@ const ServiceEcosystemAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const BASE_URL = "https://api.campaignsquat.com";
+  // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ দুই জায়গায় কাজ করবে)
+  const BASE_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
+    
   const API_URL = `${BASE_URL}/api/creative-services`;
 
   useEffect(() => {
@@ -41,7 +46,7 @@ const ServiceEcosystemAdmin = () => {
       }
     };
     fetchServices();
-  }, []);
+  }, [API_URL]);
 
   const addService = () => setServices([...services, { name: "", url: "" }]);
 
@@ -54,14 +59,17 @@ const ServiceEcosystemAdmin = () => {
     );
     if (confirmDelete) {
       const updatedServices = services.filter((_, i) => i !== index);
+      // অপটিমিস্টিক আপডেট (সাথে সাথে ইউআই থেকে সরানো)
+      const originalServices = [...services];
       setServices(updatedServices);
+      
       try {
         setSaving(true);
         await axios.post(API_URL, { sectionTitle, services: updatedServices });
         toast.success("Deleted and Updated! 🚀");
       } catch (err) {
         toast.error("Failed to sync delete");
-        setServices(services);
+        setServices(originalServices);
       } finally {
         setSaving(false);
       }
@@ -77,10 +85,11 @@ const ServiceEcosystemAdmin = () => {
   const handleSave = async () => {
     if (services.some((s) => !s.name.trim()))
       return toast.error("Fill all names!");
+    
     setSaving(true);
     try {
       await axios.post(API_URL, { sectionTitle, services });
-      toast.success("All Changes Saved!");
+      toast.success("All Changes Saved Successfully!");
     } catch (err) {
       toast.error("Save Failed!");
     } finally {
@@ -90,8 +99,9 @@ const ServiceEcosystemAdmin = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-black" />
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-black mb-4" />
+        <p className="text-[10px] font-black uppercase tracking-[3px] text-gray-400">Syncing Ecosystem...</p>
       </div>
     );
 

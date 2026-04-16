@@ -33,17 +33,23 @@ const CampaignSquat = () => {
       "Campaignsquat Ltd is a premier tech agency where technical complexity meets aesthetic excellence.",
   });
 
+  // ✅ ১. স্মার্ট এপিআই ইউআরএল সেটআপ
+  const API_BASE = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
+
   useEffect(() => {
     const fetchAbout = async () => {
       try {
-        const res = await axios.get("https://api.campaignsquat.com/api/about");
+        // ✅ এক্সিওস এখন লোকাল বা লাইভ চিনে ডাটা আনবে
+        const res = await axios.get(`${API_BASE}/api/about`);
         if (res.data) setAboutData(res.data);
       } catch (err) {
         console.error("About data fetch error", err);
       }
     };
     fetchAbout();
-  }, []);
+  }, [API_BASE]);
 
   const stats = [
     {

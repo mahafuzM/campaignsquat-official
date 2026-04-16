@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Upload, X, Image as ImageIcon, Plus, Loader2, Trash2 } from "lucide-react";
 
 const AboutGalleryEdit = () => {
   const [images, setImages] = useState([]);
   const [uploading, setUploading] = useState(false);
 
-  // আপনার বেইজ URL
-  const BASE_URL = "https://api.campaignsquat.com";
+  // app.jsx থেকে আসা বেইজ URL
+  const API_BASE = axios.defaults.baseURL;
 
   useEffect(() => {
     const fetchGallery = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/about-gallery`);
-        // ডাটাবেস থেকে সরাসরি অ্যারে আসতে পারে অথবা অবজেক্টের ভেতর images থাকতে পারে
+        const res = await axios.get("/api/about-gallery");
         const data = res.data.images || res.data;
         if (Array.isArray(data)) setImages(data);
       } catch (err) {
@@ -31,23 +31,18 @@ const AboutGalleryEdit = () => {
     formData.append("file", file);
 
     try {
-      // ১. ফাইল আপলোড করা
-      const res = await axios.post(`${BASE_URL}/api/upload`, formData);
-
-      // ২. নতুন ইমেজ পাথ অ্যারেতে যোগ করা
+      // ১. ফাইল আপলোড
+      const res = await axios.post("/api/upload", formData);
       const newImageUrl = res.data.url;
       const updatedImages = [...images, newImageUrl];
 
-      // ৩. ডাটাবেসে নতুন অ্যারে আপডেট করা
-      const updateRes = await axios.post(
-        `${BASE_URL}/api/about-gallery/update`,
-        { images: updatedImages },
-      );
+      // ২. ডাটাবেসে অ্যারে আপডেট
+      const updateRes = await axios.post("/api/about-gallery/update", { 
+        images: updatedImages 
+      });
 
       if (updateRes.data) {
-        // আপডেট হওয়ার পর নতুন লিস্ট সেট করা (যাতে সাথে সাথে প্রিভিউ দেখা যায়)
         setImages(updateRes.data.images || updatedImages);
-        alert("✅ Upload Success!");
       }
     } catch (err) {
       console.error(err);
@@ -58,82 +53,119 @@ const AboutGalleryEdit = () => {
   };
 
   const removeImage = async (index) => {
-    if (window.confirm("Delete this image?")) {
+    if (window.confirm("Are you sure you want to remove this memory?")) {
       const updatedImages = images.filter((_, i) => i !== index);
-      setImages(updatedImages);
+      const originalImages = [...images]; // ব্যাকআপ
+      
+      setImages(updatedImages); // UI আপডেট আগে (Optimistic Update)
+
       try {
-        await axios.post(`${BASE_URL}/api/about-gallery/update`, {
-          images: updatedImages,
-        });
+        await axios.post("/api/about-gallery/update", { images: updatedImages });
       } catch (err) {
         alert("❌ Delete sync failed!");
-        // ভুল হলে আবার আগের ডাটা নিয়ে আসা
+        setImages(originalImages); // ভুল হলে আগের ডাটা ফিরিয়ে আনা
       }
     }
   };
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen font-poppins text-black">
-      <h2 className="text-3xl font-bold mb-8 border-b-4 border-[#F7A400] pb-2 inline-block text-black">
-        Gallery Image Management
-      </h2>
+    <div className="p-6 md:p-10 bg-[#F8FAFC] min-h-screen font-poppins text-slate-900">
+      
+      {/* Header Section */}
+      <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
+        <div>
+          <h2 className="text-3xl font-black text-black tracking-tighter uppercase italic">
+            Gallery <span className="text-[#F7A400]">Manager</span>
+          </h2>
+          <p className="text-slate-500 text-sm mt-1">Organize and maintain your office & team memories</p>
+        </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        {images.map((img, idx) => {
-          // ✅ স্লাশ হ্যান্ডেলিং লজিক
-          const fullImgUrl = img.startsWith("http")
-            ? img
-            : `${BASE_URL}${img.startsWith("/") ? "" : "/"}${img}`;
-
-          return (
-            <div
-              key={idx}
-              className="relative aspect-[3/4] rounded-xl shadow-lg border-2 border-white bg-white group"
-            >
-              {/* মেইন ইমেজ */}
-              <img
-                src={fullImgUrl}
-                className="w-full h-full object-cover rounded-xl"
-                alt="Gallery Item"
-                onError={(e) => {
-                  e.target.src =
-                    "https://via.placeholder.com/300x400?text=Image+Not+Found";
-                }}
-              />
-
-              {/* 🔴 ডিলিট বাটন */}
-              <button
-                onClick={() => removeImage(idx)}
-                className="absolute -top-3 -right-3 bg-red-600 hover:bg-red-800 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-xl z-10 border-2 border-white transition-transform active:scale-90"
-                title="Remove Image"
-              >
-                <span className="text-sm font-bold">✕</span>
-              </button>
-            </div>
-          );
-        })}
-
-        {/* আপলোড কার্ড */}
-        <label className="border-3 border-dashed border-gray-400 flex flex-col items-center justify-center aspect-[3/4] rounded-xl cursor-pointer hover:border-[#F7A400] hover:bg-orange-50 transition-all">
-          <input
-            type="file"
-            hidden
-            onChange={handleUpload}
-            disabled={uploading}
-            accept="image/*"
-          />
-          <div className="text-4xl text-gray-400 mb-2">
-            {uploading ? (
-              <div className="animate-spin h-8 w-8 border-4 border-t-[#F7A400] rounded-full border-gray-200"></div>
-            ) : (
-              "+"
-            )}
+        <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
+          <div className="px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
+            <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Total Images</span>
+            <span className="text-xl font-black text-black">{images.length}</span>
           </div>
-          <span className="text-xs font-bold text-gray-500 uppercase">
-            {uploading ? "Uploading" : "Add New"}
-          </span>
-        </label>
+        </div>
       </div>
+
+      <div className="max-w-[1600px] mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 md:gap-8">
+          
+          {/* Add New Image Card */}
+          <label className="group relative flex flex-col items-center justify-center aspect-[3/4] rounded-3xl border-3 border-dashed border-slate-200 bg-white hover:border-[#F7A400] hover:bg-orange-50/30 transition-all cursor-pointer overflow-hidden order-first">
+            <input
+              type="file"
+              hidden
+              onChange={handleUpload}
+              disabled={uploading}
+              accept="image/*"
+            />
+            {uploading ? (
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="h-10 w-10 text-[#F7A400] animate-spin" />
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">Uploading...</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-[#F7A400] group-hover:text-white transition-colors">
+                  <Plus size={32} />
+                </div>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-black transition-colors">Add Memory</span>
+              </div>
+            )}
+          </label>
+
+          {/* Gallery Items */}
+          {images.map((img, idx) => {
+            const cleanPath = img.startsWith("/") ? img : `/${img}`;
+            const fullImgUrl = img.startsWith("http") ? img : `${API_BASE}${cleanPath}`;
+
+            return (
+              <div
+                key={idx}
+                className="group relative aspect-[3/4] rounded-3xl overflow-hidden bg-slate-200 shadow-sm hover:shadow-2xl hover:shadow-orange-200/50 transition-all duration-500 border-4 border-white"
+              >
+                {/* Main Image */}
+                <img
+                  src={fullImgUrl}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  alt="Gallery Item"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/600x800?text=Error+Loading";
+                  }}
+                />
+
+                {/* Overlays & Actions */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <button
+                      onClick={() => removeImage(idx)}
+                      className="w-full bg-white/10 backdrop-blur-md hover:bg-red-500 text-white py-3 rounded-2xl flex items-center justify-center gap-2 transition-all border border-white/20 active:scale-95"
+                    >
+                      <Trash2 size={16} />
+                      <span className="text-xs font-bold uppercase tracking-wider">Remove</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Number Badge */}
+                <div className="absolute top-4 left-4 w-7 h-7 bg-white/20 backdrop-blur-md rounded-lg flex items-center justify-center text-[10px] font-bold text-white border border-white/30">
+                  {idx + 1}
+                </div>
+              </div>
+            );
+          })}
+
+        </div>
+      </div>
+
+      {/* Empty State */}
+      {images.length === 0 && !uploading && (
+        <div className="flex flex-col items-center justify-center py-32 text-slate-300">
+          <ImageIcon size={64} strokeWidth={1} />
+          <p className="mt-4 font-medium uppercase tracking-widest text-sm">No images in gallery yet</p>
+        </div>
+      )}
     </div>
   );
 };

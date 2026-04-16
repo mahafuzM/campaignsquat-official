@@ -7,6 +7,20 @@ const ProductManager = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // ✅ Local vs Production Dynamic API URL
+  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
+
+    const getImgUrl = (imagePath) => {
+    if (!imagePath) return ""; 
+    if (imagePath.startsWith("http")) return imagePath; 
+    
+    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+    return `${BASE_URL}${cleanPath}`;
+  };
 
   // মেইন স্টেট
   const [formData, setFormData] = useState({
@@ -17,23 +31,26 @@ const ProductManager = () => {
     image: null,
   });
 
-  // ডাইনামিক সেকশন স্টেট (রাইট সাইডের জন্য)
+  // ডাইনামিক সেকশন স্টেট
   const [sections, setSections] = useState([]);
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(
-        "https://api.campaignsquat.com/api/products/all",
-      );
-      setProducts(res.data);
+      setLoading(true);
+      const res = await axios.get(`${BASE_URL}/api/products/all`);
+      // Data parsing safety
+      const actualData = Array.isArray(res.data) ? res.data : (res.data.data || []);
+      setProducts(actualData);
     } catch (err) {
       console.error("Error fetching products:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [BASE_URL]);
 
   // --- Dynamic Block Logic ---
   const addSection = (type) => {
@@ -72,9 +89,9 @@ const ProductManager = () => {
     }
   };
 
-  // ফিক্সড সাবমিট ফাংশন
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const data = new FormData();
     data.append("name", formData.name);
@@ -88,24 +105,15 @@ const ProductManager = () => {
     }
 
     try {
-      // কনফিগ যোগ করা হয়েছে যাতে মাল্টিপার্ট ডেটা ঠিকঠাক যায়
       const config = {
         headers: { "Content-Type": "multipart/form-data" },
       };
 
       if (isEditing) {
-        await axios.put(
-          `https://api.campaignsquat.com/api/products/${currentId}`,
-          data,
-          config,
-        );
+        await axios.put(`${BASE_URL}/api/products/${currentId}`, data, config);
         alert("Product Updated!");
       } else {
-        await axios.post(
-          "https://api.campaignsquat.com/api/products/add",
-          data,
-          config,
-        );
+        await axios.post(`${BASE_URL}/api/products/add`, data, config);
         alert("Product Added!");
       }
       resetForm();
@@ -113,6 +121,8 @@ const ProductManager = () => {
     } catch (err) {
       console.error("Submission Error:", err.response?.data || err.message);
       alert("Action failed! Check console for errors.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -127,14 +137,29 @@ const ProductManager = () => {
       image: null,
     });
     setSections(product.contentSections || []);
-    setPreviewUrl(`https://api.campaignsquat.com${product.image}`);
+    
+    // ✅ Perfect Image Path Handling
+    let imagePath = "";
+    if (product.image) {
+      if (product.image.startsWith('http')) {
+        // Jodi direct Cloudinary ba online link hoy
+        imagePath = product.image;
+      } else {
+        // Backend folder theke asle: BASE_URL + slash + image path
+        // path-er শুরুতে slash thakle seta bad diye amra safe vabe slash add korbo
+        const cleanPath = product.image.startsWith('/') ? product.image : `/${product.image}`;
+        imagePath = `${BASE_URL}${cleanPath}`;
+      }
+    }
+    
+    setPreviewUrl(imagePath);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.delete(`https://api.campaignsquat.com/api/products/${id}`);
+        await axios.delete(`${BASE_URL}/api/products/${id}`);
         fetchProducts();
       } catch (err) {
         console.error("Error deleting product:", err);
@@ -212,12 +237,12 @@ const ProductManager = () => {
                     required={!isEditing}
                   />
                   {previewUrl && (
-                    <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="mt-3 w-32 h-32 object-cover rounded-[5px] border shadow-sm"
-                    />
-                  )}
+  <img
+    src={previewUrl} // PreviewUrl e amra agei full path set korchi handleEdit e
+    alt="Preview"
+    className="mt-3 w-32 h-32 object-cover rounded-[5px] border border-white/10 shadow-sm"
+  />
+)}
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -412,12 +437,12 @@ const ProductManager = () => {
                   className="hover:bg-gray-50/50 transition-colors"
                 >
                   <td className="p-6 w-32">
-                    <img
-                      src={`https://api.campaignsquat.com${p.image}`}
-                      className="w-16 h-16 object-cover rounded-[5px] border"
-                      alt=""
-                    />
-                  </td>
+  <img
+    src={getImgUrl(p.image)} // Ekhan theke dynamic BASE_URL onujayi image asbe
+    className="w-16 h-16 object-cover rounded-[5px] border border-white/10"
+    alt={p.name}
+  />
+</td>
                   <td className="p-6">
                     <div className="font-bold text-gray-900">{p.name}</div>
                     <div className="text-xs text-gray-400 mt-1 line-clamp-1">

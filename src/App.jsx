@@ -1,3 +1,12 @@
+if (
+  window.location.hostname !== "localhost" && 
+  window.location.hostname !== "127.0.0.1"
+) {
+  console.log = () => {};
+  console.error = () => {};
+  console.warn = () => {};
+}
+
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
@@ -12,8 +21,10 @@ import TagManager from "react-gtm-module";
 import "react-quill/dist/quill.snow.css";
 import { Toaster } from "react-hot-toast";
 
-// ✅ Axios ডিফল্ট কনফিগারেশন
-axios.defaults.baseURL = "https://api.campaignsquat.com";
+// ✅ এটি হুবহু কপি করে বসান
+axios.defaults.baseURL = window.location.hostname === "localhost" 
+  ? "http://localhost:5000" 
+  : "https://api.campaignsquat.com";
 
 // 🛡️ Axios Interceptor
 axios.interceptors.request.use((config) => {
@@ -101,9 +112,9 @@ const ApplicationDetails = lazy(
 );
 
 // ✅ SEO Manager (অন্যান্য পেজের জন্য)
-const OtherPageManager = lazy(
-  () => import("./admin/pages/OtherPages/OtherPageManager"),
-);
+// ✅ এটি একদম নিখুঁত ফরম্যাট
+const OtherPageManager = lazy(() => import("./admin/pages/OtherPages/OtherPageManager"));
+
 const AdminPasswordChange = lazy(
   () => import("./admin/pages/settings/AdminPasswordChange"),
 );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Upload, Send, Image as ImageIcon, CheckCircle } from "lucide-react";
 
 const AboutHeroEdit = () => {
   const [formData, setFormData] = useState({
@@ -9,28 +10,28 @@ const AboutHeroEdit = () => {
   });
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-
-  // ইমেজ ফাইল এবং প্রিভিউয়ের জন্য স্টেট
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+
+  // ডাইনামিক API BASE (আপনার আগের লজিক অনুযায়ী)
+  const API_BASE = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          "https://api.campaignsquat.com/api/about-content/hero",
-        );
+        const res = await axios.get(`${API_BASE}/api/about-content/hero`);
         if (res.data) {
           setFormData({
             title: res.data.title || "",
             description: res.data.description || "",
             imageUrl: res.data.imageUrl || "",
           });
-          // ডাটাবেসে ইমেজ থাকলে প্রিভিউ দেখানো
           if (res.data.imageUrl) {
-            setImagePreview(
-              `https://api.campaignsquat.com${res.data.imageUrl}`,
-            );
+            // স্লাশ চেক করে প্রিভিউ সেট করা
+            const imgPath = res.data.imageUrl.startsWith('/') ? res.data.imageUrl : `/${res.data.imageUrl}`;
+            setImagePreview(`${API_BASE}${imgPath}`);
           }
         }
       } catch (err) {
@@ -38,9 +39,8 @@ const AboutHeroEdit = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [API_BASE]);
 
-  // ফাইল সিলেক্ট হ্যান্ডলার
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -57,124 +57,140 @@ const AboutHeroEdit = () => {
     try {
       let finalImageUrl = formData.imageUrl;
 
-      // ১. যদি নতুন ছবি সিলেক্ট করা থাকে তবে আপলোড হবে
       if (selectedFile) {
         const uploadData = new FormData();
         uploadData.append("file", selectedFile);
-        const uploadRes = await axios.post(
-          "https://api.campaignsquat.com/api/upload",
-          uploadData,
-        );
+        const uploadRes = await axios.post(`${API_BASE}/api/upload`, uploadData);
         finalImageUrl = uploadRes.data.url;
       }
 
-      // ২. মেইন ডাটা আপডেট (হিস্টোরি ছাড়া)
-      const res = await axios.post(
-        "https://api.campaignsquat.com/api/about-content/hero/update",
-        {
-          title: formData.title,
-          description: formData.description,
-          imageUrl: finalImageUrl,
-        },
-      );
+      const res = await axios.post(`${API_BASE}/api/about-content/hero/update`, {
+        title: formData.title,
+        description: formData.description,
+        imageUrl: finalImageUrl,
+      });
 
       if (res.data.success) {
-        setStatus("✅ Content Updated Successfully!");
+        setStatus("success");
         setSelectedFile(null);
-        setTimeout(() => setStatus(""), 3000);
+        setTimeout(() => setStatus(""), 4000);
       }
     } catch (err) {
       console.error("Error:", err);
-      setStatus("❌ Error Syncing Data!");
+      setStatus("error");
     }
     setLoading(false);
   };
 
   return (
-    <div className="p-4 md:p-8 bg-white min-h-screen text-black font-poppins w-full">
-      {/* Header - Full Display */}
-      <div className="flex justify-between items-center mb-8 w-full border-b border-gray-100 pb-4">
-        <h2 className="text-3xl font-bold  tracking-tighter text-black">
-          About Hero Control
-        </h2>
-        {status && (
-          <span className="text-green-600 font-bold bg-green-50 px-4 py-1 rounded-[5px]">
-            {status}
-          </span>
+    <div className="p-6 md:p-10 bg-[#F9FAFB] min-h-screen font-poppins text-slate-900">
+      {/* Header Section */}
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+        <div>
+          <h2 className="text-3xl font-black text-black tracking-tight uppercase italic">
+            About Hero <span className="text-[#F7A400]">Editor</span>
+          </h2>
+          <p className="text-slate-500 text-sm mt-1">Manage your website's about page hero section</p>
+        </div>
+
+        {status === "success" && (
+          <div className="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-lg border border-green-200 animate-bounce">
+            <CheckCircle size={18} />
+            <span className="font-bold text-sm">Successfully Pushed to Live!</span>
+          </div>
         )}
       </div>
 
-      <div className="w-full">
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Left Column: Headline & Image */}
-            <div className="space-y-8">
-              <div>
-                <label className="block font-bold mb-2  text-[12px] text-black">
-                  Main Headline
+      <div className="max-w-6xl mx-auto">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Left Side - Form Inputs (8 Columns) */}
+          <div className="lg:col-span-8 space-y-6">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+              <div className="mb-6">
+                <label className="text-[11px] uppercase tracking-widest font-black text-slate-400 mb-2 block">
+                  Hero Headline
                 </label>
                 <textarea
-                  className="w-full bg-gray-50 border border-gray-200 p-5 rounded-[5px] focus:border-black outline-none h-40 text-xl font-semibold"
+                  className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl focus:border-[#F7A400] focus:bg-white outline-none h-32 text-xl font-bold transition-all"
                   value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  placeholder="Enter main headline..."
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="e.g. We Build Digital Products That Matter"
                 />
               </div>
 
               <div>
-                <label className="block font-bold mb-2 text-[12px]  text-black">
-                  Desktop Image Upload
+                <label className="text-[11px] uppercase tracking-widest font-black text-slate-400 mb-2 block">
+                  Detailed Description
                 </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  className="w-full bg-gray-50 border border-gray-200 p-4 rounded-[5px] cursor-pointer file:mr-4 file:py-2 file:px-6 file:rounded-[5px] file:border-0 file:text-sm file:font-bold file:bg-black file:text-white"
+                <textarea
+                  className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl focus:border-[#F7A400] focus:bg-white outline-none h-80 leading-relaxed text-slate-600 transition-all"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Tell your story here..."
                 />
-
-                {/* Image Preview Area */}
-                {imagePreview && (
-                  <div className="mt-6 border border-gray-200 p-2 rounded-[5px] bg-gray-50">
-                    <p className="text-[10px] text-gray-400 mb-2 font-bold ">
-                      Image Preview:
-                    </p>
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-72 object-cover rounded-[5px] shadow-sm"
-                    />
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* Right Column: Description */}
-            <div className="flex flex-col">
-              <label className="block font-bold mb-2  text-[12px]  text-black">
-                Full Description
-              </label>
-              <textarea
-                className="w-full bg-gray-50 border border-gray-200 p-5 rounded-[5px] focus:border-black outline-none flex-grow min-h-[500px] leading-relaxed text-gray-800"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                placeholder="Enter detailed description..."
-              />
+            {/* Submit Button Area */}
+            <div className="flex items-center gap-4">
+              <button
+                type="submit"
+                className={`flex-grow md:flex-grow-0 group bg-black text-white px-10 py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all active:scale-95 ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-[#F7A400] hover:text-black'}`}
+                disabled={loading}
+              >
+                {loading ? "SYNCING..." : "PUBLISH CHANGES"}
+                <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </button>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-gray-100">
-            <button
-              type="submit"
-              className="bg-[#F7A400] text-black text-[14px] md:text-[15px] hover:text-white hover:bg-[#02050A] font-semibold py-2 px-8 rounded-[5px] border-2 border-[#F7A400] transition-all duration-300 flex items-center gap-2"
-              disabled={loading}
-            >
-              {loading ? "SYNCING DATA..." : "PUSH TO LIVE SITE"}
-            </button>
+          {/* Right Side - Media Upload (4 Columns) */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <label className="text-[11px] uppercase tracking-widest font-black text-slate-400 mb-4 block">
+                Feature Image
+              </label>
+              
+              <div className="relative group overflow-hidden rounded-xl bg-slate-100 aspect-square mb-4 border-2 border-dashed border-slate-200 flex items-center justify-center">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                ) : (
+                  <div className="text-center p-6">
+                    <ImageIcon className="mx-auto text-slate-300 mb-2" size={48} />
+                    <p className="text-xs text-slate-400">No image selected</p>
+                  </div>
+                )}
+                
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                   <label className="cursor-pointer bg-white text-black px-4 py-2 rounded-lg font-bold text-xs flex items-center gap-2 shadow-xl">
+                      <Upload size={14} /> REPLACE
+                      <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} />
+                   </label>
+                </div>
+              </div>
+
+              <p className="text-[10px] text-slate-400 text-center italic">
+                Recommended: 1200 x 800px (PNG/JPG)
+              </p>
+            </div>
+
+            {/* Quick Status Card */}
+            <div className="bg-black p-6 rounded-2xl shadow-lg text-white">
+               <h4 className="text-[10px] uppercase tracking-[3px] font-bold text-[#F7A400] mb-4">Live Preview Info</h4>
+               <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/50 text-xs">Title Length:</span>
+                    <span className="font-mono">{formData.title.length} chars</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/50 text-xs">Last Status:</span>
+                    <span className="text-green-400 font-bold">{status === "success" ? "Updated" : "Synced"}</span>
+                  </div>
+               </div>
+            </div>
           </div>
+
         </form>
       </div>
     </div>

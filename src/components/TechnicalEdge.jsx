@@ -3,14 +3,18 @@ import axios from "axios";
 import * as LucideIcons from "lucide-react";
 
 const TechnicalEdge = () => {
-  // ১. মেমোরি থেকে ইনস্ট্যান্ট ডেটা লোড
+  // ১. মেমোরি থেকে ইনস্ট্যান্ট ডেটা লোড (আপনার লজিক ঠিক আছে)
   const [data, setData] = useState(() => {
     const saved = sessionStorage.getItem("cached_tech_edge");
     return saved ? JSON.parse(saved) : null;
   });
 
   const [loading, setLoading] = useState(!data);
-  const BASE_URL = "https://api.campaignsquat.com";
+
+  // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ দুই জায়গায় কাজ করবে)
+  const BASE_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,21 +31,18 @@ const TechnicalEdge = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [BASE_URL]);
 
   // ✅ আইকন রেন্ডার করার পারফেক্ট লজিক
   const DynamicIcon = ({ name, size = 22 }) => {
     if (!name) return <LucideIcons.Box size={size} />;
 
-    // ১. 'shield-check' কে 'ShieldCheck' বানানোর ম্যাজিক লজিক
     const formattedName = name
       .split("-")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join("");
 
-    // ২. চেক করা যে এই নামে কোনো আইকন Lucide এ আছে কি না
     const IconComponent = LucideIcons[formattedName] || LucideIcons.Box;
-
     return <IconComponent size={size} strokeWidth={2.5} />;
   };
 

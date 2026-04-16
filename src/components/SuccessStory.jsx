@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
+// ✅ ডাইনামিক বেস ইউআরএল সেটআপ
+const BASE_URL = window.location.hostname === "localhost" 
+  ? "http://localhost:5000" 
+  : "https://api.campaignsquat.com";
+
 const SuccessStory = () => {
   const [data, setData] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -10,9 +15,8 @@ const SuccessStory = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          "https://api.campaignsquat.com/api/success-story",
-        );
+        // ✅ হার্ডকোডেড লিঙ্কের বদলে BASE_URL ব্যবহার
+        const res = await axios.get(`${BASE_URL}/api/success-story`);
         if (res.data) setData(res.data);
       } catch (err) {
         console.error("Fetch error:", err);
@@ -148,14 +152,14 @@ const SuccessStory = () => {
 
 const Card = ({ item, accentColor }) => (
   <div className="bg-[#02050A] border border-gray-900 flex flex-col md:flex-row items-stretch transition-all duration-300 hover:border-[#f7a400] rounded-[5px] overflow-hidden h-full cursor-pointer group">
-    {/* Image Section - Mobile optimized height */}
     <div className="w-full md:w-[40%] shrink-0 relative overflow-hidden">
       <img
         src={
           item.image
             ? item.image.startsWith("http")
               ? item.image
-              : `https://api.campaignsquat.com${item.image.startsWith("/") ? "" : "/"}${item.image}`
+              // ✅ এখানে BASE_URL ব্যবহার করা হয়েছে
+              : `${BASE_URL}${item.image.startsWith("/") ? "" : "/"}${item.image}`
             : ""
         }
         alt={item.name}
@@ -179,7 +183,6 @@ const Card = ({ item, accentColor }) => (
       </div>
     </div>
 
-    {/* Content Section - Adjusted padding and text size for mobile */}
     <div className="flex flex-col w-full p-5 md:p-8 justify-center overflow-hidden">
       <div
         className="flex gap-1 mb-2 md:mb-3"

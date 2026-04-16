@@ -16,6 +16,11 @@ const ApplyjobPage = () => {
   const [status, setStatus] = useState(null);
   const [fileName, setFileName] = useState("No file selected");
 
+  // ✅ Local vs Production Dynamic API URL
+  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
+
   // ক্যারিয়ার পেজ থেকে আসা জবের টাইটেল ধরা হচ্ছে
   const jobTitle = location.state?.jobTitle || "General Application";
 
@@ -27,8 +32,7 @@ const ApplyjobPage = () => {
     const file = e.target.files[0];
     if (file) {
       const fileSizeKB = file.size / 1024;
-      // ১৫ এমবি = ১৫ * ১০২৪ = ১৫৩৬০ কেবি
-      const limit = 15360;
+      const limit = 15360; // 15 MB
 
       if (fileSizeKB > limit) {
         alert(`Warning: File is too large! Maximum size allowed is 15 MB.`);
@@ -44,13 +48,12 @@ const ApplyjobPage = () => {
     e.preventDefault();
     setLoading(true);
 
-    // FormData অবজেক্টে ফর্মের সব ইনপুট ডাটা (hidden input সহ) চলে আসবে
     const formDataObj = new FormData(formRef.current);
 
     try {
-      // ১. ব্যাকএন্ডে ডেটা পাঠানো
+      // ১. ব্যাকএন্ডে ডেটা পাঠানো (Dynamic BASE_URL use kora hoyeche)
       await axios.post(
-        "https://api.campaignsquat.com/api/applications/apply",
+        `${BASE_URL}/api/applications/apply`,
         formDataObj,
         {
           headers: {
@@ -77,7 +80,7 @@ const ApplyjobPage = () => {
       formRef.current.reset();
     } catch (error) {
       setLoading(false);
-      console.error("Submission Error:", error);
+      console.error("Submission Error:", error.response?.data || error.message);
       const errorMsg =
         error.response?.data?.message ||
         "Application failed. Please try again.";
@@ -85,15 +88,11 @@ const ApplyjobPage = () => {
     }
   };
 
-  const labelStyle =
-    "block text-white text-[14px] md:text-[18px] font-medium mb-2 md:mb-3";
-  const inputStyle =
-    "w-full bg-white/5 border border-white/10 rounded-[5px] px-5 py-2 md:py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#F7A400] transition-all text-[12px] md:text-[15px]";
+  const labelStyle = "block text-white text-[14px] md:text-[18px] font-medium mb-2 md:mb-3";
+  const inputStyle = "w-full bg-white/5 border border-white/10 rounded-[5px] px-5 py-2 md:py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#F7A400] transition-all text-[12px] md:text-[15px]";
   const cardWrapper = "relative p-[2px] overflow-hidden rounded-[5px] group";
-  const runningBorderBg =
-    "absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000_0%,#000_40%,#F7A400_50%,#000_60%,#000_100%)]";
-  const cardInner =
-    "relative bg-[#0a0a0a] rounded-[5px] p-8 md:p-12 h-full w-full";
+  const runningBorderBg = "absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000_0%,#000_40%,#F7A400_50%,#000_60%,#000_100%)]";
+  const cardInner = "relative bg-[#0a0a0a] rounded-[5px] p-8 md:p-12 h-full w-full";
 
   return (
     <main className="bg-[#02050a] font-poppins min-h-screen pt-28 pb-20 relative">
@@ -158,7 +157,7 @@ const ApplyjobPage = () => {
               </p>
             </div>
 
-            <form ref={formRef} className="space-y-10" onSubmit={handleSubmit}>
+            <form ref={formRef} onSubmit={handleSubmit}>
               {/* ব্যাকএন্ডে জবের নাম পাঠানোর জন্য হিডেন ইনপুট */}
               <input type="hidden" name="applied_for" value={jobTitle} />
 
@@ -292,14 +291,14 @@ const ApplyjobPage = () => {
               </div>
 
               <div className="pt-10 border-t border-white/10 flex flex-col md:flex-row items-center gap-6">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-[#F7A400] border-2 border-[#F7A400] text-black hover:text-white font-semibold px-8 md:px-10 py-2 rounded-[5px] text-[12px] md:text-[15px] hover:bg-transparent transition-all transform active:scale-95 flex items-center justify-center gap-3"
-                >
-                  {loading && <FaSpinner className="animate-spin" />}
-                  {loading ? "Submitting..." : "Submit Application"}
-                </button>
+               <button
+      type="submit" // Type must be 'submit'
+      disabled={loading}
+      className="bg-[#F7A400] border-2 border-[#F7A400] text-black hover:text-white font-semibold px-8 md:px-10 py-2 rounded-[5px] text-[12px] md:text-[15px] hover:bg-transparent transition-all transform active:scale-95 flex items-center justify-center gap-3"
+    >
+      {loading && <FaSpinner className="animate-spin" />}
+      {loading ? "Submitting..." : "Submit Application"}
+    </button>
 
                 <button
                   type="reset"

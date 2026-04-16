@@ -14,9 +14,8 @@ const AdminWorkProcess = () => {
 
   const fetchSteps = async () => {
     try {
-      const res = await axios.get(
-        "https://api.campaignsquat.com/api/work-process",
-      );
+      // ✅ Dynamic URL: axios.defaults.baseURL theke nibe
+      const res = await axios.get("/api/work-process");
       setSteps(res.data);
     } catch (err) {
       console.error("Fetch Error:", err);
@@ -46,16 +45,12 @@ const AdminWorkProcess = () => {
 
     try {
       if (isEditing) {
-        await axios.put(
-          `https://api.campaignsquat.com/api/work-process/${editId}`,
-          data,
-        );
+        // ✅ Dynamic URL: localhost ba live auto detect hobe
+        await axios.put(`/api/work-process/${editId}`, data);
         alert("Updated Successfully! ✅");
       } else {
-        await axios.post(
-          "https://api.campaignsquat.com/api/work-process",
-          data,
-        );
+        // ✅ Dynamic URL
+        await axios.post("/api/work-process", data);
         alert("Added Successfully! ✅");
       }
       resetForm();
@@ -68,9 +63,8 @@ const AdminWorkProcess = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure?")) {
       try {
-        await axios.delete(
-          `https://api.campaignsquat.com/api/work-process/${id}`,
-        );
+        // ✅ Dynamic URL
+        await axios.delete(`/api/work-process/${id}`);
         fetchSteps();
       } catch (err) {
         console.error("Delete Error:", err);
@@ -206,8 +200,9 @@ const AdminWorkProcess = () => {
                 >
                   <div className="flex items-center gap-5">
                     <div className="w-14 h-14 bg-gray-900 rounded-[5px] flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                      {/* ✅ Dynamic Image Path: baseURL theke nibe */}
                       <img
-                        src={`https://api.campaignsquat.com${step.image}`}
+                        src={`${axios.defaults.baseURL}${step.image}`}
                         alt=""
                         className="w-8 h-8 object-contain brightness-0 invert"
                       />

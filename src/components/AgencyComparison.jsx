@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Check, X, ArrowRight } from "lucide-react";
+import { Check, X, ArrowRight, ShieldCheck } from "lucide-react";
 
 const AgencyComparison = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const BASE_URL = "https://api.campaignsquat.com";
+  // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ অটোমেটিক হ্যান্ডেল করবে)
+  const BASE_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +25,7 @@ const AgencyComparison = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [BASE_URL]);
 
   if (loading && !data) return null;
 

@@ -4,12 +4,14 @@ import axios from "axios";
 const AboutTeam = () => {
   const [data, setData] = useState(null);
 
+  // app.jsx থেকে আসা বেইজ URL
+  const API_BASE = axios.defaults.baseURL;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          "https://api.campaignsquat.com/api/about-team",
-        );
+        // সরাসরি এন্ডপয়েন্ট ব্যবহার করা হয়েছে
+        const res = await axios.get("/api/about-team");
         if (res.data) setData(res.data);
       } catch (err) {
         console.error("Error fetching CEO data:", err);
@@ -20,11 +22,16 @@ const AboutTeam = () => {
 
   if (!data) return null;
 
+  // ইমেজ পাথ হ্যান্ডলিং
+  const cleanImagePath = data.image?.startsWith('/') ? data.image : `/${data.image}`;
+  const fullImageUrl = data.image?.startsWith('http') ? data.image : `${API_BASE}${cleanImagePath}`;
+
   return (
     <section className="w-full py-16 md:py-24 font-poppins overflow-hidden">
       {/* Container with max-w, white background, and rounded corners */}
       <div className="max-w-[1350px] mx-auto bg-white rounded-[5px] px-6 md:px-16 lg:px-24 py-10 md:py-16">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
+          
           {/* Left Side: Image Section */}
           <div className="relative w-full max-w-[340px] md:max-w-[400px] shrink-0 pt-10 pl-10">
             {/* 1. Background Light Green Shape */}
@@ -33,9 +40,12 @@ const AboutTeam = () => {
             {/* 2. Main CEO Image with White Border */}
             <div className="relative z-10 aspect-[4/5] w-full overflow-hidden rounded-[5px] border border-white shadow-xl">
               <img
-                src={`https://api.campaignsquat.com${data.image}`}
+                src={fullImageUrl}
                 alt={data.ceoName}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = "https://via.placeholder.com/400x500?text=CEO+Profile";
+                }}
               />
             </div>
 

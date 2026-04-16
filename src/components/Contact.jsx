@@ -34,33 +34,34 @@ const Contact = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  const [isSending, setIsSending] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsSending(true); // লোডিং শুরু
 
-    const payload = {
-      ...formData,
-      service,
-      budget,
-    };
-
-    try {
-      const res = await axios.post(
-        "https://api.campaignsquat.com/api/contacts/submit",
-        payload,
-      );
-      if (res.data.success) {
-        // মেসেজ পাঠানোর পর পপ-আপ দেখানো হবে
-        setShowSuccess(true);
-        // ফর্ম রিসেট (ঐচ্ছিক)
-        setFormData({ fullName: "", email: "", whatsapp: "", details: "" });
-        setBudget("");
-        setService("");
-      }
-    } catch (err) {
-      alert("❌ Failed to send message.");
-    }
+  const payload = {
+    ...formData,
+    service,
+    budget,
   };
+
+  try {
+    // ২. baseURL ব্যবহার করে ক্লিন পাথ
+    const res = await axios.post("/api/contacts/submit", payload);
+    
+    if (res.data.success) {
+      setShowSuccess(true);
+      setFormData({ fullName: "", email: "", whatsapp: "", details: "" });
+      setBudget("");
+      setService("");
+    }
+  } catch (err) {
+    alert("❌ Failed to send message.");
+  } finally {
+    setIsSending(false); // লোডিং শেষ
+  }
+};
 
   const budgetOptions = [
     "Less than $1K",
@@ -361,19 +362,29 @@ const Contact = () => {
                 </div>
 
                 {/* Line-up Hover Button */}
-                <button
-                  type="submit"
-                  className="group relative w-full md:w-auto px-8 md:px-6 py-2 bg-[#F7A400] border-2 border-[#F7A400] rounded-[5px] font-semibold text-black overflow-hidden transition-all duration-300"
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-3 group-hover:text-white transition-colors duration-300">
-                    Sent Message{" "}
-                    <Send
-                      size={18}
-                      className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
-                    />
-                  </span>
-                  <div className="absolute inset-0 bg-[#02050A] translate-y-[102%] group-hover:translate-y-0 transition-transform duration-300"></div>
-                </button>
+                {/* Line-up Hover Button */}
+<button
+  type="submit"
+  disabled={isSending} // মেসেজ পাঠানোর সময় বাটন ডিজেবল থাকবে
+  className={`group relative w-full md:w-auto px-8 md:px-6 py-2 bg-[#F7A400] border-2 border-[#F7A400] rounded-[5px] font-semibold text-black overflow-hidden transition-all duration-300 ${
+    isSending ? "opacity-70 cursor-not-allowed" : ""
+  }`}
+>
+  <span className="relative z-10 flex items-center justify-center gap-3 group-hover:text-white transition-colors duration-300">
+    {isSending ? (
+      "Sending..."
+    ) : (
+      <>
+        Sent Message
+        <Send
+          size={18}
+          className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+        />
+      </>
+    )}
+  </span>
+  <div className="absolute inset-0 bg-[#02050A] translate-y-[102%] group-hover:translate-y-0 transition-transform duration-300"></div>
+</button>
               </form>
             </div>
           </div>

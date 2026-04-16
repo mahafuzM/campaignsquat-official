@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Trash2, UploadCloud } from "lucide-react"; // আইকন এর জন্য
+import { Trash2, UploadCloud } from "lucide-react";
 
 const BrandEdit = () => {
   const [brands, setBrands] = useState([]);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // ১. ডাটাবেস থেকে সব লোগো আনা (History)
+  // ১. ডাইনামিক বেস ইউআরএল সেটআপ
+  const API_BASE_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
+
+  // ২. ডাটাবেস থেকে সব লোগো আনা
   const fetchBrands = async () => {
     try {
-      const res = await axios.get("https://api.campaignsquat.com/api/brands");
+      const res = await axios.get(`${API_BASE_URL}/api/brands`);
       setBrands(res.data);
     } catch (err) {
       console.error("Fetch error:", err);
@@ -19,40 +24,52 @@ const BrandEdit = () => {
 
   useEffect(() => {
     fetchBrands();
-  }, []);
+  }, [API_BASE_URL]);
 
-  // ২. পিসি থেকে ফাইল সিলেক্ট এবং আপলোড
+  // ৩. পিসি থেকে ফাইল সিলেক্ট এবং আপলোড
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!file) return alert("আগে একটি ইমেজ ফাইল সিলেক্ট করুন!");
 
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("image", file); // Backend-e jodi 'image' field check kore
 
     setLoading(true);
     try {
-      await axios.post("https://api.campaignsquat.com/api/brands", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      // Token thakle headers-e pathano uchit
+      const token = localStorage.getItem("adminToken"); 
+      
+      await axios.post(`${API_BASE_URL}/api/brands`, formData, {
+        headers: { 
+          "Content-Type": "multipart/form-data",
+          "Authorization": token ? `Bearer ${token}` : ""
+        },
       });
-      alert("সফলভাবে আপলোড হয়েছে!");
+      
+      alert("সফলভাবে আপলোড হয়েছে!");
       setFile(null);
-      fetchBrands(); // লিস্ট আপডেট হবে
+      document.getElementById("fileInput").value = ""; // Input reset
+      fetchBrands(); 
     } catch (err) {
       console.error("Upload error:", err);
-      alert("আপলোড ব্যর্থ হয়েছে! সার্ভার চেক করুন।");
+      alert("আপলোড ব্যর্থ হয়েছে!");
     } finally {
       setLoading(false);
     }
   };
 
-  // ৩. ডিলিট ফাংশন
+  // ৪. ডিলিট ফাংশন
   const handleDelete = async (id) => {
     if (window.confirm("আপনি কি নিশ্চিত যে এই লোগোটি ডিলিট করতে চান?")) {
       try {
-        await axios.delete(`https://api.campaignsquat.com/api/brands/${id}`);
-        fetchBrands(); // ডিলিট হওয়ার পর লিস্ট আপডেট
+        const token = localStorage.getItem("adminToken");
+        await axios.delete(`${API_BASE_URL}/api/brands/${id}`, {
+          headers: { "Authorization": token ? `Bearer ${token}` : "" }
+        });
+        fetchBrands(); 
       } catch (err) {
-        alert("ডিলিট করা সম্ভব হয়নি!");
+        console.error("Delete error:", err);
+        alert("ডিলিট করা সম্ভব হয়নি!");
       }
     }
   };
@@ -76,14 +93,14 @@ const BrandEdit = () => {
             />
             <label
               htmlFor="fileInput"
-              className="cursor-pointer bg-white px-6 py-3 rounded-[5px] shadow-sm border border-gray-200 hover:bg-gray-100 transition-all mb-4 text-sm font-semibold"
+              className="cursor-pointer bg-white px-6 py-3 rounded-[5px] shadow-sm border border-gray-200 hover:bg-gray-100 transition-all mb-4 text-sm font-semibold inline-block"
             >
-              {file ? file.name : "select your logo"}
+              {file ? file.name : "Select your logo"}
             </label>
 
             <button
               disabled={loading}
-              className={`bg-[#F7A400] text-black text-[14px] md:text-[15px] hover:text-white hover:bg-[#02050A] font-semibold py-2 px-8 rounded-[5px] border-2 border-[#F7A400] transition-all duration-300 flex items-center gap-2'}`}
+              className={`bg-[#F7A400] text-black text-[14px] md:text-[15px] hover:text-white hover:bg-[#02050A] font-semibold py-2 px-8 rounded-[5px] border-2 border-[#F7A400] transition-all duration-300 flex items-center gap-2 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {loading ? "Uploading..." : "Upload Logo"}
             </button>
@@ -98,11 +115,12 @@ const BrandEdit = () => {
           {brands.map((brand) => (
             <div
               key={brand._id}
-              className="relative group bg-white border border-gray-100 rounded-[5px] p-4 shadow-sm hover:shadow-md transition-all"
+              className="relative group bg-white border border-gray-100 rounded-[5px] p-4 shadow-sm hover:shadow-md transition-all flex items-center justify-center h-32"
             >
-              <div className="h-24 flex items-center justify-center overflow-hidden mb-2">
+              <div className="h-full w-full flex items-center justify-center overflow-hidden">
                 <img
-                  src={brand.url}
+                  // Image source fixing
+                  src={brand.url?.startsWith('http') ? brand.url : `${API_BASE_URL}${brand.url}`}
                   alt="Brand"
                   className="max-h-full max-w-full object-contain"
                 />
@@ -121,7 +139,7 @@ const BrandEdit = () => {
 
         {brands.length === 0 && (
           <div className="text-center py-20 text-gray-400 italic">
-            এখনো কোনো লোগো আপলোড করা হয়নি।
+            এখনো কোনো লোগো আপলোড করা হয়নি।
           </div>
         )}
       </div>

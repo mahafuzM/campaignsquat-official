@@ -21,9 +21,8 @@ const ContactAdmin = () => {
 
   const fetchContacts = async () => {
     try {
-      const res = await axios.get(
-        "https://api.campaignsquat.com/api/contacts/all",
-      );
+      // ✅ App.jsx এ baseURL দেওয়া আছে, তাই শুধু এন্ডপয়েন্ট ব্যবহার করলেই হবে
+      const res = await axios.get("/api/contacts/all");
       setContacts(res.data.data);
       setLoading(false);
     } catch (err) {
@@ -39,10 +38,11 @@ const ContactAdmin = () => {
       )
     ) {
       try {
-        await axios.delete(`https://api.campaignsquat.com/api/contacts/${id}`);
+        // ✅ baseURL অনুযায়ী পাথ আপডেট করা হয়েছে
+        await axios.delete(`/api/contacts/${id}`);
         setContacts(contacts.filter((item) => item._id !== id));
       } catch (err) {
-        alert("ডিলিট করতে সমস্যা হয়েছে!");
+        alert("ডিলিট করতে সমস্যা হয়েছে!");
       }
     }
   };
@@ -100,7 +100,7 @@ const ContactAdmin = () => {
                   colSpan="5"
                   className="px-6 py-20 text-center text-gray-400 font-medium"
                 >
-                  কোন নতুন ডেটা পাওয়া যায়নি।
+                  কোন নতুন ডেটা পাওয়া যায়নি।
                 </td>
               </tr>
             ) : (

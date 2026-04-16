@@ -5,17 +5,27 @@ const AboutMission = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
+    // সরাসরি এন্ডপয়েন্ট ব্যবহার করা হয়েছে কারণ app.jsx-এ baseURL আছে
     axios
-      .get("https://api.campaignsquat.com/api/about-mission")
-      .then((res) => setData(res.data));
+      .get("/api/about-mission")
+      .then((res) => {
+        if (res.data) {
+          setData(res.data);
+        }
+      })
+      .catch((err) => {
+        console.error("Mission Data Fetch Error:", err);
+      });
   }, []);
 
+  // ডেটা না আসা পর্যন্ত একদম খালি থাকবে (ডিজাইন ব্রেক করবে না)
   if (!data) return null;
 
   return (
     <section className="w-full bg-[#02050A] py-16 md:py-24 font-poppins pt-4 md:pt-6 px- md:px-6">
       <div className="max-w-[1445px] mx-auto px- md:px-12 lg:px-12 xl:px-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+          
           {/* Mission Card */}
           <div className="group bg-white/5 p-8 md:p-12 rounded-[5px] border border-[#02050A] hover:border-[#F7A400] transition-all duration-300">
             <div className="mb-6 flex items-center gap-4">
@@ -38,7 +48,7 @@ const AboutMission = () => {
                 {data.missionTitle}
               </h3>
             </div>
-            <p className="text-white text-[16px] md:text-[18px] leading-relaxed">
+            <p className="text-white text-[16px] md:text-[18px] leading-relaxed opacity-90">
               {data.missionDesc}
             </p>
           </div>
@@ -65,10 +75,11 @@ const AboutMission = () => {
                 {data.visionTitle}
               </h3>
             </div>
-            <p className="text-white text-[16px] md:text-[18px] leading-relaxed">
+            <p className="text-white text-[16px] md:text-[18px] leading-relaxed opacity-90">
               {data.visionDesc}
             </p>
           </div>
+
         </div>
       </div>
     </section>

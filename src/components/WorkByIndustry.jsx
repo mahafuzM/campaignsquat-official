@@ -28,11 +28,24 @@ const Card = ({ item, index, total }) => {
     [1, index === total - 1 ? 1 : 0.96],
   );
 
-  // ইমেজ পাথ হ্যান্ডলিং (সার্ভার থেকে আসলে পাথ ঠিক করে দিবে)
-  const renderImg = (img) => {
+ // ইমেজ পাথ হ্যান্ডলিং (সার্ভার বনাম লোকাল)
+  const renderImg = (img, fallback) => {
+    if (!img) return fallback;
+
+    // যদি ইমেজটি স্ট্রিং হয় এবং /uploads দিয়ে শুরু হয়
     if (typeof img === "string" && img.startsWith("/uploads")) {
-      return `https://api.campaignsquat.com${img}`;
+      // Axios defaults theke baseURL nibe
+      const baseUrl = axios.defaults.baseURL;
+      
+      // যানি baseURL এর শেষে / না থাকে, তাই আমরা সেটি হ্যান্ডেল করছি
+      const cleanBaseUrl = baseUrl.endsWith("/") 
+        ? baseUrl.slice(0, -1) 
+        : baseUrl;
+
+      return `${cleanBaseUrl}${img}`;
     }
+    
+    // অন্যথায় সরাসরি ইমেজ রিটার্ন করবে (import করা ইমেজ হলে)
     return img;
   };
 
@@ -216,20 +229,20 @@ const WorkByIndustry = () => {
     },
   ];
 
-  useEffect(() => {
+useEffect(() => {
     const fetchIndustries = async () => {
       try {
-        const res = await axios.get(
-          "https://api.campaignsquat.com/api/industries",
-        );
-        // যদি ডাটাবেসে নতুন কার্ড থাকে তবে সেগুলো দেখাবে, নাহলে ডেমো গুলো থাকবে
+        // Full URL-er dorkar nai, shudhu endpoint dilei hobe
+        const res = await axios.get("/api/industries"); 
+        
         if (res.data && res.data.length > 0) {
           setIndustries(res.data);
         } else {
           setIndustries(demoData);
         }
       } catch (err) {
-        setIndustries(demoData); // এরর হলেও ডেমো দেখাবে
+        console.error("Connection failed, using demo data.");
+        setIndustries(demoData); // Error hole ba backend bondho thakle demo dekhabe
       }
     };
     fetchIndustries();

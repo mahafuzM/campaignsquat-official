@@ -16,7 +16,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 const AdminApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  // --- নতুন যোগ করা স্টেট ---
   const [selectedIds, setSelectedIds] = useState([]);
 
   const location = useLocation();
@@ -24,14 +23,20 @@ const AdminApplications = () => {
   const queryParams = new URLSearchParams(location.search);
   const searchTerm = queryParams.get("search") || "";
 
+  // ✅ Local vs Production Dynamic API URL
+  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
+
   const fetchApplications = async () => {
     try {
-      const response = await axios.get(
-        "https://api.campaignsquat.com/api/applications/all",
-      );
-      setApplications(response.data);
+      setLoading(true);
+      const response = await axios.get(`${BASE_URL}/api/applications/all`);
+      // Data safety parsing
+      const actualData = Array.isArray(response.data) ? response.data : (response.data.data || []);
+      setApplications(actualData);
     } catch (error) {
-      console.error("Fetch Error:", error);
+      console.error("Fetch Error:", error.response?.data || error.message);
     } finally {
       setLoading(false);
     }
@@ -39,10 +44,8 @@ const AdminApplications = () => {
 
   useEffect(() => {
     fetchApplications();
-  }, []);
+  }, [BASE_URL]);
 
-  // --- CSV ডাউনলোড করার কাস্টম ফাংশন (কোনো লাইব্রেরি লাগবে না) ---
-  // --- আপনার দেওয়া পারফেক্ট CSV ডাউনলোড ফাংশন ---
   const handleDownloadCSV = () => {
     const dataToExport =
       selectedIds.length > 0
@@ -62,7 +65,7 @@ const AdminApplications = () => {
       "Date",
     ];
     const rows = dataToExport.map((app) => [
-      `"${app.full_name}"`,
+      `"${app.full_name || app.fullName || "N/A"}"`,
       `"${app.email}"`,
       `"${app.phone}"`,
       `"${app.applied_for || app.jobTitle || "General"}"`,
@@ -86,11 +89,9 @@ const AdminApplications = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this candidate?")) {
       try {
-        await axios.delete(
-          `https://api.campaignsquat.com/api/applications/${id}`,
-        );
+        await axios.delete(`${BASE_URL}/api/applications/${id}`);
         setApplications(applications.filter((app) => app._id !== id));
-        setSelectedIds(selectedIds.filter((sid) => sid !== id)); // ডিলিট হলে সিলেকশন থেকেও বাদ যাবে
+        setSelectedIds(selectedIds.filter((sid) => sid !== id));
       } catch (error) {
         alert("Failed to delete.");
       }
@@ -107,16 +108,15 @@ const AdminApplications = () => {
   };
 
   const filteredApplications = applications.filter((app) => {
-    const name = app.full_name ? app.full_name.toLowerCase() : "";
-    const email = app.email ? app.email.toLowerCase() : "";
-    const position = app.applied_for ? app.applied_for.toLowerCase() : "";
+    const name = (app.full_name || app.fullName || "").toLowerCase();
+    const email = (app.email || "").toLowerCase();
+    const position = (app.applied_for || app.jobTitle || "").toLowerCase();
     const term = searchTerm.toLowerCase();
     return (
       name.includes(term) || email.includes(term) || position.includes(term)
     );
   });
 
-  // --- সিলেকশন লজিক ---
   const toggleSelectAll = (e) => {
     if (e.target.checked) {
       setSelectedIds(filteredApplications.map((app) => app._id));

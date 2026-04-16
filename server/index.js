@@ -1,3 +1,12 @@
+const result = require("dotenv").config(); // <--- Eita ekdom shuru-te thakbe
+
+if (result.error) {
+  console.error("❌ .env load korte error hochche:", result.error);
+} else {
+  // Terminal-e dekhabe ki ki load holo
+  console.log("✅ .env theke variable load hoyeche:", Object.keys(result.parsed));
+}
+
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -10,15 +19,25 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-// ১. মিডলওয়্যার কনফিগারেশন
-// আপনার বর্তমান কোড পরিবর্তন করে এভাবে দিন
+// ১. মিডলওয়্যার কনফিগারেশন (Optimized for Production & Local)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://campaignsquat.com",
+  "https://www.campaignsquat.com",
+  "https://campaignsquat-frontend.vercel.app"
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // আপনার লোকাল ফ্রন্টএন্ড
-      "https://campaignsquat.com", // আপনার আসল ডোমেইন (যখন কিনবেন)
-      "https://campaignsquat-frontend.vercel.app" // আপনার ভার্সেল লিঙ্ক
-    ],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        return callback(new Error("CORS policy error"), false);
+      }
+      return callback(null, true);
+    },
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -28,8 +47,7 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-// --- 🛡️ Admin Model (আলাদা ফাইল থেকে ইম্পোর্ট করা হলো) ---
-// index.js এ আর Schema লেখার দরকার নেই, কারণ তোর models/Admin.js অলরেডি আছে।
+// --- 🛡️ Admin Model ---
 const Admin = require("./models/Admin");
 
 // ২. অথেনটিকেশন মিডলওয়্যার
@@ -42,7 +60,7 @@ const authenticateAdmin = (req, res, next) => {
     req.admin = decoded;
     next();
   } catch (err) {
-    res.status(400).json({ message: "Invalid Token" });
+    res.status(401).json({ message: "Invalid Token" });
   }
 };
 
@@ -52,26 +70,38 @@ app.post("/api/admin-login", async (req, res) => {
     const inputEmail = req.body.email?.trim().toLowerCase();
     const inputPassword = req.body.password?.trim();
 
+    if (!inputEmail || !inputPassword) {
+      return res.status(400).json({ success: false, message: "Email and password are required!" });
+    }
+
     // প্রথমে ডাটাবেসে চেক করবে
     let admin = await Admin.findOne({ email: inputEmail });
 
     let isMatch = false;
     if (admin) {
-      // যদি ডাটাবেসে অ্যাডমিন থাকে, পাসওয়ার্ড ম্যাচ করবে
+      // যদি ডাটাবেসে অ্যাডমিন থাকে, পাসওয়ার্ড ম্যাচ করবে
       isMatch = await bcrypt.compare(inputPassword, admin.password);
     } else {
-      // যদি ডাটাবেসে না থাকে, তবে .env এর সাথে চেক করবে (প্রথমবার সেটআপের জন্য)
-      if (inputEmail === process.env.ADMIN_EMAIL?.trim().toLowerCase() && 
-          inputPassword === process.env.ADMIN_PASSWORD?.trim()) {
+      // যদি ডাটাবেসে না থাকে, তবে .env এর সাথে চেক করবে
+      const envEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+      const envPass = process.env.ADMIN_PASSWORD?.trim();
+
+      if (envEmail && envPass && inputEmail === envEmail && inputPassword === envPass) {
         isMatch = true;
       }
     }
 
     if (isMatch) {
+      // Security Check: Ensure JWT_SECRET exists to avoid 500 error
+      if (!process.env.JWT_SECRET) {
+        console.error("❌ Error: JWT_SECRET is not defined in .env file!");
+        return res.status(500).json({ success: false, message: "Server Configuration Error: Missing Secret." });
+      }
+
       const token = jwt.sign(
         { role: "admin", email: inputEmail },
         process.env.JWT_SECRET,
-        { expiresIn: "12h" },
+        { expiresIn: "24h" } // Hosting-er jonno time ektu bariye 24h kora holo
       );
 
       return res.json({
@@ -86,8 +116,8 @@ app.post("/api/admin-login", async (req, res) => {
       });
     }
   } catch (err) {
-    console.error("Login Error:", err);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    console.error("🔥 Login Error:", err);
+    res.status(500).json({ success: false, message: "Internal Server Error: " + err.message });
   }
 });
 
@@ -110,9 +140,9 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
   res.status(200).json({ url: `/uploads/${req.file.filename}` });
 });
 
-// ৪. রাউট ইম্পোর্টস ও কানেকশন
+// ৪. রাউট ইম্পোর্টস (সবগুলো এখানে আছে)
 app.use("/api/hero", require("./routes/heroRoutes"));
-app.use("/api/gtm-config", require("./routes/gtmRoutes")); // <--- এই লাইনটি যোগ করুন
+app.use("/api/gtm-config", require("./routes/gtmRoutes"));
 app.use("/api/seo-settings", require("./routes/seoRoutes"));
 app.use("/api/brands", require("./routes/brandRoutes"));
 app.use("/api/about", require("./routes/aboutRoutes"));
@@ -145,12 +175,12 @@ app.use('/api/technical-edge', require('./routes/technicalEdgeRoutes'));
 app.use('/api/projects', require('./routes/projectAllruter'));
 app.use("/api/agency-comparison", require("./routes/agencyComparisonRoutes"));
 
-
-
-// ৫. ডাটাবেস কানেকশন
+// ৫. ডাটাবেস কানেকশন (With timeout for hosting)
 mongoose.set("strictQuery", false);
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    serverSelectionTimeoutMS: 10000, // 10 seconds timeout
+  })
   .then(() => console.log("✅ MongoDB Connected!"))
   .catch((err) => console.error("❌ DB Error:", err));
 
@@ -165,6 +195,6 @@ process.on("unhandledRejection", (reason) => console.error("Unhandled Rejection:
 
 // ৭. সার্ভার লিসেনিং
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

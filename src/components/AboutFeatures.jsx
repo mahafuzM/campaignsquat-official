@@ -5,10 +5,15 @@ const AboutFeatures = () => {
   const [features, setFeatures] = useState([]);
 
   useEffect(() => {
+    // সরাসরি এন্ডপয়েন্ট ব্যবহার করা হয়েছে কারণ app.jsx-এ baseURL আছে
     axios
-      .get("https://api.campaignsquat.com/api/about-features")
-      .then((res) => setFeatures(res.data))
-      .catch((err) => console.log(err));
+      .get("/api/about-features")
+      .then((res) => {
+        if (res.data) {
+          setFeatures(res.data);
+        }
+      })
+      .catch((err) => console.log("Features fetch error:", err));
   }, []);
 
   return (
@@ -17,7 +22,7 @@ const AboutFeatures = () => {
         {/* Section Header */}
         <div className="max-w-[900px] mx-auto text-center mb-16">
           <h2 className="text-white text-[26px] md:text-[32px] lg:text-[40px] font-bold leading-[1.2] mb-6">
-            What SetsCampaignSquat Apart
+            What Sets CampaignSquat Apart
           </h2>
           <p className="text-white font-normal leading-relaxed text-[16px] md:text-[18px] lg:text-[20px]">
             We combine technical precision with creative strategy to build

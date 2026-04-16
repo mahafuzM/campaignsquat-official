@@ -7,9 +7,8 @@ const WorkProcess = () => {
   useEffect(() => {
     const fetchSteps = async () => {
       try {
-        const res = await axios.get(
-          "https://api.campaignsquat.com/api/work-process",
-        );
+        // ✅ ফুল ইউআরএল কেটে শুধু এন্ডপয়েন্ট দেওয়া হয়েছে
+        const res = await axios.get("/api/work-process");
         setSteps(res.data);
       } catch (err) {
         console.error("Error loading steps:", err);
@@ -45,12 +44,12 @@ const WorkProcess = () => {
                 <div className="absolute top-0 left-[-15px] w-full h-full rounded-full border-[3px] border-[#F7A400] transition-all duration-700 ease-in-out group-hover:left-0 group-hover:rotate-[360deg] z-0"></div>
 
                 <div className="relative w-full h-full rounded-full bg-[#0A0A0A] border border-white/10 flex items-center justify-center z-10 transition-all duration-500 group-hover:border-[#F7A400]/50 shadow-xl">
-                  {/* ডাইনামিক ইমেজ ইউআরএল */}
+                  {/* ✅ ডাইনামিক ইমেজ ইউআরএল (axios.defaults.baseURL ব্যবহার করা হয়েছে) */}
                   <img
                     src={
                       step.image.startsWith("http")
                         ? step.image
-                        : `https://api.campaignsquat.com${step.image}`
+                        : `${axios.defaults.baseURL}${step.image}`
                     }
                     alt={step.title}
                     className="w-16 h-16 md:w-20 lg:w-24 object-contain brightness-0 invert transition-all duration-500 group-hover:scale-110 z-20"

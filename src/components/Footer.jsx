@@ -11,14 +11,12 @@ import {
   Youtube,
   Linkedin,
   Twitter,
-  Chrome, // Pinterest এর বিকল্প হিসেবে বা Lucide এর নির্দিষ্ট আইকন
   Dribbble,
-  Target, // Behance বা অন্য কোনো স্টাইলিশ আইকন হিসেবে
+  Globe,
 } from "lucide-react";
 
-// Pinterest, Behance এর জন্য Lucide এ সরাসরি নাম না থাকলে নিচের আইকনগুলো ব্যবহার করা হয়
 import {
-  FileCode as BehanceIcon, // Lucide এ সরাসরি Behance নেই, আপনি চাইলে SVG ব্যবহার করতে পারেন
+  FileCode as BehanceIcon,
   Pin as PinterestIcon,
 } from "lucide-react";
 
@@ -47,7 +45,6 @@ const Footer = () => {
   const [footerData, setFooterData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // আইকন ম্যাপ করার জন্য আপডেট করা অবজেক্ট
   const socialIcons = {
     facebook: Facebook,
     instagram: Instagram,
@@ -57,16 +54,20 @@ const Footer = () => {
     pinterest: PinterestIcon,
     behance: BehanceIcon,
     dribbble: Dribbble,
-    dribble: Dribbble, // বানান ভুল থাকলেও যাতে পায়
+    dribble: Dribbble,
   };
 
   useEffect(() => {
     const fetchFooter = async () => {
       try {
-        const res = await axios.get("https://api.campaignsquat.com/api/footer");
-        setFooterData(res.data);
+        // App.jsx এ baseURL দেওয়া থাকলে শুধু "/api/footer" দিলেও হবে
+        // তবে আমরা সেফটির জন্য পুরো URL অথবা পাথ টা ঠিক রাখব
+        const res = await axios.get("/api/footer"); 
+        if (res.data) {
+          setFooterData(res.data);
+        }
       } catch (err) {
-        console.error("Footer Data Fetch Error:", err);
+        console.error("Footer Fetch Error:", err);
       } finally {
         setLoading(false);
       }
@@ -74,7 +75,9 @@ const Footer = () => {
     fetchFooter();
   }, []);
 
-  if (loading && !footerData) return null;
+  // লোডিং অবস্থায় ফুটার এরিয়া খালি রাখা (Layout shift রোধ করতে)
+  if (loading) return <footer className="w-full bg-[#0A0A0A] h-[300px]"></footer>;
+  if (!footerData) return null;
 
   return (
     <footer className="w-full bg-[#0A0A0A] text-white pt-12 md:pt-20 pb-10 font-poppins border-t border-white/5">

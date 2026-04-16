@@ -15,18 +15,17 @@ const PricingPlans = () => {
 
   const [activeCategory, setActiveCategory] = useState(() => {
     const categories = Object.keys(pricingData);
-    return (
-      sessionStorage.getItem("activePricingTab") ||
-      (categories.length > 0 ? categories[0] : "")
-    );
+    const savedTab = sessionStorage.getItem("activePricingTab");
+    return savedTab || (categories.length > 0 ? categories[0] : "");
   });
 
-  const BASE_URL = "https://api.campaignsquat.com";
+  const BASE_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
 
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        // ব্যাকগ্রাউন্ডে সাইলেন্টলি কল হবে
         const res = await axios.get(`${BASE_URL}/api/pricing/all`);
 
         if (res.data && Array.isArray(res.data)) {
@@ -38,13 +37,11 @@ const PricingPlans = () => {
             return acc;
           }, {});
 
-          // আগের ডেটার সাথে নতুন ডেটা চেক করা (যদি আপডেট থাকে তবেই স্টেট আপডেট হবে)
           const currentCached = sessionStorage.getItem("cached_pricing");
           if (JSON.stringify(grouped) !== currentCached) {
             setPricingData(grouped);
             sessionStorage.setItem("cached_pricing", JSON.stringify(grouped));
 
-            // যদি আগে কোনো ক্যাটাগরি সিলেক্ট না থাকে তবে প্রথমটা সেট করো
             const categories = Object.keys(grouped);
             if (!activeCategory && categories.length > 0) {
               setActiveCategory(categories[0]);
@@ -58,7 +55,7 @@ const PricingPlans = () => {
       }
     };
     fetchPricing();
-  }, [activeCategory]);
+  }, [activeCategory, BASE_URL]);
 
   useEffect(() => {
     if (activeCategory) {
@@ -66,10 +63,9 @@ const PricingPlans = () => {
     }
   }, [activeCategory]);
 
-  // যদি প্রথমবার একদম কোনো ডেটা না থাকে তবেই শুধু লোডিং দেখাবে
   if (loading && Object.keys(pricingData).length === 0) {
     return (
-      <div className="bg-[#02050A] min-h-screen flex flex-col items-center justify-center text-white font-poppins">
+      <div className="bg-[#02050A] min-h-screen flex flex-col items-center justify-center text-white font-['Poppins']">
         <div className="w-12 h-12 border-4 border-[#F7A400] border-t-transparent rounded-full animate-spin mb-4"></div>
         <p className="text-[10px] uppercase tracking-[4px] font-bold">
           Engineering Strategic Models...

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Edit3, Trash2, PlusCircle, XCircle, LayoutGrid, CheckCircle2 } from "lucide-react";
 
 const AboutFeaturesEdit = () => {
   const [features, setFeatures] = useState([]);
@@ -9,17 +10,23 @@ const AboutFeaturesEdit = () => {
     iconPath: "",
   });
   const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const fetchFeatures = () => {
-    axios
-      .get("https://api.campaignsquat.com/api/about-features")
-      .then((res) => setFeatures(res.data));
+  // ১. ফিচার লিস্ট ফেচ করা
+  const fetchFeatures = async () => {
+    try {
+      const res = await axios.get("/api/about-features");
+      setFeatures(res.data);
+    } catch (err) {
+      console.error("Fetch Error:", err);
+    }
   };
 
   useEffect(() => {
     fetchFeatures();
   }, []);
 
+  // ২. এডিট মোড অ্যাক্টিভ করা
   const handleEditClick = (feature) => {
     setEditingId(feature._id);
     setFormData({
@@ -30,142 +37,165 @@ const AboutFeaturesEdit = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // ৩. অ্যাড বা আপডেট সাবমিট করা
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       if (editingId) {
-        await axios.post(
-          `https://api.campaignsquat.com/api/about-features/update/${editingId}`,
-          formData,
-        );
+        await axios.post(`/api/about-features/update/${editingId}`, formData);
       } else {
-        await axios.post(
-          "https://api.campaignsquat.com/api/about-features/add",
-          formData,
-        );
+        await axios.post("/api/about-features/add", formData);
       }
       setFormData({ title: "", desc: "", iconPath: "" });
       setEditingId(null);
       fetchFeatures();
     } catch (err) {
-      alert("Action failed!");
+      alert("Something went wrong!");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // ৪. ডিলিট করা
   const handleDelete = async (id) => {
-    if (window.confirm("Delete this feature?")) {
-      await axios.delete(
-        `https://api.campaignsquat.com/api/about-features/${id}`,
-      );
-      fetchFeatures();
+    if (window.confirm("Are you sure? This feature will be permanently removed!")) {
+      try {
+        await axios.delete(`/api/about-features/${id}`);
+        fetchFeatures();
+      } catch (err) {
+        alert("Delete failed!");
+      }
     }
   };
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen font-poppins text-black">
-      <h2 className="text-3xl text-black font-bold mb-6 border-b-4 border-[#F7A400] pb-2 inline-block ">
-        {editingId ? "Edit Feature" : "Manage Features"}
-      </h2>
+    <div className="p-6 md:p-10 bg-[#F9FAFB] min-h-screen font-poppins text-slate-900">
+      
+      {/* Header */}
+      <div className="max-w-6xl mx-auto mb-10">
+        <div className="flex items-center gap-3 mb-2">
+          <LayoutGrid className="text-[#F7A400]" size={28} />
+          <h2 className="text-3xl font-black text-black tracking-tight uppercase italic">
+            Features <span className="text-[#F7A400]">Manager</span>
+          </h2>
+        </div>
+        <p className="text-slate-500 text-sm">Create, update or remove agency service features</p>
+      </div>
 
-      {/* Form Section */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md mb-12 grid grid-cols-1 md:grid-cols-3 gap-6 border-t-8 border-[#F7A400]"
-      >
-        <div className="flex flex-col gap-2">
-          <label className="font-bold">Title</label>
-          <input
-            className="p-3 border rounded focus:outline-[#F7A400]"
-            placeholder="Enter Title"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
-            required
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label className="font-bold">Icon Path (SVG d)</label>
-          <input
-            className="p-3 border rounded focus:outline-[#F7A400]"
-            placeholder="Paste SVG Path"
-            value={formData.iconPath}
-            onChange={(e) =>
-              setFormData({ ...formData, iconPath: e.target.value })
-            }
-            required
-          />
-        </div>
-        <div className="flex flex-col gap-2 md:col-span-2">
-          <label className="font-bold">Description</label>
-          <textarea
-            rows="3"
-            className="p-3 border rounded focus:outline-[#F7A400]"
-            placeholder="Enter feature description..."
-            value={formData.desc}
-            onChange={(e) => setFormData({ ...formData, desc: e.target.value })}
-            required
-          />
-        </div>
-        <div className="flex items-end gap-3">
-          <button
-            type="submit"
-            className="flex-1 bg-[#F7A400] text-black font-extrabold py-3 rounded hover:bg-black hover:text-white transition-all tracking-wider"
-          >
-            {editingId ? "Update Feature" : "Add Feature"}
-          </button>
-          {editingId && (
-            <button
-              type="button"
-              onClick={() => {
-                setEditingId(null);
-                setFormData({ title: "", desc: "", iconPath: "" });
-              }}
-              className="bg-gray-500 text-white px-6 py-3 rounded font-bold"
-            >
-              Cancel
-            </button>
-          )}
-        </div>
-      </form>
-
-      {/* List Section */}
-      <div className="grid grid-cols-1 gap-6">
-        {features.map((f) => (
-          <div
-            key={f._id}
-            className="bg-white p-6 md:p-8 rounded-[5px] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center border-l-[12px] border-[#F7A400] hover:shadow-md transition-shadow"
-          >
-            <div className="flex-1 pr-4">
-              {/* Title কে বড় করা হয়েছে (text-2xl) */}
-              <h4 className="text-2xl md:text-3xl font-black text-gray-900 mb-2  tracking-tight">
-                {f.title}
-              </h4>
-              {/* Description কে বড় এবং স্পষ্ট করা হয়েছে (text-lg) */}
-              <p className="text-lg md:text-xl text-gray-700 leading-relaxed font-medium">
-                {f.desc}
-              </p>
-              <div className="mt-3 inline-block bg-gray-100 px-3 py-1 rounded text-[10px] text-gray-400 font-mono">
-                Icon Path: {f.iconPath.substring(0, 30)}...
-              </div>
+      <div className="max-w-6xl mx-auto">
+        {/* Form Section */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-6 md:p-8 rounded-2xl shadow-sm mb-12 border border-slate-100 relative overflow-hidden transition-all"
+        >
+          {/* Top Indicator Line */}
+          <div className="absolute top-0 left-0 right-0 h-2 bg-[#F7A400]"></div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block">Feature Title</label>
+              <input
+                className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:border-[#F7A400] outline-none transition-all font-bold"
+                placeholder="e.g. Creative Strategy"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block">Icon Path (SVG 'd')</label>
+              <input
+                className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:border-[#F7A400] outline-none transition-all font-mono text-xs"
+                placeholder="M10 20l..."
+                value={formData.iconPath}
+                onChange={(e) => setFormData({ ...formData, iconPath: e.target.value })}
+                required
+              />
             </div>
 
-            <div className="flex gap-4 mt-6 md:mt-0 w-full md:w-auto">
-              <button
-                onClick={() => handleEditClick(f)}
-                className="flex-1 md:flex-none px-8 py-3 bg-blue-50 text-blue-600 font-black border-2 border-blue-600 rounded-md hover:bg-blue-600 hover:text-white transition-all text-lg"
-              >
-                EDIT
-              </button>
-              <button
-                onClick={() => handleDelete(f._id)}
-                className="flex-1 md:flex-none px-8 py-3 bg-red-50 text-red-600 font-black border-2 border-red-600 rounded-md hover:bg-red-600 hover:text-white transition-all text-lg"
-              >
-                DELETE
-              </button>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block">Feature Description</label>
+              <textarea
+                rows="3"
+                className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:border-[#F7A400] outline-none transition-all leading-relaxed"
+                placeholder="Explain what this feature offers..."
+                value={formData.desc}
+                onChange={(e) => setFormData({ ...formData, desc: e.target.value })}
+                required
+              />
             </div>
           </div>
-        ))}
+
+          <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-slate-50">
+            {editingId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingId(null);
+                  setFormData({ title: "", desc: "", iconPath: "" });
+                }}
+                className="px-6 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-200 transition-all"
+              >
+                <XCircle size={18} /> CANCEL
+              </button>
+            )}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`px-10 py-3 bg-black text-white rounded-xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-slate-200 ${loading ? 'opacity-50' : 'hover:bg-[#F7A400] hover:text-black'}`}
+            >
+              {editingId ? <CheckCircle2 size={18} /> : <PlusCircle size={18} />}
+              {loading ? "SYNCING..." : editingId ? "UPDATE FEATURE" : "ADD NEW FEATURE"}
+            </button>
+          </div>
+        </form>
+
+        {/* List Section */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Current Active Features ({features.length})</h3>
+          
+          {features.map((f) => (
+            <div
+              key={f._id}
+              className="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 group hover:border-[#F7A400] transition-all"
+            >
+              <div className="flex gap-5 items-start">
+                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0 border border-slate-100 text-[#F7A400] group-hover:bg-[#F7A400] group-hover:text-white transition-colors">
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={f.iconPath} />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-black mb-1 leading-tight tracking-tight italic">
+                    {f.title}
+                  </h4>
+                  <p className="text-slate-500 text-sm max-w-xl leading-relaxed">
+                    {f.desc}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-2 w-full md:w-auto">
+                <button
+                  onClick={() => handleEditClick(f)}
+                  className="flex-1 md:flex-none p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                  title="Edit"
+                >
+                  <Edit3 size={20} />
+                </button>
+                <button
+                  onClick={() => handleDelete(f._id)}
+                  className="flex-1 md:flex-none p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                  title="Delete"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

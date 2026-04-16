@@ -17,7 +17,7 @@ const AdminFooter = () => {
   const [footerData, setFooterData] = useState({
     brandName: "",
     brandDescription: "",
-    socialLinks: [], // এটা নতুন যোগ করা হয়েছে
+    socialLinks: [],
     services: [],
     quickLinks: [],
     contact: { email: "", phone: "", offices: [] },
@@ -34,22 +34,32 @@ const AdminFooter = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
-  const BASE_URL = "https://api.campaignsquat.com/api/footer";
+  const BASE_URL = "/api/footer"; // App.jsx-এ বেস দেওয়া আছে তাই শুধু এটা দিলেই হবে
 
+  // ১. ডেটা ফেচ করার লজিক
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await axios.get(BASE_URL);
         if (res.data) {
-          // নিশ্চিত করা হচ্ছে যে সব অ্যারে অন্তত খালি অ্যারে হিসেবে আছে
+          const data = res.data;
           setFooterData({
-            ...res.data,
-            socialLinks: res.data.socialLinks || [],
-            services: res.data.services || [],
-            quickLinks: res.data.quickLinks || [],
+            brandName: data.brandName || "",
+            brandDescription: data.brandDescription || "",
+            socialLinks: data.socialLinks || [],
+            services: data.services || [],
+            quickLinks: data.quickLinks || [],
             contact: {
-              ...res.data.contact,
-              offices: res.data.contact?.offices || [],
+              email: data.contact?.email || "",
+              phone: data.contact?.phone || "",
+              offices: data.contact?.offices || [],
+            },
+            hiringStatus: {
+              showCard: data.hiringStatus?.showCard ?? true,
+              isHiring: data.hiringStatus?.isHiring ?? true,
+              title: data.hiringStatus?.title || "",
+              description: data.hiringStatus?.description || "",
+              hiringNotice: data.hiringStatus?.hiringNotice || "",
             },
           });
         }
@@ -62,45 +72,52 @@ const AdminFooter = () => {
     fetchData();
   }, []);
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      await axios.put(BASE_URL, footerData);
-      setMessage("Footer updated successfully!");
-      setTimeout(() => setMessage(""), 3000);
-    } catch (err) {
-      console.error(err);
-      alert("Error updating footer");
-    } finally {
-      setSaving(false);
-    }
-  };
+const handleSave = async () => {
+  setSaving(true);
+  try {
+    // ডেটা পাঠানোর আগে ছোট হাতের করে নেওয়া (যাতে ফ্রন্টএন্ডে আইকন ঠিক থাকে)
+    const cleanedData = {
+      ...footerData,
+      socialLinks: footerData.socialLinks.map(link => ({
+        ...link,
+        platform: link.platform.toLowerCase().trim()
+      }))
+    };
 
-  // ডাইনামিক অ্যারে আইটেম অ্যাড করার লজিক
+    // axios.put ব্যবহার করুন
+    const response = await axios.put(BASE_URL, cleanedData);
+    
+    if (response.status === 200 || response.status === 201) {
+      setMessage("Footer updated successfully! 🎉");
+      setTimeout(() => setMessage(""), 3000);
+    }
+  } catch (err) {
+    console.error("Save Error:", err.response?.data);
+    alert("Error: " + (err.response?.data?.message || "Check your backend route (PUT vs POST)"));
+  } finally {
+    setSaving(false);
+  }
+};
+
+  // ৩. ডাইনামিক অ্যারে আইটেম অ্যাড/রিমুভ
   const addArrayItem = (type) => {
     const newData = { ...footerData };
     if (type === "services") newData.services.push({ name: "", link: "" });
     if (type === "quickLinks") newData.quickLinks.push({ name: "", url: "" });
-    if (type === "socialLinks")
-      newData.socialLinks.push({ platform: "", url: "" });
-    if (type === "offices")
-      newData.contact.offices.push({ country: "", address: "" });
+    if (type === "socialLinks") newData.socialLinks.push({ platform: "", url: "" });
+    if (type === "offices") newData.contact.offices.push({ country: "", address: "" });
     setFooterData(newData);
   };
 
   const removeArrayItem = (type, index) => {
-    const newData = { ...footerData };
-    if (type === "services")
-      newData.services = newData.services.filter((_, i) => i !== index);
-    if (type === "quickLinks")
-      newData.quickLinks = newData.quickLinks.filter((_, i) => i !== index);
-    if (type === "socialLinks")
-      newData.socialLinks = newData.socialLinks.filter((_, i) => i !== index);
-    if (type === "offices")
-      newData.contact.offices = newData.contact.offices.filter(
-        (_, i) => i !== index,
-      );
-    setFooterData(newData);
+    if (window.confirm("Are you sure you want to remove this item?")) {
+      const newData = { ...footerData };
+      if (type === "services") newData.services = newData.services.filter((_, i) => i !== index);
+      if (type === "quickLinks") newData.quickLinks = newData.quickLinks.filter((_, i) => i !== index);
+      if (type === "socialLinks") newData.socialLinks = newData.socialLinks.filter((_, i) => i !== index);
+      if (type === "offices") newData.contact.offices = newData.contact.offices.filter((_, i) => i !== index);
+      setFooterData(newData);
+    }
   };
 
   if (loading)

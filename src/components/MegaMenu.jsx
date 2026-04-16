@@ -32,12 +32,12 @@ const MegaMenu = () => {
     },
   ];
 
-  useEffect(() => {
+ useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const res = await axios.get(
-          "https://api.campaignsquat.com/api/megamenu",
-        );
+        // ✅ ইউআরএল থেকে ডোমেইন সরিয়ে শুধু এন্ডপয়েন্ট দিন
+        // এখন এটি App.jsx এর baseURL ব্যবহার করবে
+        const res = await axios.get("/api/megamenu");
 
         if (res.data && Array.isArray(res.data)) {
           // ২. লজিক: নতুন সার্ভিস সবার আগে (1st) দেখাবে

@@ -7,13 +7,16 @@ import {
   Globe,
   ArrowLeft,
   AlertCircle,
-  CalendarCheck,
-  Stars,
-  CheckCircle2,
   Loader2,
   FileText,
+  CalendarCheck,
 } from "lucide-react";
 import axios from "axios";
+
+// ✅ Global Axios Setup (নিশ্চিত করুন এটি কাজ করছে)
+axios.defaults.baseURL = window.location.hostname === "localhost" 
+  ? "http://localhost:5000" 
+  : "https://api.campaignsquat.com";
 
 const ProjectDetails = () => {
   const { slug } = useParams();
@@ -24,39 +27,36 @@ const ProjectDetails = () => {
   const [loading, setLoading] = useState(!project);
   const [error, setError] = useState(null);
 
-  const BASE_URL = "https://api.campaignsquat.com";
+  const API_BASE = axios.defaults.baseURL;
 
   useEffect(() => {
     const fetchProject = async () => {
-      // যদি অলরেডি ডাটা থাকে এবং স্লাগ মিলে যায়, তবে আবার ফেচ করার দরকার নেই
-      if (project && project.fullName === slug) return;
+      // যদি অলরেডি ডাটা থাকে তবে ফেচ করার দরকার নেই
+      if (project && (project.fullName === slug || project.slug === slug)) {
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
         setError(null);
 
-        const res = await axios.get(`${BASE_URL}/api/projects/slug/${slug}`);
+        // ✅ রাউটটি আপনার ব্যাকএন্ড অনুযায়ী চেক করুন। 
+        // যদি ব্যাকএন্ডে স্লাগ দিয়ে খোঁজার রাউট /api/projects/slug/SLUG_NAME হয়:
+        const res = await axios.get(`/api/projects/slug/${slug}`);
 
         if (res.data) {
-          // ১. সেকশন ডাটা পার্সিং (স্মার্ট চেক)
           const rawSections = res.data.sections;
-          const sanitizedSections =
-            typeof rawSections === "string"
-              ? JSON.parse(rawSections)
-              : Array.isArray(rawSections)
-                ? rawSections
-                : [];
+          const sanitizedSections = typeof rawSections === "string"
+            ? JSON.parse(rawSections)
+            : Array.isArray(rawSections) ? rawSections : [];
 
-          // ২. ডাটাবেসের year এবং বাকি সব ডাটাকে একসাথে স্টেট-এ সেট করা
-          // নিশ্চিত করা হচ্ছে যেন year: "2020" বা আপনার দেওয়া সালটি সঠিকভাবে আসে
           setProject({
             ...res.data,
             sections: sanitizedSections,
-            // যদি year না থাকে, তবে ব্যাকআপ হিসেবে ২০২৬ দেখাবে (হার্ডকোড মুক্ত)
             year: res.data.year || "2026",
           });
 
-          // ৩. পেজ টাইটেল আপডেট
           if (res.data.title) {
             document.title = `${res.data.title} | Case Study`;
           }
@@ -65,24 +65,23 @@ const ProjectDetails = () => {
         }
       } catch (err) {
         console.error("Fetch Error:", err);
-        setError("Failed to load project details.");
+        setError(err.response?.status === 404 ? "Project not found!" : "Connection error to the server.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchProject();
-
-    // পেজের একদম উপরে নিয়ে যাওয়া
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [slug]); // শুধুমাত্র স্লাগ পরিবর্তন হলে এটি চলবে
+  }, [slug]);
 
+  // ✅ ইমেজ ইউআরএল লজিক ফিক্স (ProjectFilter এর মতই)
   const getImageUrl = (img) => {
-    if (!img)
-      return "https://via.placeholder.com/1920x1080?text=No+Image+Found";
+    if (!img) return "https://via.placeholder.com/1920x1080?text=No+Image+Found";
     if (img.startsWith("http")) return img;
-    const fileName = img.split("/").pop();
-    return `${BASE_URL}/uploads/${fileName}`;
+    const cleanPath = img.replace(/\\/g, "/");
+    const finalPath = cleanPath.startsWith('uploads/') ? cleanPath : `uploads/${cleanPath.startsWith('/') ? cleanPath.slice(1) : cleanPath}`;
+    return `${API_BASE}/${finalPath}`;
   };
 
   if (loading) {

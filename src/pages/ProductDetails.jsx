@@ -8,21 +8,29 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // ✅ Local vs Production Dynamic API URL
+  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
+
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+
     const fetchProductDetails = async () => {
       try {
-        const res = await axios.get(
-          `https://api.campaignsquat.com/api/products/${id}`,
-        );
+        setLoading(true);
+        // Dynamic BASE_URL use kora hoyeche
+        const res = await axios.get(`${BASE_URL}/api/products/${id}`);
         setProduct(res.data);
-        setLoading(false);
       } catch (err) {
-        console.error("Error fetching details:", err);
+        console.error("Error fetching details:", err.response?.data || err.message);
+      } finally {
         setLoading(false);
       }
     };
-    fetchProductDetails();
-  }, [id]);
+
+    if (id) fetchProductDetails();
+  }, [id, BASE_URL]);
 
   if (loading)
     return (
@@ -39,10 +47,15 @@ const ProductDetails = () => {
 
   return (
     <div className="bg-[#02050A] min-h-screen text-white pb-20 overflow-x-hidden">
-      {/* ১. ফুল ডিসপ্লে ইমেজ সেকশন - মোবাইলে ফুল দেখানোর জন্য h-auto এবং object-contain */}
+      {/* ১. ফুল ডিসপ্লে ইমেজ সেকশন */}
       <div className="w-full h-auto md:h-[80vh] relative bg-[#02050A] flex items-center justify-center ">
         <img
-          src={`https://api.campaignsquat.com${product.image}`}
+          // ✅ Dynamic Image URL with Slash Protection
+          src={
+            product.image?.startsWith("http") 
+              ? product.image 
+              : `${BASE_URL}${product.image?.startsWith("/") ? "" : "/"}${product.image}`
+          }
           alt={product.name}
           className="w-full h-full object-contain md:object-cover"
         />
@@ -51,7 +64,6 @@ const ProductDetails = () => {
 
       {/* ২. মেইন কন্টেন্ট সেকশন (Max-width 1445px) */}
       <div className="max-w-[1445px] mx-auto px-2 md:px-12 lg:px-20 mt-10 md:-mt-20 relative z-10">
-        {/* হেডার টেক্সট - মোবাইলে text-4xl এবং ডেস্কটপে 7xl */}
         <div className="space-y-4 md:space-y-6 mb-12 md:mb-20">
           <h1 className="text-[26px] md:text-[30px] lg:text-[40px] font-semibold text-white drop-shadow-2xl">
             {product.name}
@@ -146,7 +158,7 @@ const ProductDetails = () => {
               <line x1="8" y1="2" x2="8" y2="6"></line>
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
-            <span>Get the Product</span>
+            <span>{product.buttonText || "Get the Product"}</span>
           </a>
         </div>
 

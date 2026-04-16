@@ -4,10 +4,13 @@ import axios from "axios";
 const AboutRecognition = () => {
   const [data, setData] = useState(null);
 
+  // app.jsx থেকে আসা বেইজ URL
+  const API_BASE = axios.defaults.baseURL;
+
   useEffect(() => {
-    // ডাটাবেস থেকে সব ডাটা নিয়ে আসা হচ্ছে
+    // সরাসরি এন্ডপয়েন্ট ব্যবহার করা হয়েছে
     axios
-      .get("https://api.campaignsquat.com/api/about-recognition")
+      .get("/api/about-recognition")
       .then((res) => {
         if (res.data) {
           setData(res.data);
@@ -16,20 +19,28 @@ const AboutRecognition = () => {
       .catch((err) => console.log("Data fetch error:", err));
   }, []);
 
-  // ডাটা না আসা পর্যন্ত যাতে এরর না দেয়
+  // ডাটা না আসা পর্যন্ত যাতে এরর না দেয়
   if (!data) return null;
+
+  // ইমেজ পাথ হ্যান্ডলিং (স্লাশ চেক করা)
+  const cleanImagePath = data.image?.startsWith('/') ? data.image : `/${data.image}`;
+  const fullImageUrl = data.image?.startsWith('http') ? data.image : `${API_BASE}${cleanImagePath}`;
 
   return (
     <section className="w-full bg-[#02050A] py-16 md:py-24 font-poppins overflow-hidden pt-4 md:pt-6">
       <div className="max-w-[1445px] mx-auto px-2 sm:px-10 md:px-16 lg:px-24">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
+          
           {/* LEFT SIDE: Dynamic Image from Backend */}
           <div className="w-full lg:w-[45%]">
             <div className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[620px] overflow-hidden rounded-[5px] border border-white/10 shadow-2xl">
               <img
-                src={`https://api.campaignsquat.com${data.image}`}
+                src={fullImageUrl}
                 alt="Our Recognition"
                 className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                onError={(e) => {
+                  e.target.src = "https://via.placeholder.com/600x800?text=Recognition+Image";
+                }}
               />
             </div>
           </div>

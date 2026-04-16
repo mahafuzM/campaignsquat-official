@@ -1,17 +1,20 @@
 const Hero = require("../models/Hero");
+const fs = require("fs");
 
 // --- Hero Section Logic ---
 
-// Get Hero Data & Icon History
+// ১. Get Hero Data & Icon History
 exports.getHero = async (req, res) => {
   try {
     let data = await Hero.findOne();
 
+    // Data thakle kintu iconHistory na thakle default set kora
     if (data && !data.iconHistory) {
       data.iconHistory = [{ name: "zap" }];
       await data.save();
     }
 
+    // Data ekdom-i na thakle default object create kora
     if (!data) {
       data = await Hero.create({
         badge: "zap",
@@ -21,16 +24,21 @@ exports.getHero = async (req, res) => {
         vimeoId: "1153559168",
       });
     }
-    res.status(200).json(data);
+    
+    res.status(200).json({ success: true, data });
   } catch (err) {
-    res.status(500).json({ error: "Fetch failed" });
+    res.status(500).json({ success: false, error: "Fetch failed" });
   }
 };
 
-// Update Hero Content
+// ২. Update Hero Content (Relative Path Fix)
 exports.updateHero = async (req, res) => {
   try {
     const { badge, heading, paragraph, vimeoId } = req.body;
+    
+    // Prothome current data khuje nibo jate purono image delete kora jay
+    const currentHero = await Hero.findOne();
+
     let updateData = {
       badge: badge ? badge.toLowerCase().trim() : "zap",
       heading,
@@ -38,11 +46,17 @@ exports.updateHero = async (req, res) => {
       vimeoId,
     };
 
-    // যদি নতুন ফাইল আপলোড হয় তবেই imageUrl আপডেট হবে
+    // ✅ Best Practice: Sudhu relative path save kora
     if (req.file) {
-      // লোকালহোস্টের বদলে .env থেকে BASE_URL ব্যবহার করা হয়েছে
-      const baseUrl = process.env.BASE_URL || "http://localhost:5000";
-      updateData.imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
+      // Purono image delete kora (Optional but recommended)
+      if (currentHero && currentHero.imageUrl) {
+        const oldFilePath = `./${currentHero.imageUrl}`;
+        if (fs.existsSync(oldFilePath)) {
+          fs.unlinkSync(oldFilePath);
+        }
+      }
+      
+      updateData.imageUrl = `/uploads/${req.file.filename}`;
     }
 
     const updatedHero = await Hero.findOneAndUpdate({}, updateData, {
@@ -50,25 +64,26 @@ exports.updateHero = async (req, res) => {
       new: true,
     });
 
-    res.status(200).json(updatedHero);
+    res.status(200).json({ success: true, data: updatedHero });
   } catch (err) {
-    res.status(500).json({ error: "Update failed" });
+    console.error("Update Error:", err);
+    res.status(500).json({ success: false, error: "Update failed" });
   }
 };
 
-// --- Icon Management Logic (Using Hero Model Array) ---
+// --- Icon Management Logic ---
 
-// Get All Icons from Hero History
+// ৩. Get All Icons
 exports.getAllIcons = async (req, res) => {
   try {
     const hero = await Hero.findOne();
-    res.status(200).json(hero ? hero.iconHistory : []);
+    res.status(200).json({ success: true, data: hero ? hero.iconHistory : [] });
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch icons" });
+    res.status(500).json({ success: false, error: "Failed to fetch icons" });
   }
 };
 
-// Add New Icon to History Array
+// ৪. Add New Icon
 exports.addIcon = async (req, res) => {
   try {
     const { name } = req.body;
@@ -81,20 +96,18 @@ exports.addIcon = async (req, res) => {
 
     const isExist = hero.iconHistory.find((icon) => icon.name === cleanName);
     if (isExist)
-      return res
-        .status(400)
-        .json({ error: "This icon already exists in history" });
+      return res.status(400).json({ error: "This icon already exists" });
 
     hero.iconHistory.push({ name: cleanName });
     await hero.save();
 
-    res.status(201).json(hero.iconHistory[hero.iconHistory.length - 1]);
+    res.status(201).json({ success: true, data: hero.iconHistory[hero.iconHistory.length - 1] });
   } catch (err) {
-    res.status(500).json({ error: "Failed to add icon" });
+    res.status(500).json({ success: false, error: "Failed to add icon" });
   }
 };
 
-// Delete Icon from History Array
+// ৫. Delete Icon
 exports.deleteIcon = async (req, res) => {
   try {
     const hero = await Hero.findOne();
@@ -105,8 +118,8 @@ exports.deleteIcon = async (req, res) => {
     );
 
     await hero.save();
-    res.status(200).json({ message: "Icon deleted from history" });
+    res.status(200).json({ success: true, message: "Icon deleted" });
   } catch (err) {
-    res.status(500).json({ error: "Delete failed" });
+    res.status(500).json({ success: false, error: "Delete failed" });
   }
 };

@@ -14,14 +14,19 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
+// ✅ Global Axios Setup (এটি সাধারণত App.jsx এ থাকে, তবে এখানেও কাজ করবে)
+axios.defaults.baseURL = window.location.hostname === "localhost" 
+  ? "http://localhost:5000" 
+  : "https://api.campaignsquat.com";
+
 const AdminProject = () => {
   const [projects, setProjects] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
-    fullName: "", // এটিই আপনার স্ল্যাগ
+    fullName: "", 
     category: "Website Development",
     description: "",
-    clientName: "", // ব্যাকএন্ড স্কিমা অনুযায়ী নাম
+    clientName: "", 
     year: "2026",
     projectUrl: "",
   });
@@ -40,8 +45,8 @@ const AdminProject = () => {
     "Mobile App Development",
   ];
 
-  // ✅ আপনার নতুন ফাইল সেটআপ অনুযায়ী API URL
-  const API_URL = "https://api.campaignsquat.com/api/projects";
+  // ✅ API URL এখন ডাইনামিক (Global baseURL ব্যবহার করবে)
+  const API_URL = "/api/projects";
 
   const fetchProjects = async () => {
     try {
@@ -112,13 +117,12 @@ const AdminProject = () => {
     const { name, value } = e.target;
 
     if (name === "title") {
-      // ১. টাইটেল থেকে অটোমেটিক স্লাগ (fullName) জেনারেট করা
       const slug = value
         .toLowerCase()
         .trim()
-        .replace(/[^\w\s-]/g, "") // স্পেশাল ক্যারেক্টার রিমুভ
-        .replace(/[\s_-]+/g, "-") // স্পেস ও আন্ডারস্কোরকে ড্যাশ করা
-        .replace(/^-+|-+$/g, ""); // শুরুর ও শেষের ড্যাশ রিমুভ
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
 
       setFormData((prev) => ({
         ...prev,
@@ -126,15 +130,12 @@ const AdminProject = () => {
         fullName: slug,
       }));
     } else if (name === "year") {
-      // ২. Year ফিল্ডে শুধু সংখ্যা (digits) অ্যালাউ করা এবং ম্যাক্স ৪ ক্যারেক্টার
       const cleanYear = value.replace(/\D/g, "").slice(0, 4);
-
       setFormData((prev) => ({
         ...prev,
         year: cleanYear,
       }));
     } else {
-      // ৩. বাকি সব ইনপুটের জন্য সাধারণ আপডেট
       setFormData((prev) => ({
         ...prev,
         [name]: value,
@@ -158,22 +159,15 @@ const AdminProject = () => {
 
     try {
       const data = new FormData();
-
-      // ১. সাধারণ টেক্সট ফিল্ডগুলো অ্যাপেন্ড করা
       Object.keys(formData).forEach((key) => {
         data.append(key, formData[key]);
       });
-
-      // ২. ডাইনামিক সেকশনগুলো স্ট্রিং হিসেবে পাঠানো (ব্যাকএন্ডে JSON.parse হবে)
       data.append("sections", JSON.stringify(sections));
 
-      // ৩. 🚨 হান্ড্রেড পারসেন্ট রাইট লজিক:
-      // আপনার রাউটারে আছে 'upload.single("imageUrl")', তাই এখানে 'imageUrl' ই দিতে হবে।
       if (image) {
         data.append("imageUrl", image);
       }
 
-      // ৪. রিকোয়েস্ট পাঠানো
       if (editId) {
         const response = await axios.put(`${API_URL}/${editId}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
@@ -186,12 +180,10 @@ const AdminProject = () => {
         if (response.data.success) alert("Project added successfully!");
       }
 
-      // ৫. সাকসেস হলে ফর্ম রিসেট ও লিস্ট আপডেট
       resetForm();
       fetchProjects();
     } catch (err) {
       console.error("Submission Error:", err.response?.data || err.message);
-      // ব্যাকএন্ড থেকে আসা নির্দিষ্ট এরর মেসেজ দেখাবে
       const errorMsg = err.response?.data?.message || "Operation failed!";
       alert(errorMsg);
     } finally {
@@ -212,48 +204,37 @@ const AdminProject = () => {
   };
 
   const handleEdit = (project) => {
-    // ১. এডিট মুড অন করার জন্য আইডি সেট করা
     setEditId(project._id);
-
-    // ২. কোর ডাটাগুলো ফর্মে সেট করা (স্মার্ট চেক সহ)
     setFormData({
       title: project.title || "",
       fullName: project.fullName || "",
       category: project.category || "Website Development",
       description: project.description || "",
       clientName: project.clientName || "",
-      // যদি ডাটাবেসে year থাকে তবে সেটা দেখাবে, না থাকলে ডিফল্ট ২০২৬
       year: project.year ? project.year.toString() : "2026",
       projectUrl: project.projectUrl || "",
     });
 
-    // ৩. ইমেজ প্রিভিউ হ্যান্ডলিং (ব্যাকএন্ডের imageUrl ফিল্ড অনুযায়ী)
+    // ✅ ইমেজ প্রিভিউ এখন ডাইনামিক বেস ইউআরএল থেকে আসবে
     if (project.imageUrl) {
-      setImagePreview(
-        `https://api.campaignsquat.com/uploads/${project.imageUrl}`,
-      );
+      setImagePreview(`${axios.defaults.baseURL}/uploads/${project.imageUrl}`);
     } else {
       setImagePreview(null);
     }
 
-    // ৪. সেকশন ডাটা পার্সিং (স্মার্ট চেক সহ যাতে অ্যাপ ক্রাশ না করে)
     try {
       let loadedSections = [];
       if (project.sections) {
-        // ব্যাকএন্ড যদি স্ট্রিং পাঠায় তবে পার্স করবে, না হলে সরাসরি অ্যারে নিবে
-        loadedSections =
-          typeof project.sections === "string"
-            ? JSON.parse(project.sections)
-            : project.sections;
+        loadedSections = typeof project.sections === "string"
+          ? JSON.parse(project.sections)
+          : project.sections;
       }
-      // নিশ্চিত করা হচ্ছে যে ডাটাটি অবশ্যই একটি অ্যারে
       setSections(Array.isArray(loadedSections) ? loadedSections : []);
     } catch (e) {
       console.error("Error parsing sections during edit:", e);
       setSections([]);
     }
 
-    // ৫. এডিট ক্লিক করার পর পেজের একদম উপরে স্মুথলি নিয়ে যাবে
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -693,7 +674,7 @@ const AdminProject = () => {
                     <td className="p-5">
                       {item.imageUrl && (
                         <img
-                          src={`https://api.campaignsquat.com/uploads/${item.imageUrl}`}
+                          src={`http://localhost:5000/uploads/${item.imageUrl}`}
                           alt={item.title}
                           className="w-24 h-16 object-cover rounded shadow-md border border-gray-200"
                         />

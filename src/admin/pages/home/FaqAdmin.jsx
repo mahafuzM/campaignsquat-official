@@ -7,9 +7,6 @@ const FaqAdmin = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
-  // আপনার লোকালহোস্ট API URL
-  const API_URL = "https://api.campaignsquat.com/api/faqs";
-
   useEffect(() => {
     fetchFaqs();
   }, []);
@@ -17,8 +14,8 @@ const FaqAdmin = () => {
   const fetchFaqs = async () => {
     try {
       setFetching(true);
-      const res = await axios.get(API_URL);
-      // নিশ্চিত করা হচ্ছে যে ডাটাবেস থেকে আসা ডাটা যেন অ্যারে হয়
+      // ✅ Dynamic Endpoint
+      const res = await axios.get("/api/faqs");
       setFaqs(res.data || []);
     } catch (err) {
       console.error("Error fetching FAQs:", err);
@@ -28,18 +25,14 @@ const FaqAdmin = () => {
   };
 
   const addFaq = () => {
-    // নতুন FAQ লিস্টের শুরুতে অ্যাড হবে
     setFaqs([{ question: "", answer: "", order: 0 }, ...faqs]);
   };
 
-  // ✅ ডিলিট ফাংশন আপডেট করা হয়েছে (OK করলে সরাসরি ডাটাবেস আপডেট হবে)
   const deleteFaq = async (index) => {
     if (window.confirm("Are you sure you want to delete this FAQ?")) {
       const newFaqs = faqs.filter((_, i) => i !== index);
-      // ১. প্রথমে স্টেট আপডেট করা
       setFaqs([...newFaqs]);
 
-      // ২. সরাসরি ডাটাবেসে সেভ পাঠানো
       setLoading(true);
       try {
         const faqsToSync = newFaqs.map((f, idx) => ({
@@ -48,18 +41,18 @@ const FaqAdmin = () => {
           order: idx,
         }));
 
-        const response = await axios.post(`${API_URL}/update`, {
+        // ✅ Dynamic Endpoint for Update
+        const response = await axios.post("/api/faqs/update", {
           faqs: faqsToSync,
         });
 
         if (response.data) {
           setFaqs(response.data);
-          console.log("Deleted & Saved to DB");
         }
       } catch (err) {
         console.error("Auto-save Error:", err);
-        alert("❌ ডিলিট হয়েছে কিন্তু ডাটাবেসে সেভ হতে সমস্যা হয়েছে!");
-        fetchFaqs(); // এরর হলে ডাটা ক্লিয়ার না করে আবার লোড করবে
+        alert("❌ ডিলিট হয়েছে কিন্তু ডাটাবেসে সেভ হতে সমস্যা হয়েছে!");
+        fetchFaqs();
       } finally {
         setLoading(false);
       }
@@ -69,21 +62,21 @@ const FaqAdmin = () => {
   const handleSave = async () => {
     if (faqs.length === 0) {
       const confirmClear = window.confirm(
-        "You are about to clear all FAQs. Proceed?",
+        "You are about to clear all FAQs. Proceed?"
       );
       if (!confirmClear) return;
     }
 
     setLoading(true);
     try {
-      // ব্যাকএন্ডে পাঠানোর আগে অপ্রয়োজনীয় ID এবং মেটাডাটা বাদ দেওয়া
       const faqsToSync = faqs.map((f, index) => ({
         question: f.question || "",
         answer: f.answer || "",
         order: index,
       }));
 
-      const response = await axios.post(`${API_URL}/update`, {
+      // ✅ Dynamic Endpoint for Update
+      const response = await axios.post("/api/faqs/update", {
         faqs: faqsToSync,
       });
 
@@ -93,7 +86,7 @@ const FaqAdmin = () => {
       }
     } catch (err) {
       console.error("Save Error:", err);
-      alert("❌ Error saving data! Check if server is running.");
+      alert("❌ Error saving data!");
     } finally {
       setLoading(false);
     }
@@ -111,7 +104,7 @@ const FaqAdmin = () => {
     <div className="p-8 bg-gray-100 min-h-screen font-poppins text-black">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex justify-between items-center border-b-2 border-black pb-4">
-          <h2 className="text-3xl text-black font-bold  tracking-tighter">
+          <h2 className="text-3xl text-black font-bold tracking-tighter">
             Manage FAQs
           </h2>
           <span className="bg-black text-white px-3 py-1 text-xs font-bold rounded">
@@ -195,9 +188,7 @@ const FaqAdmin = () => {
             onClick={handleSave}
             disabled={loading}
             className={`w-full justify-center bg-[#F7A400] text-black text-[14px] md:text-[15px] hover:text-white hover:bg-[#02050A] font-semibold py-2 px-8 rounded-[5px] border-2 border-[#F7A400] transition-all duration-300 flex items-center gap-2 ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "   active:scale-[0.99]"
+              loading ? "bg-gray-400 cursor-not-allowed" : "active:scale-[0.99]"
             }`}
           >
             {loading ? (

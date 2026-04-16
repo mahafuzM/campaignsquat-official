@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Upload, Plus, Trash2, Save, Globe, Info, Loader2 } from "lucide-react";
 
 const AboutRecognitionEdit = () => {
   const [mainTitle, setMainTitle] = useState("");
   const [image, setImage] = useState("");
   const [platforms, setPlatforms] = useState([{ platform: "", desc: "" }]);
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // ডাটাবেস থেকে বর্তমান ডাটা লোড করা
+  // app.jsx থেকে আসা বেইজ URL
+  const API_BASE = axios.defaults.baseURL;
+
+  // ১. ডাটাবেস থেকে বর্তমান ডাটা লোড করা
   useEffect(() => {
     axios
-      .get("https://api.campaignsquat.com/api/about-recognition")
+      .get("/api/about-recognition")
       .then((res) => {
         if (res.data) {
           setMainTitle(res.data.mainTitle || "");
@@ -18,170 +23,187 @@ const AboutRecognitionEdit = () => {
           setPlatforms(res.data.platforms || [{ platform: "", desc: "" }]);
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error("Fetch error:", err));
   }, []);
 
-  // ইমেজ আপলোড হ্যান্ডলার
+  // ২. ইমেজ আপলোড হ্যান্ডলার
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+
     const formData = new FormData();
     formData.append("file", file);
     setUploading(true);
+
     try {
-      const res = await axios.post(
-        "https://api.campaignsquat.com/api/upload",
-        formData,
-      );
+      const res = await axios.post("/api/upload", formData);
       setImage(res.data.url);
     } catch (err) {
       alert("Image upload failed!");
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   };
 
-  // সব ডাটা একসাথে সেভ/আপডেট করা
+  // ৩. সব ডাটা একসাথে সেভ/আপডেট করা
   const handleUpdate = async () => {
+    setLoading(true);
     try {
-      await axios.post(
-        "https://api.campaignsquat.com/api/about-recognition/update",
-        {
-          mainTitle,
-          image,
-          platforms,
-        },
-      );
-      alert("Recognition Content Updated Successfully!");
+      await axios.post("/api/about-recognition/update", {
+        mainTitle,
+        image,
+        platforms,
+      });
+      alert("✅ Recognition Content Updated Successfully!");
     } catch (err) {
-      alert("Update failed!");
+      alert("❌ Update failed!");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // নতুন প্ল্যাটফর্ম রো যোগ করা
-  const addMore = () =>
-    setPlatforms([...platforms, { platform: "", desc: "" }]);
+  // ৪. প্ল্যাটফর্ম ম্যানেজমেন্ট ফাংশন
+  const addMore = () => setPlatforms([...platforms, { platform: "", desc: "" }]);
 
-  // কোনো প্ল্যাটফর্ম রিমুভ করা
   const removePlatform = (index) => {
-    const newArr = platforms.filter((_, i) => i !== index);
+    if (platforms.length > 1) {
+      setPlatforms(platforms.filter((_, i) => i !== index));
+    } else {
+      alert("At least one platform is required!");
+    }
+  };
+
+  const updatePlatform = (index, field, value) => {
+    const newArr = [...platforms];
+    newArr[index][field] = value;
     setPlatforms(newArr);
   };
 
-  return (
-    <div className="p-8 bg-gray-100 min-h-screen text-black font-poppins">
-      <h2 className="text-3xl font-black mb-6 border-b-4 text-black border-[#F7A400] pb-2 inline-block ">
-        Global Recognition Admin
-      </h2>
+  // ইমেজ পাথ হ্যান্ডলিং
+  const fullImgUrl = image?.startsWith("http") 
+    ? image 
+    : `${API_BASE}${image?.startsWith("/") ? "" : "/"}${image}`;
 
-      <div className="bg-white p-8 rounded shadow-md border-t-8 border-[#F7A400] space-y-8">
-        {/* ১. মেইন টাইটেল এডিট (H2) */}
-        <div className="flex flex-col gap-2">
-          <label className="font-bold text-gray-700">
-            Main Section Title (H2)
+  return (
+    <div className="p-6 md:p-10 bg-[#F8FAFC] min-h-screen text-slate-900 font-poppins">
+      
+      {/* Header Section */}
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+        <div>
+          <h2 className="text-3xl font-black text-black tracking-tighter uppercase italic flex items-center gap-3">
+            <Globe className="text-[#F7A400]" size={32} />
+            Recognition <span className="text-[#F7A400]">Admin</span>
+          </h2>
+          <p className="text-slate-500 text-sm mt-1">Manage global awards and platform achievements</p>
+        </div>
+        <button
+          onClick={handleUpdate}
+          disabled={loading}
+          className="flex items-center justify-center gap-2 bg-black text-white px-8 py-4 rounded-xl font-bold hover:bg-[#F7A400] hover:text-black transition-all shadow-xl disabled:opacity-50"
+        >
+          {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+          {loading ? "SAVING..." : "SAVE CHANGES"}
+        </button>
+      </div>
+
+      <div className="max-w-5xl mx-auto space-y-8">
+        
+        {/* Main Title Section */}
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-2 h-full bg-[#F7A400]"></div>
+          <label className="flex items-center gap-2 font-black text-xs uppercase tracking-[0.2em] text-slate-400 mb-4">
+            <Info size={14} /> Section Heading
           </label>
           <input
-            className="p-4 border-2 rounded-[5px] focus:border-[#F7A400] outline-none font-bold text-xl"
+            className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-[#F7A400] focus:bg-white outline-none font-bold text-2xl transition-all"
             placeholder="e.g. The Global Recognition"
             value={mainTitle}
             onChange={(e) => setMainTitle(e.target.value)}
           />
         </div>
 
-        {/* ২. ইমেজ আপলোড সেকশন */}
-        <div className="p-6 bg-gray-50 rounded-[5px] border-2 border-dashed border-gray-300">
-          <label className="block font-bold mb-3 text-lg">
-            Recognition Image (Left Side)
-          </label>
-          <input
-            type="file"
-            onChange={handleImageUpload}
-            className="mb-4 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#F7A400] file:text-black hover:file:bg-black hover:file:text-white"
-          />
-
-          {uploading && (
-            <p className="text-[#F7A400] font-bold animate-pulse">
-              Uploading...
-            </p>
-          )}
-
-          {image && (
-            <div className="mt-4 shadow-xl inline-block rounded-[5px] overflow-hidden border-4 border-white">
-              <img
-                src={`https://api.campaignsquat.com${image}`}
-                className="w-80 h-48 object-cover"
-                alt="Preview"
+        {/* Image Upload Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center">
+             <label className="font-black text-xs uppercase tracking-[0.2em] text-slate-400 mb-6 block">
+              Feature Illustration
+            </label>
+            <div className="relative group cursor-pointer">
+              <input
+                type="file"
+                onChange={handleImageUpload}
+                className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                accept="image/*"
               />
+              <div className="border-3 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center group-hover:border-[#F7A400] group-hover:bg-orange-50 transition-all">
+                <Upload className="text-slate-300 group-hover:text-[#F7A400] mb-2" size={40} />
+                <span className="text-sm font-bold text-slate-500 group-hover:text-black">
+                  {uploading ? "Uploading..." : "Click to Replace Image"}
+                </span>
+              </div>
             </div>
-          )}
+          </div>
+
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center">
+            {image ? (
+              <div className="relative rounded-xl overflow-hidden shadow-2xl border-4 border-white aspect-video w-full">
+                <img src={fullImgUrl} className="w-full h-full object-cover" alt="Preview" />
+              </div>
+            ) : (
+              <div className="text-slate-300 italic text-sm">No preview available</div>
+            )}
+          </div>
         </div>
 
-        {/* ৩. প্ল্যাটফর্ম লিস্ট (H3 & P) */}
-        <div className="space-y-6">
-          <label className="block font-bold text-xl border-b-2 pb-2 text-[#F7A400]">
-            Recognition Items (H3 & P)
-          </label>
+        {/* Platforms List Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="font-black text-xs uppercase tracking-[0.2em] text-slate-400">
+              Recognition Platforms ({platforms.length})
+            </h3>
+            <button
+              onClick={addMore}
+              className="flex items-center gap-2 text-[#F7A400] font-bold text-sm hover:underline"
+            >
+              <Plus size={18} /> Add New Platform
+            </button>
+          </div>
 
           {platforms.map((p, index) => (
             <div
               key={index}
-              className="relative group grid grid-cols-1 md:grid-cols-2 gap-6 p-8 bg-gray-50 border-2 rounded-[5px] hover:border-[#F7A400] transition-all duration-300"
+              className="group relative bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row gap-6 transition-all hover:border-[#F7A400]"
             >
-              {/* রিমুভ বাটন */}
+              <div className="flex-1 space-y-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Platform Name</label>
+                  <input
+                    className="w-full p-3 bg-slate-50 border border-transparent rounded-xl font-black text-xl focus:border-[#F7A400] outline-none transition-all"
+                    placeholder="e.g. Upwork"
+                    value={p.platform}
+                    onChange={(e) => updatePlatform(index, "platform", e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Description</label>
+                  <textarea
+                    className="w-full p-3 bg-slate-50 border border-transparent rounded-xl font-medium focus:border-[#F7A400] outline-none min-h-[80px] transition-all"
+                    placeholder="e.g. Top Rated Agency"
+                    value={p.desc}
+                    onChange={(e) => updatePlatform(index, "desc", e.target.value)}
+                  />
+                </div>
+              </div>
+
               <button
                 onClick={() => removePlatform(index)}
-                className="absolute -top-3 -right-3 bg-red-600 text-white w-10 h-10 rounded-full font-bold shadow-lg hover:bg-black transition-all"
+                className="self-start md:self-center p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm"
               >
-                ✕
+                <Trash2 size={20} />
               </button>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                  Platform Name (H3)
-                </label>
-                <input
-                  className="p-3 border rounded-[5px] font-black text-xl focus:border-[#F7A400] outline-none"
-                  placeholder="e.g. Upwork"
-                  value={p.platform}
-                  onChange={(e) => {
-                    const newArr = [...platforms];
-                    newArr[index].platform = e.target.value;
-                    setPlatforms(newArr);
-                  }}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                  Description (P)
-                </label>
-                <textarea
-                  className="p-3 border rounded-lg font-medium focus:border-[#F7A400] outline-none min-h-[55px]"
-                  placeholder="e.g. Top Rated Agency"
-                  value={p.desc}
-                  onChange={(e) => {
-                    const newArr = [...platforms];
-                    newArr[index].desc = e.target.value;
-                    setPlatforms(newArr);
-                  }}
-                />
-              </div>
             </div>
           ))}
-
-          <button
-            onClick={addMore}
-            className="w-full md:w-auto bg-black text-white px-10 py-4 rounded-[5px] font-bold hover:bg-[#F7A400] hover:text-black transition-all shadow-lg flex items-center justify-center gap-2"
-          >
-            <span className="text-2xl">+</span> Add New item
-          </button>
         </div>
-
-        {/* ৪. ফাইনাল সেভ বাটন */}
-        <button
-          onClick={handleUpdate}
-          className="w-full bg-[#F7A400] text-black font-black py-6 rounded-[5px] text-2xl tracking-[0.1em] hover:bg-black hover:text-white transition-all shadow-2xl border-b-8 border-black/20"
-        >
-          Save Recognition Changes
-        </button>
       </div>
     </div>
   );

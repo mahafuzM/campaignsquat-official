@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { CheckCircle2 } from "lucide-react";
-import { Link } from "react-router-dom"; // ✅ রিয়্যাক্ট রাউটার ব্যবহার করলে এটা লাগবে
+import { CheckCircle2, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const ServiceEcosystem = () => {
+  // ১. মেমোরি থেকে ইনস্ট্যান্ট ডেটা লোড (আপনার লজিক)
   const [data, setData] = useState(() => {
     const saved = sessionStorage.getItem("cached_creative_services");
     return saved ? JSON.parse(saved) : null;
   });
 
   const [loading, setLoading] = useState(!data);
-  const BASE_URL = "https://api.campaignsquat.com";
+
+  // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ দুই জায়গায় কাজ করবে)
+  const BASE_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,30 +35,29 @@ const ServiceEcosystem = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [BASE_URL]);
 
-  // ✅ পারফেক্ট লিঙ্ক হ্যান্ডলার ফাংশন
+  // ✅ পারফেক্ট লিঙ্ক হ্যান্ডলার ফাংশন (আপনার লজিক অক্ষুণ্ণ রাখা হয়েছে)
   const renderLink = (service, index) => {
     const url = service.url?.trim() || "#";
-
-    // ১. যদি লিঙ্কটি বাইরের হয় (http দিয়ে শুরু হয়)
     const isExternal = url.startsWith("http");
-
-    // ২. কমন স্টাইল
     const commonClass =
-      "flex items-center gap-4 group/item transition-all duration-300 hover:translate-x-3 cursor-pointer";
+      "flex items-center gap-4 group/item transition-all duration-300 hover:translate-x-3 cursor-pointer p-4 bg-[#0A0D12] border border-gray-900 rounded-[5px] hover:border-[#F7A400]/50";
 
     const content = (
       <>
         <div className="flex-shrink-0">
           <CheckCircle2
-            size={20}
-            className="text-[#F7A400] drop-shadow-[0_0_10px_rgba(247,164,0,0.6)] group-hover/item:scale-125 transition-transform"
+            size={18}
+            className="text-[#F7A400] drop-shadow-[0_0_10px_rgba(247,164,0,0.4)] group-hover/item:scale-125 transition-transform"
           />
         </div>
-        <span className="text-white text-[14px] md:text-[16px] font-semibold tracking-tight group-hover/item:text-white transition-colors">
-          {service.name}
-        </span>
+        <div className="flex flex-col flex-grow">
+          <span className="text-white text-[14px] md:text-[15px] font-bold tracking-tight group-hover/item:text-[#F7A400] transition-colors ">
+            {service.name}
+          </span>
+        </div>
+        <ArrowRight size={14} className="text-gray-700 group-hover/item:text-[#F7A400] group-hover/item:translate-x-1 transition-all" />
       </>
     );
 

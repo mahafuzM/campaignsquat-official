@@ -9,24 +9,34 @@ const CampaignEdit = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
-  // ১. ডাটাবেস থেকে বর্তমান ডাটা নিয়ে আসা
+  // ✅ ১. ডাইনামিক API_BASE (লোকাল এবং লাইভ সুইচিং)
+  const API_BASE = window.location.hostname === "localhost" 
+    ? "http://localhost:5000" 
+    : "https://api.campaignsquat.com";
+
   useEffect(() => {
     const fetchAboutData = async () => {
       try {
-        const res = await axios.get("https://api.campaignsquat.com/api/about");
+        // ✅ ডোমেইন নাম ছাড়া শুধু এন্ডপয়েন্ট (App.jsx এর baseURL ব্যবহার করবে)
+        const res = await axios.get("/api/about");
         if (res.data) {
           setFormData({
             title: res.data.title,
             description: res.data.description,
           });
-          setPreview(res.data.imageUrl);
+          
+          // ইমেজের ফুল পাথ সেট করা যাতে প্রিভিউ ঠিকমতো আসে
+          const imagePath = res.data.imageUrl;
+          if (imagePath) {
+            setPreview(imagePath.startsWith("http") ? imagePath : `${API_BASE}/${imagePath}`);
+          }
         }
       } catch (err) {
         console.error("Error fetching about data:", err);
       }
     };
     fetchAboutData();
-  }, []);
+  }, [API_BASE]);
 
   // ২. ইনপুট হ্যান্ডলার
   const handleChange = (e) => {
@@ -53,7 +63,8 @@ const CampaignEdit = () => {
     if (file) data.append("image", file);
 
     try {
-      await axios.post("https://api.campaignsquat.com/api/about", data);
+      // ✅ এখানেও শুধু এন্ডপয়েন্ট ব্যবহার করুন
+      await axios.post("/api/about", data);
       setMessage({
         type: "success",
         text: "Campaign section updated successfully! ✅",
