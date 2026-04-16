@@ -22,7 +22,7 @@ const app = express();
 // ১. মিডলওয়্যার কনফিগারেশন (Optimized for Production & Local)
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://localhost:5174",
+  'http://localhost:4173', // Vite preview port (এটি এখন যোগ করুন)
   "https://campaignsquat.com",
   "https://www.campaignsquat.com",
   "https://campaignsquat-frontend.vercel.app"
