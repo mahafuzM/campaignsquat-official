@@ -15,18 +15,17 @@ import {
 } from "lucide-react";
 
 // ✅ Global Axios Setup (এটি সাধারণত App.jsx এ থাকে, তবে এখানেও কাজ করবে)
-axios.defaults.baseURL = window.location.hostname === "localhost" 
-  ? "http://localhost:5000" 
-  : "https://api.campaignsquat.com";
+axios.defaults.baseURL =
+  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
 const AdminProject = () => {
   const [projects, setProjects] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
-    fullName: "", 
+    fullName: "",
     category: "Website Development",
     description: "",
-    clientName: "", 
+    clientName: "",
     year: "2026",
     projectUrl: "",
   });
@@ -225,9 +224,10 @@ const AdminProject = () => {
     try {
       let loadedSections = [];
       if (project.sections) {
-        loadedSections = typeof project.sections === "string"
-          ? JSON.parse(project.sections)
-          : project.sections;
+        loadedSections =
+          typeof project.sections === "string"
+            ? JSON.parse(project.sections)
+            : project.sections;
       }
       setSections(Array.isArray(loadedSections) ? loadedSections : []);
     } catch (e) {

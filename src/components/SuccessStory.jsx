@@ -2,9 +2,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 // ✅ ডাইনামিক বেস ইউআরএল সেটআপ
-const BASE_URL = window.location.hostname === "localhost" 
-  ? "http://localhost:5000" 
-  : "https://api.campaignsquat.com";
+const BASE_URL =
+  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
 const SuccessStory = () => {
   const [data, setData] = useState(null);
@@ -158,8 +157,8 @@ const Card = ({ item, accentColor }) => (
           item.image
             ? item.image.startsWith("http")
               ? item.image
-              // ✅ এখানে BASE_URL ব্যবহার করা হয়েছে
-              : `${BASE_URL}${item.image.startsWith("/") ? "" : "/"}${item.image}`
+              : // ✅ এখানে BASE_URL ব্যবহার করা হয়েছে
+                `${BASE_URL}${item.image.startsWith("/") ? "" : "/"}${item.image}`
             : ""
         }
         alt={item.name}

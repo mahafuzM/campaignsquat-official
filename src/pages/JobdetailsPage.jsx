@@ -20,9 +20,11 @@ const JobdetailsPage = () => {
   const sectionPadding = "max-w-[1300px] mx-auto px-6 sm:px-10 md:px-16";
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000"
+      : "/api";
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -32,7 +34,7 @@ const JobdetailsPage = () => {
         setLoading(true);
         // Dynamic BASE_URL use kora hoyeche
         const res = await axios.get(`${BASE_URL}/api/jobs/${id}`);
-        
+
         // Data parsing safety: res.data direct object hote pare ba res.data.data
         const actualData = res.data?.data || res.data;
         setJob(actualData);

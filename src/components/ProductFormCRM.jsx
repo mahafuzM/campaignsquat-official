@@ -29,14 +29,16 @@ const ProductFormCRM = () => {
   const [loading, setLoading] = useState(true);
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000"
+      : "/api";
 
   // ✅ Image Path Helper Logic
   const getImgUrl = (imagePath) => {
-    if (!imagePath) return ""; 
-    if (imagePath.startsWith("http")) return imagePath; 
+    if (!imagePath) return "";
+    if (imagePath.startsWith("http")) return imagePath;
     const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
     return `${BASE_URL}${cleanPath}`;
   };
@@ -47,12 +49,17 @@ const ProductFormCRM = () => {
         setLoading(true);
         // Dynamic BASE_URL use kora hoyeche
         const res = await axios.get(`${BASE_URL}/api/products/all`);
-        
+
         // Data safety check: Array na hole empty array set korbe
-        const actualData = Array.isArray(res.data) ? res.data : (res.data.data || []);
+        const actualData = Array.isArray(res.data)
+          ? res.data
+          : res.data.data || [];
         setProducts(actualData);
       } catch (err) {
-        console.error("Error loading products:", err.response?.data || err.message);
+        console.error(
+          "Error loading products:",
+          err.response?.data || err.message,
+        );
       } finally {
         setLoading(false);
       }
@@ -61,7 +68,9 @@ const ProductFormCRM = () => {
   }, [BASE_URL]);
 
   if (loading) {
-    return <div className="text-center py-10 text-white/50">Loading Products...</div>;
+    return (
+      <div className="text-center py-10 text-white/50">Loading Products...</div>
+    );
   }
 
   return (
@@ -114,18 +123,18 @@ const ProductFormCRM = () => {
                   <div className="relative group">
                     <div className="absolute -inset-1 bg-white/5 rounded-[5px] blur-lg group-hover:bg-white/10 transition duration-700"></div>
                     <div className="relative overflow-hidden rounded-[5px] border border-white/10 bg-[#0A0A0A]">
-                     <img
-  // ✅ BASE_URL use kora hoyeche jate local ar live duitai thik thake
-  // slash (/) handling logic-o add kora hoyeche
-  src={
-    product.image?.startsWith("http") 
-      ? product.image 
-      : `${BASE_URL}${product.image?.startsWith("/") ? "" : "/"}${product.image}`
-  }
-  alt={product.name}
-  loading="lazy"
-  className="w-full h-[250px] md:h-[400px] object-cover transform group-hover:scale-105 transition-transform duration-1000"
-/>
+                      <img
+                        // ✅ BASE_URL use kora hoyeche jate local ar live duitai thik thake
+                        // slash (/) handling logic-o add kora hoyeche
+                        src={
+                          product.image?.startsWith("http")
+                            ? product.image
+                            : `${BASE_URL}${product.image?.startsWith("/") ? "" : "/"}${product.image}`
+                        }
+                        alt={product.name}
+                        loading="lazy"
+                        className="w-full h-[250px] md:h-[400px] object-cover transform group-hover:scale-105 transition-transform duration-1000"
+                      />
                     </div>
                   </div>
                 </div>

@@ -10,7 +10,7 @@ import {
   Edit,
   Trash,
   Image as ImageIcon,
-  Loader2
+  Loader2,
 } from "lucide-react";
 
 const BlogManager = () => {
@@ -28,9 +28,8 @@ const BlogManager = () => {
   ]);
 
   // ✅ ডাইনামিক বেস ইউআরএল সেটআপ
-  const BASE_URL = window.location.hostname === "localhost" 
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
   // 🔥 ১০০% পারফেক্ট স্লাগ জেনারেটর লজিক
   const generateSlug = (text) => {

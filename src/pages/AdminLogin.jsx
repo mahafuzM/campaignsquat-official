@@ -27,33 +27,32 @@ const AdminLogin = () => {
 
     // --- 🌍 Dynamic API URL Logic ---
     // Local-e thakle 5000 port-e call hobe, hosting-e thakle api sub-domain-e
-    const API_BASE_URL = window.location.hostname === "localhost" 
-      ? "http://localhost:5000" 
-      : "https://api.campaignsquat.com";
+    const API_BASE_URL =
+      window.location.hostname === "localhost"
+        ? "http://localhost:5000"
+        : "/api";
 
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/admin-login`,
-        {
-          email: email.trim().toLowerCase(),
-          password: password,
-        }
-      );
+      const response = await axios.post(`${API_BASE_URL}/api/admin-login`, {
+        email: email.trim().toLowerCase(),
+        password: password,
+      });
 
       if (response.data.success || response.data.token) {
         const token = response.data.token;
         localStorage.setItem("adminToken", token);
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        
+
         // Use window.location for a clean redirect on both local/hosting
-        window.location.href = "/admin"; 
+        window.location.href = "/admin";
       } else {
         setError("Invalid response from server.");
       }
     } catch (err) {
       console.error("Login Error:", err);
       // Detailed error message handling
-      const msg = err.response?.data?.message || "Login failed. Server is unreachable!";
+      const msg =
+        err.response?.data?.message || "Login failed. Server is unreachable!";
       setError(msg);
     } finally {
       setLoading(false);
@@ -72,7 +71,11 @@ const AdminLogin = () => {
           <div className="relative p-[1.5px] rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(247,164,0,0.15)]">
             <div className="absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#F7A400_0%,#0B1120_50%,#F7A400_100%)]" />
             <div className="relative bg-[#0B1120] p-4 rounded-[15px] backdrop-blur-xl">
-              <img src={logo} alt="Campaignsquat Logo" className="h-14 w-auto object-contain transition-transform duration-500 group-hover:scale-110" />
+              <img
+                src={logo}
+                alt="Campaignsquat Logo"
+                className="h-14 w-auto object-contain transition-transform duration-500 group-hover:scale-110"
+              />
             </div>
           </div>
         </div>
@@ -83,8 +86,12 @@ const AdminLogin = () => {
 
           <div className="relative bg-[#0B1120] rounded-[22px] p-10 md:p-12 pt-16 z-10 backdrop-blur-xl border border-white/5">
             <div className="text-center mb-10">
-              <h1 className="text-[12px] font-bold text-[#F7A400] tracking-[0.2em] mb-2">CAMPAIGNSQUAT LTD.</h1>
-              <h2 className="text-4xl font-extrabold text-white tracking-tight">Admin <span className="text-[#F7A400]">Panel</span></h2>
+              <h1 className="text-[12px] font-bold text-[#F7A400] tracking-[0.2em] mb-2">
+                CAMPAIGNSQUAT LTD.
+              </h1>
+              <h2 className="text-4xl font-extrabold text-white tracking-tight">
+                Admin <span className="text-[#F7A400]">Panel</span>
+              </h2>
               <div className="w-12 h-[2px] bg-[#F7A400] mx-auto mt-4 rounded-full"></div>
             </div>
 
@@ -96,9 +103,14 @@ const AdminLogin = () => {
               )}
 
               <div className="space-y-2">
-                <label className="text-white font-medium ml-1">Email Address</label>
+                <label className="text-white font-medium ml-1">
+                  Email Address
+                </label>
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-4 text-gray-400 group-focus-within:text-[#F7A400] transition-colors" size={20} />
+                  <Mail
+                    className="absolute left-4 top-4 text-gray-400 group-focus-within:text-[#F7A400] transition-colors"
+                    size={20}
+                  />
                   <input
                     type="email"
                     required
@@ -114,7 +126,10 @@ const AdminLogin = () => {
               <div className="space-y-2">
                 <label className="text-white font-medium ml-1">Password</label>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-4 text-gray-400 group-focus-within:text-[#F7A400] transition-colors" size={20} />
+                  <Lock
+                    className="absolute left-4 top-4 text-gray-400 group-focus-within:text-[#F7A400] transition-colors"
+                    size={20}
+                  />
                   <input
                     type={showPassword ? "text" : "password"}
                     required
@@ -124,7 +139,11 @@ const AdminLogin = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-4 text-gray-500 hover:text-white transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-4 text-gray-500 hover:text-white transition-colors"
+                  >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
@@ -137,13 +156,21 @@ const AdminLogin = () => {
                   disabled={loading}
                   className="relative w-full py-4 bg-[#F7A400] hover:bg-[#ffb31a] text-[#02050A] font-bold tracking-widest rounded-[5px] transition-all active:scale-[0.98] flex items-center justify-center disabled:opacity-70"
                 >
-                  {loading ? <div className="w-6 h-6 border-2 border-[#02050A] border-t-transparent rounded-full animate-spin"></div> : "SECURE LOGIN"}
+                  {loading ? (
+                    <div className="w-6 h-6 border-2 border-[#02050A] border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    "SECURE LOGIN"
+                  )}
                 </button>
               </div>
             </form>
 
             <div className="mt-10 text-center border-t border-white/5 pt-6 text-sm text-gray-400">
-              © 2026 <span className="text-white font-semibold">Campaignsquat Ltd.</span> All Rights Reserved.
+              © 2026{" "}
+              <span className="text-white font-semibold">
+                Campaignsquat Ltd.
+              </span>{" "}
+              All Rights Reserved.
             </div>
           </div>
         </div>

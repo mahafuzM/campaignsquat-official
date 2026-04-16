@@ -11,7 +11,7 @@ const AboutVision = () => {
     imageUrl: visionImgDefault,
   });
 
-  const API_BASE = "https://api.campaignsquat.com";
+  const API_BASE = "/api";
 
   useEffect(() => {
     const fetchVision = async () => {

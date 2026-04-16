@@ -4,9 +4,8 @@ import axios from "axios";
 import { SearchX } from "lucide-react";
 
 // ✅ Global Axios Setup
-axios.defaults.baseURL = window.location.hostname === "localhost" 
-  ? "http://localhost:5000" 
-  : "https://api.campaignsquat.com";
+axios.defaults.baseURL =
+  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
 const ProjectFilter = () => {
   const [cases, setCases] = useState(() => {
@@ -33,8 +32,8 @@ const ProjectFilter = () => {
         const res = await axios.get(`/api/projects`, { timeout: 10000 });
 
         if (res.data && Array.isArray(res.data)) {
-          const sortedData = [...res.data].sort((a, b) => 
-            b._id.toString().localeCompare(a._id.toString())
+          const sortedData = [...res.data].sort((a, b) =>
+            b._id.toString().localeCompare(a._id.toString()),
           );
           setCases(sortedData);
           setError(null);
@@ -74,8 +73,10 @@ const ProjectFilter = () => {
     if (!img) return "https://via.placeholder.com/800x600?text=No+Image";
     if (img.startsWith("http")) return img;
     const cleanPath = img.replace(/\\/g, "/");
-    const fileName = cleanPath.startsWith('/') ? cleanPath.slice(1) : cleanPath;
-    const finalPath = fileName.startsWith('uploads/') ? fileName : `uploads/${fileName}`;
+    const fileName = cleanPath.startsWith("/") ? cleanPath.slice(1) : cleanPath;
+    const finalPath = fileName.startsWith("uploads/")
+      ? fileName
+      : `uploads/${fileName}`;
     return `${API_BASE}/${finalPath}`;
   };
 
@@ -84,7 +85,10 @@ const ProjectFilter = () => {
       <section className="w-full bg-[#02050A] pt-20 pb-20 px-4 md:px-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {[1, 2, 3, 4, 5, 6].map((n) => (
-            <div key={n} className="bg-[#0A0A0A] border border-gray-900 rounded-[5px] h-[450px] animate-pulse">
+            <div
+              key={n}
+              className="bg-[#0A0A0A] border border-gray-900 rounded-[5px] h-[450px] animate-pulse"
+            >
               <div className="w-full h-[250px] bg-gray-800/20" />
               <div className="p-8 space-y-4">
                 <div className="h-4 bg-gray-800/40 w-1/4 mx-auto" />
@@ -101,7 +105,6 @@ const ProjectFilter = () => {
   return (
     <section className="w-full bg-[#02050A] pt-10 md:pt-20 font-['Poppins'] pb-20 min-h-screen">
       <div className="max-w-[1445px] mx-auto px-4 md:px-14">
-        
         {/* Filter Tabs */}
         <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 mb-14 w-full">
           {categories.map((category) => (
@@ -123,8 +126,8 @@ const ProjectFilter = () => {
         {filteredCases.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {filteredCases.map((item, index) => (
-              <div 
-                key={item._id} 
+              <div
+                key={item._id}
                 className="group bg-[#0A0A0A] border border-gray-900 flex flex-col overflow-hidden transition-all duration-500 hover:border-[#f7a400] rounded-[5px] hover:-translate-y-2 shadow-2xl"
               >
                 {/* Image Section */}
@@ -134,9 +137,10 @@ const ProjectFilter = () => {
                     alt={item.title}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                     loading={index < 3 ? "eager" : "lazy"}
-                    onError={(e) => { 
-                      e.target.onerror = null; 
-                      e.target.src = "https://via.placeholder.com/800x600?text=Image+Not+Found"; 
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src =
+                        "https://via.placeholder.com/800x600?text=Image+Not+Found";
                     }}
                   />
                   {/* Category Badge - Top Left like CaseStudy */}
@@ -173,7 +177,9 @@ const ProjectFilter = () => {
           <div className="flex flex-col items-center justify-center py-32 border border-dashed border-gray-800 rounded-lg bg-[#0A0A0A]/50">
             <SearchX size={60} className="text-gray-600 mb-6" />
             <p className="text-white text-xl font-medium">
-              {error ? "Server connection failed!" : "No projects found in this category."}
+              {error
+                ? "Server connection failed!"
+                : "No projects found in this category."}
             </p>
           </div>
         )}

@@ -1,5 +1,5 @@
 if (
-  window.location.hostname !== "localhost" && 
+  window.location.hostname !== "localhost" &&
   window.location.hostname !== "127.0.0.1"
 ) {
   console.log = () => {};
@@ -22,9 +22,8 @@ import "react-quill/dist/quill.snow.css";
 import { Toaster } from "react-hot-toast";
 
 // ✅ এটি হুবহু কপি করে বসান
-axios.defaults.baseURL = window.location.hostname === "localhost" 
-  ? "http://localhost:5000" 
-  : "https://api.campaignsquat.com";
+axios.defaults.baseURL =
+  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
 // 🛡️ Axios Interceptor
 axios.interceptors.request.use((config) => {
@@ -113,7 +112,9 @@ const ApplicationDetails = lazy(
 
 // ✅ SEO Manager (অন্যান্য পেজের জন্য)
 // ✅ এটি একদম নিখুঁত ফরম্যাট
-const OtherPageManager = lazy(() => import("./admin/pages/OtherPages/OtherPageManager"));
+const OtherPageManager = lazy(
+  () => import("./admin/pages/OtherPages/OtherPageManager"),
+);
 
 const AdminPasswordChange = lazy(
   () => import("./admin/pages/settings/AdminPasswordChange"),

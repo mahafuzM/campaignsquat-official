@@ -10,14 +10,16 @@ const ProductManager = () => {
   const [loading, setLoading] = useState(false);
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000"
+      : "/api";
 
-    const getImgUrl = (imagePath) => {
-    if (!imagePath) return ""; 
-    if (imagePath.startsWith("http")) return imagePath; 
-    
+  const getImgUrl = (imagePath) => {
+    if (!imagePath) return "";
+    if (imagePath.startsWith("http")) return imagePath;
+
     const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
     return `${BASE_URL}${cleanPath}`;
   };
@@ -39,7 +41,9 @@ const ProductManager = () => {
       setLoading(true);
       const res = await axios.get(`${BASE_URL}/api/products/all`);
       // Data parsing safety
-      const actualData = Array.isArray(res.data) ? res.data : (res.data.data || []);
+      const actualData = Array.isArray(res.data)
+        ? res.data
+        : res.data.data || [];
       setProducts(actualData);
     } catch (err) {
       console.error("Error fetching products:", err);
@@ -137,21 +141,23 @@ const ProductManager = () => {
       image: null,
     });
     setSections(product.contentSections || []);
-    
+
     // ✅ Perfect Image Path Handling
     let imagePath = "";
     if (product.image) {
-      if (product.image.startsWith('http')) {
+      if (product.image.startsWith("http")) {
         // Jodi direct Cloudinary ba online link hoy
         imagePath = product.image;
       } else {
         // Backend folder theke asle: BASE_URL + slash + image path
         // path-er শুরুতে slash thakle seta bad diye amra safe vabe slash add korbo
-        const cleanPath = product.image.startsWith('/') ? product.image : `/${product.image}`;
+        const cleanPath = product.image.startsWith("/")
+          ? product.image
+          : `/${product.image}`;
         imagePath = `${BASE_URL}${cleanPath}`;
       }
     }
-    
+
     setPreviewUrl(imagePath);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -237,12 +243,12 @@ const ProductManager = () => {
                     required={!isEditing}
                   />
                   {previewUrl && (
-  <img
-    src={previewUrl} // PreviewUrl e amra agei full path set korchi handleEdit e
-    alt="Preview"
-    className="mt-3 w-32 h-32 object-cover rounded-[5px] border border-white/10 shadow-sm"
-  />
-)}
+                    <img
+                      src={previewUrl} // PreviewUrl e amra agei full path set korchi handleEdit e
+                      alt="Preview"
+                      className="mt-3 w-32 h-32 object-cover rounded-[5px] border border-white/10 shadow-sm"
+                    />
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -437,12 +443,12 @@ const ProductManager = () => {
                   className="hover:bg-gray-50/50 transition-colors"
                 >
                   <td className="p-6 w-32">
-  <img
-    src={getImgUrl(p.image)} // Ekhan theke dynamic BASE_URL onujayi image asbe
-    className="w-16 h-16 object-cover rounded-[5px] border border-white/10"
-    alt={p.name}
-  />
-</td>
+                    <img
+                      src={getImgUrl(p.image)} // Ekhan theke dynamic BASE_URL onujayi image asbe
+                      className="w-16 h-16 object-cover rounded-[5px] border border-white/10"
+                      alt={p.name}
+                    />
+                  </td>
                   <td className="p-6">
                     <div className="font-bold text-gray-900">{p.name}</div>
                     <div className="text-xs text-gray-400 mt-1 line-clamp-1">

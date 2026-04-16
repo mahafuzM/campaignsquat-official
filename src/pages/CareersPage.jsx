@@ -51,9 +51,11 @@ const CareersPage = () => {
   const [loading, setLoading] = useState(true);
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000"
+      : "/api";
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -63,7 +65,7 @@ const CareersPage = () => {
         setLoading(true);
         // Direct absolute URL use kora holo jate kono config-e jhamela na hoy
         const res = await axios.get(`${BASE_URL}/api/jobs`);
-        
+
         if (res.data) {
           // Data format check: res.data direct array hote pare, abar res.data.data o hote pare
           const actualData = Array.isArray(res.data) ? res.data : res.data.data;
@@ -79,18 +81,55 @@ const CareersPage = () => {
   }, [BASE_URL]);
 
   const benefits = [
-    { title: <>Excellent Culture <br /> & Environment</>, img: environmentIcon },
-    { title: <>Performance & <br /> Festival Bonuses</>, img: moneyIcon },
-    { title: <>Meals, Coffee <br /> & Snacks</>, img: coffeeIcon },
-    { title: <>Work-Life <br /> Harmony</>, img: virtualIcon },
-    { title: <>Annual <br /> Pleasure Tour</>, img: travelIcon },
+    {
+      title: (
+        <>
+          Excellent Culture <br /> & Environment
+        </>
+      ),
+      img: environmentIcon,
+    },
+    {
+      title: (
+        <>
+          Performance & <br /> Festival Bonuses
+        </>
+      ),
+      img: moneyIcon,
+    },
+    {
+      title: (
+        <>
+          Meals, Coffee <br /> & Snacks
+        </>
+      ),
+      img: coffeeIcon,
+    },
+    {
+      title: (
+        <>
+          Work-Life <br /> Harmony
+        </>
+      ),
+      img: virtualIcon,
+    },
+    {
+      title: (
+        <>
+          Annual <br /> Pleasure Tour
+        </>
+      ),
+      img: travelIcon,
+    },
   ];
 
   const goldenFilter = {
-    filter: "invert(71%) sepia(85%) saturate(945%) hue-rotate(354deg) brightness(102%) contrast(101%)",
+    filter:
+      "invert(71%) sepia(85%) saturate(945%) hue-rotate(354deg) brightness(102%) contrast(101%)",
   };
 
-  const sectionPadding = "max-w-[1445px] mx-auto px-4 sm:px-10 md:px-16 lg:px-16 xl:px-18";
+  const sectionPadding =
+    "max-w-[1445px] mx-auto px-4 sm:px-10 md:px-16 lg:px-16 xl:px-18";
 
   return (
     <>
@@ -199,7 +238,10 @@ const CareersPage = () => {
                         <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-[#F7A400]/10 text-[#F7A400] group-hover:bg-[#F7A400] group-hover:text-black group-hover:scale-110 transition-all duration-500">
                           {(() => {
                             // Support for both iconName and legacy icon field
-                            const Icon = iconMap[job.iconName] || iconMap[job.icon] || Code;
+                            const Icon =
+                              iconMap[job.iconName] ||
+                              iconMap[job.icon] ||
+                              Code;
                             return <Icon size={24} />;
                           })()}
                         </div>

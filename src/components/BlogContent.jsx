@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import { Search, SearchX, ArrowRight, Calendar, Tag, ChevronDown } from "lucide-react";
+import {
+  Search,
+  SearchX,
+  ArrowRight,
+  Calendar,
+  Tag,
+  ChevronDown,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 const BlogContent = () => {
@@ -24,9 +31,8 @@ const BlogContent = () => {
   ];
 
   // ✅ ডাইনামিক বেস ইউআরএল
-  const BASE_URL = window.location.hostname === "localhost" 
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
   useEffect(() => {
     const fetchBlogs = async () => {

@@ -21,9 +21,11 @@ const ApplicationDetails = () => {
   const [loading, setLoading] = useState(true);
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000"
+      : "/api";
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -33,9 +35,11 @@ const ApplicationDetails = () => {
         setLoading(true);
         // Dynamic BASE_URL use kora hoyeche
         const res = await axios.get(`${BASE_URL}/api/applications/all`);
-        
+
         // Data format safety check
-        const dataList = Array.isArray(res.data) ? res.data : (res.data.data || []);
+        const dataList = Array.isArray(res.data)
+          ? res.data
+          : res.data.data || [];
         const found = dataList.find((item) => item._id === id);
 
         if (found) {
@@ -44,7 +48,10 @@ const ApplicationDetails = () => {
           setApplication(null);
         }
       } catch (err) {
-        console.error("Error fetching details:", err.response?.data || err.message);
+        console.error(
+          "Error fetching details:",
+          err.response?.data || err.message,
+        );
         setApplication(null);
       } finally {
         setLoading(false);

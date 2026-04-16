@@ -10,7 +10,7 @@ import {
   LayoutDashboard,
   Type,
   ShieldCheck,
-  Zap
+  Zap,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -25,10 +25,9 @@ const AgencyComparisonAdmin = () => {
   const [saving, setSaving] = useState(false);
 
   // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ অটোমেটিক হ্যান্ডেল করবে)
-  const BASE_URL = window.location.hostname === "localhost" 
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
-    
+  const BASE_URL =
+    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+
   const API_URL = `${BASE_URL}/api/agency-comparison`;
 
   useEffect(() => {
@@ -64,12 +63,14 @@ const AgencyComparisonAdmin = () => {
       return toast.error("At least one item required!");
     }
 
-    const confirmDelete = window.confirm("Are you sure you want to remove this feature? 🗑️");
-    
+    const confirmDelete = window.confirm(
+      "Are you sure you want to remove this feature? 🗑️",
+    );
+
     if (confirmDelete) {
       // ১. প্রথমে স্টেট থেকে ফিল্টার করে নতুন লিস্ট তৈরি করা
       const updatedList = comparisonList.filter((_, i) => i !== index);
-      
+
       // ২. স্টেট আপডেট করা
       setComparisonList(updatedList);
 
@@ -87,7 +88,7 @@ const AgencyComparisonAdmin = () => {
         console.error("Delete Sync Error:", err);
         toast.error("Failed to sync with server. Reloading data...");
         // যদি সার্ভারে সেভ না হয়, তবে ডাটা আবার আগের অবস্থায় ফিরিয়ে আনা (Optional)
-        window.location.reload(); 
+        window.location.reload();
       } finally {
         setSaving(false);
       }
@@ -127,7 +128,9 @@ const AgencyComparisonAdmin = () => {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center">
         <Loader2 className="w-10 h-10 animate-spin text-black mb-4" />
-        <p className="text-[10px] font-black uppercase tracking-[3px] text-gray-400 font-['Poppins']">Syncing Tactical Matrix...</p>
+        <p className="text-[10px] font-black uppercase tracking-[3px] text-gray-400 font-['Poppins']">
+          Syncing Tactical Matrix...
+        </p>
       </div>
     );
 

@@ -18,9 +18,7 @@ const Services = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await axios.get(
-          "https://api.campaignsquat.com/api/megamenu",
-        );
+        const res = await axios.get("/api/megamenu");
         if (res.data) {
           // ২. লজিক: নতুন সার্ভিসগুলো যেন সিরিয়ালের শুরুতে থাকে
           const sortedData = [...res.data].reverse();

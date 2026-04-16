@@ -12,7 +12,7 @@ const DynamicSeoPage = () => {
   const [loading, setLoading] = useState(true);
   const [openIndex, setOpenIndex] = useState(-1);
 
-  const API_URL = "https://api.campaignsquat.com";
+  const API_URL = "/api";
 
   const getFullImageUrl = (path) => {
     if (!path) return "https://via.placeholder.com/400x300?text=IMAGE";

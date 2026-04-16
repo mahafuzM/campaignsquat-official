@@ -13,9 +13,8 @@ const ServiceEcosystem = () => {
   const [loading, setLoading] = useState(!data);
 
   // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ দুই জায়গায় কাজ করবে)
-  const BASE_URL = window.location.hostname === "localhost" 
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,7 +56,10 @@ const ServiceEcosystem = () => {
             {service.name}
           </span>
         </div>
-        <ArrowRight size={14} className="text-gray-700 group-hover/item:text-[#F7A400] group-hover/item:translate-x-1 transition-all" />
+        <ArrowRight
+          size={14}
+          className="text-gray-700 group-hover/item:text-[#F7A400] group-hover/item:translate-x-1 transition-all"
+        />
       </>
     );
 

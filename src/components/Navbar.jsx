@@ -36,9 +36,7 @@ const Navbar = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await axios.get(
-          "https://api.campaignsquat.com/api/megamenu",
-        );
+        const res = await axios.get("/api/megamenu");
         setDbServices(res.data);
       } catch (err) {
         console.error("Error fetching menu for mobile:", err);

@@ -34,9 +34,8 @@ const CampaignSquat = () => {
   });
 
   // ✅ ১. স্মার্ট এপিআই ইউআরএল সেটআপ
-  const API_BASE = window.location.hostname === "localhost" 
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const API_BASE =
+    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
   useEffect(() => {
     const fetchAbout = async () => {
@@ -97,7 +96,7 @@ const CampaignSquat = () => {
                 src={
                   aboutData.imageUrl &&
                   aboutData.imageUrl.startsWith("/uploads")
-                    ? `https://api.campaignsquat.com${aboutData.imageUrl}`
+                    ? `/api${aboutData.imageUrl}`
                     : aboutData.imageUrl || defaultAboutBanner
                 }
                 alt="About Us"

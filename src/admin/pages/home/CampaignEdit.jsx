@@ -10,9 +10,8 @@ const CampaignEdit = () => {
   const [message, setMessage] = useState({ type: "", text: "" });
 
   // ✅ ১. ডাইনামিক API_BASE (লোকাল এবং লাইভ সুইচিং)
-  const API_BASE = window.location.hostname === "localhost" 
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const API_BASE =
+    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
   useEffect(() => {
     const fetchAboutData = async () => {
@@ -24,11 +23,15 @@ const CampaignEdit = () => {
             title: res.data.title,
             description: res.data.description,
           });
-          
+
           // ইমেজের ফুল পাথ সেট করা যাতে প্রিভিউ ঠিকমতো আসে
           const imagePath = res.data.imageUrl;
           if (imagePath) {
-            setPreview(imagePath.startsWith("http") ? imagePath : `${API_BASE}/${imagePath}`);
+            setPreview(
+              imagePath.startsWith("http")
+                ? imagePath
+                : `${API_BASE}/${imagePath}`,
+            );
           }
         }
       } catch (err) {

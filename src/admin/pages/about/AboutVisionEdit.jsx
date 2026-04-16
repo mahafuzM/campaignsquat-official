@@ -12,7 +12,7 @@ const AboutVisionEdit = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
-  const API_BASE = "https://api.campaignsquat.com";
+  const API_BASE = "/api";
 
   // ১. ডাটাবেস থেকে বর্তমান ডাটা নিয়ে আসা (ইউআরএল ফিক্সড)
   useEffect(() => {

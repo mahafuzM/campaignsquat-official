@@ -17,7 +17,7 @@ const FloatingContactAdmin = () => {
   const [saving, setSaving] = useState(false);
 
   // ব্যাকএন্ড URL নিশ্চিত করুন (আপনার পোর্টের সাথে মিলিয়ে)
-  const BASE_URL = "https://api.campaignsquat.com/api/contact-menu";
+  const BASE_URL = "/api/contact-menu";
 
   useEffect(() => {
     fetchData();

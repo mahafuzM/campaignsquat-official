@@ -17,9 +17,11 @@ const ApplyjobPage = () => {
   const [fileName, setFileName] = useState("No file selected");
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000"
+      : "/api";
 
   // ক্যারিয়ার পেজ থেকে আসা জবের টাইটেল ধরা হচ্ছে
   const jobTitle = location.state?.jobTitle || "General Application";
@@ -52,15 +54,11 @@ const ApplyjobPage = () => {
 
     try {
       // ১. ব্যাকএন্ডে ডেটা পাঠানো (Dynamic BASE_URL use kora hoyeche)
-      await axios.post(
-        `${BASE_URL}/api/applications/apply`,
-        formDataObj,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      await axios.post(`${BASE_URL}/api/applications/apply`, formDataObj, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-      );
+      });
 
       // ২. ইমেইল নোটিফিকেশন পাঠানো
       try {
@@ -88,11 +86,15 @@ const ApplyjobPage = () => {
     }
   };
 
-  const labelStyle = "block text-white text-[14px] md:text-[18px] font-medium mb-2 md:mb-3";
-  const inputStyle = "w-full bg-white/5 border border-white/10 rounded-[5px] px-5 py-2 md:py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#F7A400] transition-all text-[12px] md:text-[15px]";
+  const labelStyle =
+    "block text-white text-[14px] md:text-[18px] font-medium mb-2 md:mb-3";
+  const inputStyle =
+    "w-full bg-white/5 border border-white/10 rounded-[5px] px-5 py-2 md:py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#F7A400] transition-all text-[12px] md:text-[15px]";
   const cardWrapper = "relative p-[2px] overflow-hidden rounded-[5px] group";
-  const runningBorderBg = "absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000_0%,#000_40%,#F7A400_50%,#000_60%,#000_100%)]";
-  const cardInner = "relative bg-[#0a0a0a] rounded-[5px] p-8 md:p-12 h-full w-full";
+  const runningBorderBg =
+    "absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000_0%,#000_40%,#F7A400_50%,#000_60%,#000_100%)]";
+  const cardInner =
+    "relative bg-[#0a0a0a] rounded-[5px] p-8 md:p-12 h-full w-full";
 
   return (
     <main className="bg-[#02050a] font-poppins min-h-screen pt-28 pb-20 relative">
@@ -291,14 +293,14 @@ const ApplyjobPage = () => {
               </div>
 
               <div className="pt-10 border-t border-white/10 flex flex-col md:flex-row items-center gap-6">
-               <button
-      type="submit" // Type must be 'submit'
-      disabled={loading}
-      className="bg-[#F7A400] border-2 border-[#F7A400] text-black hover:text-white font-semibold px-8 md:px-10 py-2 rounded-[5px] text-[12px] md:text-[15px] hover:bg-transparent transition-all transform active:scale-95 flex items-center justify-center gap-3"
-    >
-      {loading && <FaSpinner className="animate-spin" />}
-      {loading ? "Submitting..." : "Submit Application"}
-    </button>
+                <button
+                  type="submit" // Type must be 'submit'
+                  disabled={loading}
+                  className="bg-[#F7A400] border-2 border-[#F7A400] text-black hover:text-white font-semibold px-8 md:px-10 py-2 rounded-[5px] text-[12px] md:text-[15px] hover:bg-transparent transition-all transform active:scale-95 flex items-center justify-center gap-3"
+                >
+                  {loading && <FaSpinner className="animate-spin" />}
+                  {loading ? "Submitting..." : "Submit Application"}
+                </button>
 
                 <button
                   type="reset"

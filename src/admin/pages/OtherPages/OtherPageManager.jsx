@@ -73,7 +73,7 @@ const OtherPageManager = () => {
   });
   const [newFaq, setNewFaq] = useState({ question: "", answer: "" });
 
-  const API_BASE = "https://api.campaignsquat.com/api/other-pages";
+  const API_BASE = "/api/other-pages";
 
   const config = useMemo(
     () => ({
@@ -683,7 +683,7 @@ const OtherPageManager = () => {
                           src={
                             card.cardImage instanceof File
                               ? URL.createObjectURL(card.cardImage)
-                              : `https://api.campaignsquat.com${card.cardImage}`
+                              : `/api${card.cardImage}`
                           }
                           className="w-full h-full object-cover"
                           alt="icon"
@@ -897,7 +897,7 @@ const OtherPageManager = () => {
                           src={
                             item.img instanceof File
                               ? URL.createObjectURL(item.img)
-                              : `https://api.campaignsquat.com${item.img}`
+                              : `/api${item.img}`
                           }
                           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all"
                           alt="feat"
@@ -1040,7 +1040,7 @@ const OtherPageManager = () => {
                           src={
                             step.img instanceof File
                               ? URL.createObjectURL(step.img)
-                              : `https://api.campaignsquat.com${step.img}`
+                              : `/api${step.img}`
                           }
                           className="w-full h-full object-contain p-1 invert"
                           alt="step-icon"

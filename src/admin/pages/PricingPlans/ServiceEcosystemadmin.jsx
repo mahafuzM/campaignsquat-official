@@ -9,7 +9,7 @@ import {
   Loader2,
   AlertCircle,
   PlusCircle,
-  LayoutGrid
+  LayoutGrid,
 } from "lucide-react"; // ✅ Fixed here
 import { toast } from "react-hot-toast";
 
@@ -20,10 +20,9 @@ const ServiceEcosystemAdmin = () => {
   const [saving, setSaving] = useState(false);
 
   // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ দুই জায়গায় কাজ করবে)
-  const BASE_URL = window.location.hostname === "localhost" 
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
-    
+  const BASE_URL =
+    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+
   const API_URL = `${BASE_URL}/api/creative-services`;
 
   useEffect(() => {
@@ -62,7 +61,7 @@ const ServiceEcosystemAdmin = () => {
       // অপটিমিস্টিক আপডেট (সাথে সাথে ইউআই থেকে সরানো)
       const originalServices = [...services];
       setServices(updatedServices);
-      
+
       try {
         setSaving(true);
         await axios.post(API_URL, { sectionTitle, services: updatedServices });
@@ -85,7 +84,7 @@ const ServiceEcosystemAdmin = () => {
   const handleSave = async () => {
     if (services.some((s) => !s.name.trim()))
       return toast.error("Fill all names!");
-    
+
     setSaving(true);
     try {
       await axios.post(API_URL, { sectionTitle, services });
@@ -101,7 +100,9 @@ const ServiceEcosystemAdmin = () => {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center">
         <Loader2 className="w-10 h-10 animate-spin text-black mb-4" />
-        <p className="text-[10px] font-black uppercase tracking-[3px] text-gray-400">Syncing Ecosystem...</p>
+        <p className="text-[10px] font-black uppercase tracking-[3px] text-gray-400">
+          Syncing Ecosystem...
+        </p>
       </div>
     );
 

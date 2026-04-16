@@ -1,9 +1,10 @@
 import axios from "axios";
 
 const API = axios.create({
-  // হোস্টিং করার পর এখানে আপনার আসল ডোমেইন লিংক দেবেন
-  // আপাতত লোকালহোস্ট দিয়ে রাখতে পারেন
-  baseURL: "https://api.campaignsquat.com",
+  // এটি লোকালহোস্ট এবং লাইভ সার্ভার দুটিতেই অটোমেটিক কাজ করবে
+  baseURL: window.location.hostname === "localhost" 
+    ? "http://localhost:5000/api" 
+    : "/api",
 });
 
 export default API;

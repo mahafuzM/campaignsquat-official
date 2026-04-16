@@ -12,9 +12,8 @@ const ServiceDetails = () => {
   const [openIndex, setOpenIndex] = useState(0);
 
   // ✅ ১. এই অংশটি আপডেট করা হয়েছে (অটোমেটিক লোকাল বা লাইভ চিনে নেবে)
-  const API_BASE = window.location.hostname === "localhost" 
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const API_BASE =
+    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
   useEffect(() => {
     const controller = new AbortController();
@@ -52,17 +51,20 @@ const ServiceDetails = () => {
 
     return () => controller.abort();
   }, [id, API_BASE]); // API_BASE ডিপেন্ডেন্সিতে যোগ করা হয়েছে
-// ইমেজ ইউআরএল হ্যান্ডলার
- const getFullImageUrl = (imagePath) => {
-  if (!imagePath) return "https://via.placeholder.com/550x400?text=Campaignsquat";
-  if (imagePath.startsWith("http")) return imagePath;
-  
-  // ব্যাকস্ল্যাশ ঠিক করা এবং শুরুর স্ল্যাশ বাদ দেওয়া
-  const cleanPath = imagePath.replace(/\\/g, "/");
-  const finalPath = cleanPath.startsWith("/") ? cleanPath.slice(1) : cleanPath;
-  
-  return `${API_BASE}/${finalPath}`;
-};
+  // ইমেজ ইউআরএল হ্যান্ডলার
+  const getFullImageUrl = (imagePath) => {
+    if (!imagePath)
+      return "https://via.placeholder.com/550x400?text=Campaignsquat";
+    if (imagePath.startsWith("http")) return imagePath;
+
+    // ব্যাকস্ল্যাশ ঠিক করা এবং শুরুর স্ল্যাশ বাদ দেওয়া
+    const cleanPath = imagePath.replace(/\\/g, "/");
+    const finalPath = cleanPath.startsWith("/")
+      ? cleanPath.slice(1)
+      : cleanPath;
+
+    return `${API_BASE}/${finalPath}`;
+  };
 
   if (loading) {
     return (
@@ -372,15 +374,16 @@ const ServiceDetails = () => {
                 <div className="relative flex justify-center lg:justify-end">
                   {service.sideImg ? (
                     <img
-  // সরাসরি লিঙ্ক না লিখে ফাংশনটি ব্যবহার করুন
-  src={getFullImageUrl(service.sideImg)} 
-  alt={service.sec5Title}
-  className="w-full h-auto max-h-[750px] object-contain shadow-2xl"
-  onError={(e) => {
-    // যদি ইমেজ না পায় তবে এই প্লেসহোল্ডারটি দেখাবে
-    e.target.src = "https://via.placeholder.com/600x800?text=Campaignsquat";
-  }}
-/>
+                      // সরাসরি লিঙ্ক না লিখে ফাংশনটি ব্যবহার করুন
+                      src={getFullImageUrl(service.sideImg)}
+                      alt={service.sec5Title}
+                      className="w-full h-auto max-h-[750px] object-contain shadow-2xl"
+                      onError={(e) => {
+                        // যদি ইমেজ না পায় তবে এই প্লেসহোল্ডারটি দেখাবে
+                        e.target.src =
+                          "https://via.placeholder.com/600x800?text=Campaignsquat";
+                      }}
+                    />
                   ) : (
                     <div className="w-full h-[400px] bg-gray-800 flex items-center justify-center text-white">
                       No Image
@@ -427,16 +430,17 @@ const ServiceDetails = () => {
                     <div className="card-content flex flex-col">
                       {/* ডাইনামিক ইমেজ */}
                       <div className="w-full aspect-[4/3] overflow-hidden border-b border-white/5 rounded-t-[5px]">
-                       <img
-  src={getFullImageUrl(item.img)} // এটি অটোমেটিক লোকাল বা লাইভ লিঙ্ক তৈরি করবে
-  alt={item.title}
-  loading="lazy"
-  className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
-  onError={(e) => {
-    // ইমেজ না পেলে বা লিঙ্ক ভুল হলে এটি দেখাবে
-    e.target.src = "https://via.placeholder.com/400x300?text=Campaignsquat";
-  }}
-/>
+                        <img
+                          src={getFullImageUrl(item.img)} // এটি অটোমেটিক লোকাল বা লাইভ লিঙ্ক তৈরি করবে
+                          alt={item.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+                          onError={(e) => {
+                            // ইমেজ না পেলে বা লিঙ্ক ভুল হলে এটি দেখাবে
+                            e.target.src =
+                              "https://via.placeholder.com/400x300?text=Campaignsquat";
+                          }}
+                        />
                       </div>
 
                       {/* কার্ডের টেক্সট কন্টেন্ট */}

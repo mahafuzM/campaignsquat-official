@@ -3,9 +3,8 @@ import axios from "axios";
 import { Plus, Trash2, Edit, Save, X, CheckCircle } from "lucide-react";
 
 // ✅ ডাইনামিক বেস ইউআরএল সেটআপ
-const BASE_URL = window.location.hostname === "localhost" 
-  ? "http://localhost:5000" 
-  : "https://api.campaignsquat.com";
+const BASE_URL =
+  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
 const PricingManager = () => {
   const [plans, setPlans] = useState([]);

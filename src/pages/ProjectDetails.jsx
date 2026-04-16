@@ -14,9 +14,8 @@ import {
 import axios from "axios";
 
 // ✅ Global Axios Setup (নিশ্চিত করুন এটি কাজ করছে)
-axios.defaults.baseURL = window.location.hostname === "localhost" 
-  ? "http://localhost:5000" 
-  : "https://api.campaignsquat.com";
+axios.defaults.baseURL =
+  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
 const ProjectDetails = () => {
   const { slug } = useParams();
@@ -41,15 +40,18 @@ const ProjectDetails = () => {
         setLoading(true);
         setError(null);
 
-        // ✅ রাউটটি আপনার ব্যাকএন্ড অনুযায়ী চেক করুন। 
+        // ✅ রাউটটি আপনার ব্যাকএন্ড অনুযায়ী চেক করুন।
         // যদি ব্যাকএন্ডে স্লাগ দিয়ে খোঁজার রাউট /api/projects/slug/SLUG_NAME হয়:
         const res = await axios.get(`/api/projects/slug/${slug}`);
 
         if (res.data) {
           const rawSections = res.data.sections;
-          const sanitizedSections = typeof rawSections === "string"
-            ? JSON.parse(rawSections)
-            : Array.isArray(rawSections) ? rawSections : [];
+          const sanitizedSections =
+            typeof rawSections === "string"
+              ? JSON.parse(rawSections)
+              : Array.isArray(rawSections)
+                ? rawSections
+                : [];
 
           setProject({
             ...res.data,
@@ -65,7 +67,11 @@ const ProjectDetails = () => {
         }
       } catch (err) {
         console.error("Fetch Error:", err);
-        setError(err.response?.status === 404 ? "Project not found!" : "Connection error to the server.");
+        setError(
+          err.response?.status === 404
+            ? "Project not found!"
+            : "Connection error to the server.",
+        );
       } finally {
         setLoading(false);
       }
@@ -77,10 +83,13 @@ const ProjectDetails = () => {
 
   // ✅ ইমেজ ইউআরএল লজিক ফিক্স (ProjectFilter এর মতই)
   const getImageUrl = (img) => {
-    if (!img) return "https://via.placeholder.com/1920x1080?text=No+Image+Found";
+    if (!img)
+      return "https://via.placeholder.com/1920x1080?text=No+Image+Found";
     if (img.startsWith("http")) return img;
     const cleanPath = img.replace(/\\/g, "/");
-    const finalPath = cleanPath.startsWith('uploads/') ? cleanPath : `uploads/${cleanPath.startsWith('/') ? cleanPath.slice(1) : cleanPath}`;
+    const finalPath = cleanPath.startsWith("uploads/")
+      ? cleanPath
+      : `uploads/${cleanPath.startsWith("/") ? cleanPath.slice(1) : cleanPath}`;
     return `${API_BASE}/${finalPath}`;
   };
 

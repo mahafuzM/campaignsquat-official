@@ -9,9 +9,9 @@ const CaseStudy = () => {
   });
 
   const [loading, setLoading] = useState(dbData.length === 0);
-  
+
   // ✅ ProjectFilter এর মতো সরাসরি baseURL ব্যবহার
-  const API_BASE = axios.defaults.baseURL || "https://api.campaignsquat.com";
+  const API_BASE = axios.defaults.baseURL || "/api";
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -24,7 +24,10 @@ const CaseStudy = () => {
             b._id.toString().localeCompare(a._id.toString()),
           );
           setDbData(sortedData);
-          sessionStorage.setItem("cached_home_projects", JSON.stringify(sortedData));
+          sessionStorage.setItem(
+            "cached_home_projects",
+            JSON.stringify(sortedData),
+          );
         }
       } catch (err) {
         console.error("Error loading projects:", err);
@@ -53,14 +56,16 @@ const CaseStudy = () => {
   // ✅ আপনার ProjectFilter থেকে নেওয়া "পারফেক্ট ইমেজ লজিক"
   const getImageUrl = (img) => {
     if (!img) return "https://via.placeholder.com/800x600?text=No+Image";
-    
+
     if (img.startsWith("http")) return img;
 
     const cleanPath = img.replace(/\\/g, "/"); // উইন্ডোজ পাথ ফিক্স
-    const fileName = cleanPath.startsWith('/') ? cleanPath.slice(1) : cleanPath;
+    const fileName = cleanPath.startsWith("/") ? cleanPath.slice(1) : cleanPath;
 
     // পাথে 'uploads/' না থাকলে সেটি যোগ করা
-    const finalPath = fileName.startsWith('uploads/') ? fileName : `uploads/${fileName}`;
+    const finalPath = fileName.startsWith("uploads/")
+      ? fileName
+      : `uploads/${fileName}`;
 
     return `${API_BASE}/${finalPath}`;
   };
@@ -75,7 +80,9 @@ const CaseStudy = () => {
             Featured Projects
           </h2>
           <p className="text-white text-[16px] md:text-[18px] max-w-full md:max-w-6xl mx-auto leading-relaxed font-normal px-2">
-            Where high-end UI/UX Design meets scalable Software Development. We build digital products engineered to accelerate your business growth.
+            Where high-end UI/UX Design meets scalable Software Development. We
+            build digital products engineered to accelerate your business
+            growth.
           </p>
         </div>
 
@@ -93,7 +100,8 @@ const CaseStudy = () => {
                   loading={index < 3 ? "eager" : "lazy"}
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = "https://via.placeholder.com/800x600?text=No+Image+Found";
+                    e.target.src =
+                      "https://via.placeholder.com/800x600?text=No+Image+Found";
                   }}
                 />
                 <div className="absolute top-4 left-4">

@@ -26,9 +26,7 @@ const ApplicationDetails = () => {
     const fetchApplicationDetails = async () => {
       try {
         // সরাসরি সব ডাটা থেকে ফিল্টার করা অথবা আইডি দিয়ে স্পেসিফিক ডাটা আনা
-        const res = await axios.get(
-          `https://api.campaignsquat.com/api/applications/all`,
-        );
+        const res = await axios.get(`/api/applications/all`);
         const found = res.data.find((item) => item._id === id);
 
         if (found) {

@@ -63,9 +63,11 @@ const AdminCareers = () => {
   ]);
 
   // ✅ Local vs Live Dynamic URL Logic
-  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000"
+      : "/api";
 
   // --- API Interactions ---
   const fetchJobs = useCallback(async () => {
@@ -164,10 +166,13 @@ const AdminCareers = () => {
             label: typeof it === "object" ? it.label || "" : "",
             desc: typeof it === "object" ? it.desc || "" : "",
           })),
-          items: [], 
+          items: [],
         };
       }
-      return { ...base, items: Array.isArray(section.items) ? section.items : [] };
+      return {
+        ...base,
+        items: Array.isArray(section.items) ? section.items : [],
+      };
     });
 
     const payload = {
@@ -183,7 +188,10 @@ const AdminCareers = () => {
     try {
       let response;
       if (editingId) {
-        response = await axios.put(`${BASE_URL}/api/jobs/${editingId}`, payload);
+        response = await axios.put(
+          `${BASE_URL}/api/jobs/${editingId}`,
+          payload,
+        );
       } else {
         response = await axios.post(`${BASE_URL}/api/jobs`, payload);
       }

@@ -13,9 +13,8 @@ import {
 import * as LucideIcons from "lucide-react";
 
 // ✅ ডাইনামিক বেস ইউআরএল সেটআপ
-const BASE_URL = window.location.hostname === "localhost" 
-  ? "http://localhost:5000" 
-  : "https://api.campaignsquat.com";
+const BASE_URL =
+  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
 const TechnicalEdgeAdmin = () => {
   const [mainHeader, setMainHeader] = useState("");
@@ -27,8 +26,16 @@ const TechnicalEdgeAdmin = () => {
   const [fetching, setFetching] = useState(true);
 
   const commonIcons = [
-    "zap", "shield", "layers", "map", "cpu", 
-    "database", "code", "globe", "smartphone", "server"
+    "zap",
+    "shield",
+    "layers",
+    "map",
+    "cpu",
+    "database",
+    "code",
+    "globe",
+    "smartphone",
+    "server",
   ];
 
   // ১. আগের ডাটা লোড করা (Fetch Data)
@@ -39,7 +46,7 @@ const TechnicalEdgeAdmin = () => {
         setMainHeader(res.data.mainHeader || "");
         setSubTitle(res.data.subTitle || "");
         setAssets(
-          res.data.assets || [{ icon: "zap", title: "", description: "" }]
+          res.data.assets || [{ icon: "zap", title: "", description: "" }],
         );
       }
     } catch (err) {
@@ -103,7 +110,7 @@ const TechnicalEdgeAdmin = () => {
       <div className="p-20 text-center font-black text-[#F7A400] tracking-widest animate-pulse">
         Syncing Tactical Data...
       </div>
-    )
+    );
 
   return (
     <div className="bg-[#f8f9fa] min-h-screen font-Inter pb-20">

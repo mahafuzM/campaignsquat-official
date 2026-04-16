@@ -24,16 +24,20 @@ const AdminApplications = () => {
   const searchTerm = queryParams.get("search") || "";
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000"
+      : "/api";
 
   const fetchApplications = async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${BASE_URL}/api/applications/all`);
       // Data safety parsing
-      const actualData = Array.isArray(response.data) ? response.data : (response.data.data || []);
+      const actualData = Array.isArray(response.data)
+        ? response.data
+        : response.data.data || [];
       setApplications(actualData);
     } catch (error) {
       console.error("Fetch Error:", error.response?.data || error.message);

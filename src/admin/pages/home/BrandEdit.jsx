@@ -8,9 +8,8 @@ const BrandEdit = () => {
   const [loading, setLoading] = useState(false);
 
   // ১. ডাইনামিক বেস ইউআরএল সেটআপ
-  const API_BASE_URL = window.location.hostname === "localhost" 
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const API_BASE_URL =
+    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
   // ২. ডাটাবেস থেকে সব লোগো আনা
   const fetchBrands = async () => {
@@ -37,19 +36,19 @@ const BrandEdit = () => {
     setLoading(true);
     try {
       // Token thakle headers-e pathano uchit
-      const token = localStorage.getItem("adminToken"); 
-      
+      const token = localStorage.getItem("adminToken");
+
       await axios.post(`${API_BASE_URL}/api/brands`, formData, {
-        headers: { 
+        headers: {
           "Content-Type": "multipart/form-data",
-          "Authorization": token ? `Bearer ${token}` : ""
+          Authorization: token ? `Bearer ${token}` : "",
         },
       });
-      
+
       alert("সফলভাবে আপলোড হয়েছে!");
       setFile(null);
       document.getElementById("fileInput").value = ""; // Input reset
-      fetchBrands(); 
+      fetchBrands();
     } catch (err) {
       console.error("Upload error:", err);
       alert("আপলোড ব্যর্থ হয়েছে!");
@@ -64,9 +63,9 @@ const BrandEdit = () => {
       try {
         const token = localStorage.getItem("adminToken");
         await axios.delete(`${API_BASE_URL}/api/brands/${id}`, {
-          headers: { "Authorization": token ? `Bearer ${token}` : "" }
+          headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
-        fetchBrands(); 
+        fetchBrands();
       } catch (err) {
         console.error("Delete error:", err);
         alert("ডিলিট করা সম্ভব হয়নি!");
@@ -120,7 +119,11 @@ const BrandEdit = () => {
               <div className="h-full w-full flex items-center justify-center overflow-hidden">
                 <img
                   // Image source fixing
-                  src={brand.url?.startsWith('http') ? brand.url : `${API_BASE_URL}${brand.url}`}
+                  src={
+                    brand.url?.startsWith("http")
+                      ? brand.url
+                      : `${API_BASE_URL}${brand.url}`
+                  }
                   alt="Brand"
                   className="max-h-full max-w-full object-contain"
                 />

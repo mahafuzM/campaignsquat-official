@@ -7,7 +7,7 @@ const FloatingContact = () => {
   const [menuItems, setMenuItems] = useState([]);
 
   // ব্যাকএন্ড URL - এখানে আপনার ব্যাকএন্ডের ফুল পাথ দিন
-  const API_URL = "https://api.campaignsquat.com/api/contact-menu";
+  const API_URL = "/api/contact-menu";
 
   useEffect(() => {
     const fetchData = async () => {

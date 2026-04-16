@@ -15,19 +15,14 @@ const AboutVisionEdit = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          "https://api.campaignsquat.com/api/about-content/vision",
-        );
+        const res = await axios.get("/api/about-content/vision");
         if (res.data) {
           setFormData({
             title: res.data.title || "",
             description: res.data.description || "",
             imageUrl: res.data.imageUrl || "",
           });
-          if (res.data.imageUrl)
-            setImagePreview(
-              `https://api.campaignsquat.com${res.data.imageUrl}`,
-            );
+          if (res.data.imageUrl) setImagePreview(`/api${res.data.imageUrl}`);
         }
       } catch (err) {
         console.error(err);
@@ -52,20 +47,14 @@ const AboutVisionEdit = () => {
       if (selectedFile) {
         const uploadData = new FormData();
         uploadData.append("file", selectedFile);
-        const uploadRes = await axios.post(
-          "https://api.campaignsquat.com/api/upload",
-          uploadData,
-        );
+        const uploadRes = await axios.post("/api/upload", uploadData);
         finalImageUrl = uploadRes.data.url;
       }
 
-      await axios.post(
-        "https://api.campaignsquat.com/api/about-content/vision/update",
-        {
-          ...formData,
-          imageUrl: finalImageUrl,
-        },
-      );
+      await axios.post("/api/about-content/vision/update", {
+        ...formData,
+        imageUrl: finalImageUrl,
+      });
 
       setStatus("✅ Vision Updated Successfully!");
       setTimeout(() => setStatus(""), 3000);

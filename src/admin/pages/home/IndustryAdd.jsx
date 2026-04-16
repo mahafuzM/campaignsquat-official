@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Trash2, Edit, Save, X } from "lucide-react"; // আইকন ব্যবহারের জন্য
 
-const API_BASE_URL = window.location.hostname === "localhost" 
-  ? "http://localhost:5000" 
-  : "https://api.campaignsquat.com";
-  
+const API_BASE_URL =
+  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+
 const IndustryAdd = () => {
   const [formData, setFormData] = useState({
     title: "",
@@ -28,37 +27,35 @@ const IndustryAdd = () => {
   const [editingItem, setEditingItem] = useState(null); // কোন আইটেমটি এডিট হচ্ছে
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // মোডাল কন্ট্রোল
 
- // ১. ডাটাবেস থেকে সব কার্ড লোড করা
-const fetchHistory = async () => {
-  try {
-    setLoading(true);
-    const res = await axios.get(`${API_BASE_URL}/api/industries`);
-    
-    // Console-e check koro data ki bhabe ashche
-    console.log("Response from server:", res.data);
+  // ১. ডাটাবেস থেকে সব কার্ড লোড করা
+  const fetchHistory = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_BASE_URL}/api/industries`);
 
-    // Jodi data direct array hoye ashe: [{}, {}]
-    if (Array.isArray(res.data)) {
-      setHistory(res.data);
-    } 
-    // Jodi data object-er bhetore thake: { data: [{}, {}] }
-    else if (res.data && Array.isArray(res.data.data)) {
-      setHistory(res.data.data);
+      // Console-e check koro data ki bhabe ashche
+      console.log("Response from server:", res.data);
+
+      // Jodi data direct array hoye ashe: [{}, {}]
+      if (Array.isArray(res.data)) {
+        setHistory(res.data);
+      }
+      // Jodi data object-er bhetore thake: { data: [{}, {}] }
+      else if (res.data && Array.isArray(res.data.data)) {
+        setHistory(res.data.data);
+      }
+    } catch (err) {
+      console.error("Data fetch hoyni:", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
     }
-    
-  } catch (err) {
-    console.error("Data fetch hoyni:", err.response?.data || err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
     fetchHistory();
   }, []);
 
-
-// ২. নতুন কার্ড অ্যাড করা
+  // ২. নতুন কার্ড অ্যাড করা
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -72,16 +69,16 @@ const fetchHistory = async () => {
     try {
       // --- এইখানে নিচের নতুন কোডটুকু বসাও ---
       await axios.post(`${API_BASE_URL}/api/industries`, data, {
-        headers: { 
+        headers: {
           "Content-Type": "multipart/form-data",
-          "Authorization": `Bearer ${localStorage.getItem("adminToken")}` 
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
       });
       // --------------------------------------
 
       alert("Card Added Successfully! ✅");
       fetchHistory();
-      
+
       // ফর্ম ক্লিয়ার করা
       setFormData({
         title: "",
@@ -97,7 +94,6 @@ const fetchHistory = async () => {
       });
       setProjectImg(null); // Image state ও রিসেট করে দাও
       setCeoImg(null);
-
     } catch (err) {
       console.error(err);
       alert("Error adding card ❌. Please check login or server.");
@@ -110,9 +106,11 @@ const fetchHistory = async () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this card?")) {
       try {
-       await axios.delete(`${API_BASE_URL}/api/industries/${id}`, {
-  headers: { "Authorization": `Bearer ${localStorage.getItem("adminToken")}` }
-});
+        await axios.delete(`${API_BASE_URL}/api/industries/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+        });
         alert("Card Deleted! 🗑️");
         fetchHistory();
       } catch (err) {
@@ -127,69 +125,78 @@ const fetchHistory = async () => {
     setIsEditModalOpen(true);
   };
 
- // ৫. আপডেট সাবমিট করা (Perfect Version)
-const handleUpdate = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+  // ৫. আপডেট সাবমিট করা (Perfect Version)
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  // FormData object create kora
-  const data = new FormData();
+    // FormData object create kora
+    const data = new FormData();
 
-  // ১. Shudhu proyojoniyo text fields gulo pathano (Specific bhabe)
-  // Ete kore link, title, description shob thikmoto jabe
-  const textFields = [
-    "title", "heading", "description", "pages", 
-    "growth", "ceoName", "ceoTitle", "link", 
-    "color", "imgBg"
-  ];
+    // ১. Shudhu proyojoniyo text fields gulo pathano (Specific bhabe)
+    // Ete kore link, title, description shob thikmoto jabe
+    const textFields = [
+      "title",
+      "heading",
+      "description",
+      "pages",
+      "growth",
+      "ceoName",
+      "ceoTitle",
+      "link",
+      "color",
+      "imgBg",
+    ];
 
-  textFields.forEach((field) => {
-    // editingItem e data thakle sheta append hobe, na thakle empty string jabe
-    data.append(field, editingItem[field] || "");
-  });
+    textFields.forEach((field) => {
+      // editingItem e data thakle sheta append hobe, na thakle empty string jabe
+      data.append(field, editingItem[field] || "");
+    });
 
-  // ২. Image logic: Jodi user NOTUN file select kore, tobei pathabo
-  // Project Image check
-  if (projectImg instanceof File) {
-    data.append("projectImg", projectImg);
-  }
-
-  // CEO Image check
-  if (ceoImg instanceof File) {
-    data.append("ceoImg", ceoImg);
-  }
-
-  try {
-    const response = await axios.put(
-      `${API_BASE_URL}/api/industries/${editingItem._id}`,
-      data,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          "Authorization": `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-      }
-    );
-
-    if (response.status === 200) {
-      alert("Card Updated Successfully! ✅");
-
-      // ৩. State properly reset kora
-      setIsEditModalOpen(false);
-      setEditingItem(null);
-      setProjectImg(null); // File state reset
-      setCeoImg(null);     // File state reset
-
-      // ৪. Table refresh kora
-      fetchHistory();
+    // ২. Image logic: Jodi user NOTUN file select kore, tobei pathabo
+    // Project Image check
+    if (projectImg instanceof File) {
+      data.append("projectImg", projectImg);
     }
-  } catch (err) {
-    console.error("Update Error Details:", err.response?.data || err.message);
-    alert("Update failed! ❌ Link ba text save hoyni. Backend console check koro.");
-  } finally {
-    setLoading(false);
-  }
-};
+
+    // CEO Image check
+    if (ceoImg instanceof File) {
+      data.append("ceoImg", ceoImg);
+    }
+
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/api/industries/${editingItem._id}`,
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+        },
+      );
+
+      if (response.status === 200) {
+        alert("Card Updated Successfully! ✅");
+
+        // ৩. State properly reset kora
+        setIsEditModalOpen(false);
+        setEditingItem(null);
+        setProjectImg(null); // File state reset
+        setCeoImg(null); // File state reset
+
+        // ৪. Table refresh kora
+        fetchHistory();
+      }
+    } catch (err) {
+      console.error("Update Error Details:", err.response?.data || err.message);
+      alert(
+        "Update failed! ❌ Link ba text save hoyni. Backend console check koro.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const inputStyle =
     "border border-gray-400 p-3 rounded-md focus:ring-2 focus:ring-[#F7A400] outline-none transition-all text-black placeholder:text-gray-700 font-medium";
@@ -377,24 +384,24 @@ const handleUpdate = async (e) => {
               />
             </div>
 
-           {/* Modal-er bhetore Link field - Safe Version */}
-<div className="flex flex-col gap-2 col-span-1 md:col-span-2">
-  <label className="text-xs font-bold uppercase text-gray-500">
-    Behance / External Project Link
-  </label>
-  <input
-    className={inputStyle}
-    // editingItem thaklei shudhu link access korbe, nahole empty string
-    value={editingItem?.link || ""} 
-    placeholder="https://behance.net/..."
-    onChange={(e) =>
-      setEditingItem({
-        ...editingItem,
-        link: e.target.value,
-      })
-    }
-  />
-</div>
+            {/* Modal-er bhetore Link field - Safe Version */}
+            <div className="flex flex-col gap-2 col-span-1 md:col-span-2">
+              <label className="text-xs font-bold uppercase text-gray-500">
+                Behance / External Project Link
+              </label>
+              <input
+                className={inputStyle}
+                // editingItem thaklei shudhu link access korbe, nahole empty string
+                value={editingItem?.link || ""}
+                placeholder="https://behance.net/..."
+                onChange={(e) =>
+                  setEditingItem({
+                    ...editingItem,
+                    link: e.target.value,
+                  })
+                }
+              />
+            </div>
           </div>
 
           <div className="mt-10 border-t border-gray-300 pt-8">
@@ -437,65 +444,65 @@ const handleUpdate = async (e) => {
                 {history.length > 0 ? (
                   history.map((item) => (
                     <tr
-  key={item._id}
-  className="border-b border-gray-200 hover:bg-orange-50 transition-colors group"
->
-  {/* ১. Project Title ও Image Column (Replacement) */}
-  <td className="p-4 flex items-center gap-3">
-    <div className="w-12 h-10 rounded border border-gray-200 bg-gray-100 overflow-hidden flex-shrink-0">
-      <img
-        src={`${API_BASE_URL}${item.projectImg}`}
-        className="w-full h-full object-cover"
-        alt="thumb"
-        onError={(e) => {
-          e.target.src = "https://via.placeholder.com/50";
-        }}
-      />
-    </div>
-    <span className="text-[12px] font-bold text-black uppercase tracking-tighter">
-      {item.title}
-    </span>
-  </td>
+                      key={item._id}
+                      className="border-b border-gray-200 hover:bg-orange-50 transition-colors group"
+                    >
+                      {/* ১. Project Title ও Image Column (Replacement) */}
+                      <td className="p-4 flex items-center gap-3">
+                        <div className="w-12 h-10 rounded border border-gray-200 bg-gray-100 overflow-hidden flex-shrink-0">
+                          <img
+                            src={`${API_BASE_URL}${item.projectImg}`}
+                            className="w-full h-full object-cover"
+                            alt="thumb"
+                            onError={(e) => {
+                              e.target.src = "https://via.placeholder.com/50";
+                            }}
+                          />
+                        </div>
+                        <span className="text-[12px] font-bold text-black uppercase tracking-tighter">
+                          {item.title}
+                        </span>
+                      </td>
 
-  {/* ২. Heading Column (অপরিবর্তিত) */}
-  <td className="p-4 text-[12px] text-gray-700 font-medium truncate max-w-[250px]">
-    {item.heading}
-  </td>
+                      {/* ২. Heading Column (অপরিবর্তিত) */}
+                      <td className="p-4 text-[12px] text-gray-700 font-medium truncate max-w-[250px]">
+                        {item.heading}
+                      </td>
 
-  {/* ৩. Stats Column (অপরিবর্তিত) */}
-  <td className="p-4 text-center">
-    <div className="flex flex-col text-[10px] font-black">
-      <span className="text-[12px] text-orange-600">
-        Pages: {item.pages}
-      </span>
-      <span className="text-[12px] text-blue-600">
-        Growth: {item.growth}
-      </span>
-    </div>
-  </td>
+                      {/* ৩. Stats Column (অপরিবর্তিত) */}
+                      <td className="p-4 text-center">
+                        <div className="flex flex-col text-[10px] font-black">
+                          <span className="text-[12px] text-orange-600">
+                            Pages: {item.pages}
+                          </span>
+                          <span className="text-[12px] text-blue-600">
+                            Growth: {item.growth}
+                          </span>
+                        </div>
+                      </td>
 
-  {/* ৪. Action Buttons (অপরিবর্তিত) */}
-  <td className="p-4">
-    <div className="flex items-center justify-center gap-3">
-      {/* এডিট বাটন */}
-      <button
-        onClick={() => handleEditClick(item)}
-        className="p-2 bg-blue-100 text-blue-600 rounded border border-blue-200 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-        title="Edit"
-      >
-        <Edit size={18} />
-      </button>
-      {/* ডিলিট বাটন */}
-      <button
-        onClick={() => handleDelete(item._id)}
-        className="p-2 bg-red-100 text-red-600 rounded border border-red-200 hover:bg-red-600 hover:text-white transition-all shadow-sm"
-        title="Delete"
-      >
-        <Trash2 size={18} />
-      </button>
-    </div>
-  </td>
-</tr>
+                      {/* ৪. Action Buttons (অপরিবর্তিত) */}
+                      <td className="p-4">
+                        <div className="flex items-center justify-center gap-3">
+                          {/* এডিট বাটন */}
+                          <button
+                            onClick={() => handleEditClick(item)}
+                            className="p-2 bg-blue-100 text-blue-600 rounded border border-blue-200 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                            title="Edit"
+                          >
+                            <Edit size={18} />
+                          </button>
+                          {/* ডিলিট বাটন */}
+                          <button
+                            onClick={() => handleDelete(item._id)}
+                            className="p-2 bg-red-100 text-red-600 rounded border border-red-200 hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                            title="Delete"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
                   ))
                 ) : (
                   <tr>

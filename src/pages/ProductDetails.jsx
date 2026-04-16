@@ -9,9 +9,11 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000"
+      : "/api";
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -23,7 +25,10 @@ const ProductDetails = () => {
         const res = await axios.get(`${BASE_URL}/api/products/${id}`);
         setProduct(res.data);
       } catch (err) {
-        console.error("Error fetching details:", err.response?.data || err.message);
+        console.error(
+          "Error fetching details:",
+          err.response?.data || err.message,
+        );
       } finally {
         setLoading(false);
       }
@@ -52,8 +57,8 @@ const ProductDetails = () => {
         <img
           // ✅ Dynamic Image URL with Slash Protection
           src={
-            product.image?.startsWith("http") 
-              ? product.image 
+            product.image?.startsWith("http")
+              ? product.image
               : `${BASE_URL}${product.image?.startsWith("/") ? "" : "/"}${product.image}`
           }
           alt={product.name}

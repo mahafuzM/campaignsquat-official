@@ -19,9 +19,8 @@ const PricingPlans = () => {
     return savedTab || (categories.length > 0 ? categories[0] : "");
   });
 
-  const BASE_URL = window.location.hostname === "localhost" 
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const BASE_URL =
+    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
   useEffect(() => {
     const fetchPricing = async () => {

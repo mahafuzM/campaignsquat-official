@@ -6,9 +6,8 @@ const BrandSlider = () => {
   const [loading, setLoading] = useState(true);
 
   // ১. ডাইনামিক বেস ইউআরএল সেটআপ
-  const API_BASE_URL = window.location.hostname === "localhost" 
-    ? "http://localhost:5000" 
-    : "https://api.campaignsquat.com";
+  const API_BASE_URL =
+    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
   useEffect(() => {
     let isMounted = true;
@@ -17,7 +16,9 @@ const BrandSlider = () => {
         const res = await axios.get(`${API_BASE_URL}/api/brands`);
         if (isMounted) {
           // নিশ্চিত করা হচ্ছে যে ডাটা একটি অ্যারে
-          const brandData = Array.isArray(res.data) ? res.data : (res.data?.brands || []);
+          const brandData = Array.isArray(res.data)
+            ? res.data
+            : res.data?.brands || [];
           setBrands(brandData);
         }
       } catch (err) {
@@ -27,7 +28,9 @@ const BrandSlider = () => {
       }
     };
     fetchBrands();
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [API_BASE_URL]);
 
   // লোডিং অবস্থায় বা ডাটা না থাকলে কিছুই দেখাবে না (যাতে সাইট ক্রাশ না করে)
@@ -42,14 +45,15 @@ const BrandSlider = () => {
   // ইমেজ ইউআরএল জেনারেট করার ফাংশন (কোড ক্লিন রাখার জন্য)
   const getImageUrl = (brand) => {
     if (!brand?.url) return "";
-    return brand.url.startsWith('http') ? brand.url : `${API_BASE_URL}${brand.url}`;
+    return brand.url.startsWith("http")
+      ? brand.url
+      : `${API_BASE_URL}${brand.url}`;
   };
 
   return (
     <section className="w-full bg-[#02050A] md:py-4 overflow-hidden font-poppins relative z-10">
       <div className="w-full py-10 md:py-16">
         <div className="relative w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_10%,_black_90%,transparent_100%)] flex flex-col gap-3 md:gap-10">
-          
           {/* Row 1: Left to Right */}
           <div className="flex overflow-hidden">
             <div className="flex animate-scroll-right whitespace-nowrap items-center pause-on-hover">
