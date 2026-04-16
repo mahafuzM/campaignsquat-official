@@ -1,7 +1,16 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # ১. এপিআই রিকোয়েস্টগুলো ব্যাকএন্ডে পাঠানোর জন্য (এটি সবার উপরে থাকবে)
+  # যদি আপনার ব্যাকএন্ড পোর্ট ৫০০০ হয়, তবে নিচের ৫০০০ নম্বরটি পরিবর্তন করবেন না
+  RewriteCond %{REQUEST_URI} ^/api [NC]
+  RewriteRule ^api/(.*)$ http://localhost:5000/api/$1 [P,L]
+
+  # ২. ফ্রন্টএন্ডের ইনডেক্স ফাইল হ্যান্ডেল করা
   RewriteRule ^index\.html$ - [L]
+
+  # ৩. রিঅ্যাক্ট রাউটিং সাপোর্ট (যাতে রিফ্রেশ করলে ৪MD৪ না আসে)
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
