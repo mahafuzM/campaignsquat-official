@@ -22,7 +22,7 @@ const app = express();
 // ১. মিডলওয়্যার কনফিগারেশন (Optimized for Production & Local)
 const allowedOrigins = [
   "http://localhost:5173",
-  'http://localhost:4173', // Vite preview port (এটি এখন যোগ করুন)
+  "http://localhost:4173",
   "https://campaignsquat.com",
   "https://www.campaignsquat.com",
   "https://campaignsquat-frontend.vercel.app"
@@ -31,15 +31,14 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        return callback(new Error("CORS policy error"), false);
+      // লোকাল এবং প্রোডাকশন উভয় ক্ষেত্রে এলাউ করার জন্য
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
-      return callback(null, true);
+      return callback(new Error("CORS policy error"), false);
     },
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // X-Requested-With যোগ করা হলো
     credentials: true,
   })
 );
@@ -193,8 +192,12 @@ app.use((err, req, res, next) => {
 process.on("uncaughtException", (err) => console.error("Uncaught Error:", err));
 process.on("unhandledRejection", (reason) => console.error("Unhandled Rejection:", reason));
 
-// ৭. সার্ভার লিসেনিং
+// ৭. সার্ভার লিসেনিং (Optimized for Production)
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+
+const server = app.listen(PORT, "0.0.0.0", () => {
+    const host = server.address().address;
+    const port = server.address().port;
+    console.log(`🚀 Campaignsquat Backend running at http://${host}:${port}`);
+    console.log(`✅ Server is ready to accept connections from all interfaces`);
 });
