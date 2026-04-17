@@ -42,13 +42,37 @@ const RunningIcons = () => (
 );
 
 const Footer = () => {
-  const CACHE_KEY = "footer_data";
-
+  const CACHE_KEY = "footer_data_cached";
   const [footerData, setFooterData] = useState(() => {
     const cached = sessionStorage.getItem(CACHE_KEY);
-    return cached ? JSON.parse(cached) : null;
+    if (cached) return JSON.parse(cached);
+    
+    // Default fallback to prevent disappearing if API fails
+    return {
+      brandName: "CampaignSquat Ltd",
+      brandDescription: "CampaignSquat Ltd. is a digital creative agency that helps brands and businesses to achieve their goals by providing creative and innovative solutions.",
+      socialLinks: [
+        { platform: "facebook", url: "https://facebook.com" },
+        { platform: "instagram", url: "https://instagram.com" },
+        { platform: "linkedin", url: "https://linkedin.com" }
+      ],
+      services: [
+        { name: "Website Development", link: "/service" },
+        { name: "Digital Marketing", link: "/service" }
+      ],
+      quickLinks: [
+        { name: "About Us", url: "/about" },
+        { name: "Contact", url: "/contact" }
+      ],
+      contact: { 
+        email: "hello@campaignsquat.com", 
+        phone: "+880 1700 000000", 
+        offices: [{ country: "Bangladesh", address: "Dhaka, Bangladesh" }] 
+      },
+      hiringStatus: { showCard: false }
+    };
   });
-  const [loading, setLoading] = useState(!footerData);
+  const [loading, setLoading] = useState(true);
 
   const socialIcons = {
     facebook: Facebook,
@@ -65,7 +89,7 @@ const Footer = () => {
   useEffect(() => {
     const fetchFooter = async () => {
       try {
-        const res = await axios.get("/api/footer");
+        const res = await axios.get("/api/footer"); 
         if (res.data) {
           setFooterData(res.data);
           sessionStorage.setItem(CACHE_KEY, JSON.stringify(res.data));
@@ -79,21 +103,9 @@ const Footer = () => {
     fetchFooter();
   }, []);
 
-  // Default values to prevent returning null
-  const data = footerData || {
-    brandName: "CampaignSquat Ltd",
-    brandDescription: "Your Trusted Technology Partner",
-    socialLinks: [],
-    services: [],
-    quickLinks: [],
-    contact: { email: "info@campaignsquat.com", phone: "", offices: [] },
-    hiringStatus: { showCard: false }
-  };
-
-  // Improved placeholder to avoid layout shift
-  if (loading && !footerData) {
-    return <footer className="w-full bg-[#0A0A0A] min-h-[400px]"></footer>;
-  }
+  // লোডিং অবস্থায় ফুটার এরিয়া খালি রাখা (Layout shift রোধ করতে)
+  if (loading && !footerData) return <footer className="w-full bg-[#0A0A0A] h-[300px]"></footer>;
+  if (!footerData) return null;
 
   return (
     <footer className="w-full bg-[#0A0A0A] text-white pt-12 md:pt-20 pb-10 font-poppins border-t border-white/5">
@@ -111,16 +123,16 @@ const Footer = () => {
               className="inline-block hover:opacity-80 transition-opacity"
             >
               <h2 className="text-[20px] md:text-[22px] font-bold text-white tracking-tight">
-                {data?.brandName || "CampaignSquat Ltd"}
+                {footerData?.brandName || "CampaignSquat Ltd"}
               </h2>
             </Link>
 
             <p className="text-white text-[14px] md:text-[16px] leading-[1.6] text-left max-w-[400px]">
-              {data?.brandDescription}
+              {footerData?.brandDescription}
             </p>
 
             <div className="flex flex-wrap justify-start gap-3 pt-2">
-              {data?.socialLinks?.map((social, index) => {
+              {footerData?.socialLinks?.map((social, index) => {
                 // platform নাম ছোট হাতের করে চেক করা হচ্ছে
                 const platform = social?.platform || "";
                 const Icon = socialIcons[platform.toLowerCase()];
@@ -147,7 +159,7 @@ const Footer = () => {
               </h4>
             </Link>
             <ul className="space-y-3 text-white text-[14px] md:text-[16px]">
-              {data?.services?.map((service, index) => (
+              {footerData?.services?.map((service, index) => (
                 <li
                   key={index}
                   className="flex items-center justify-start gap-2 group cursor-pointer"
@@ -173,7 +185,7 @@ const Footer = () => {
               Quick Links
             </h4>
             <ul className="space-y-3 text-white text-[14px] md:text-[16px]">
-              {data?.quickLinks?.map((link, index) => (
+              {footerData?.quickLinks?.map((link, index) => (
                 <li
                   key={index}
                   className="flex items-center justify-start gap-2 group cursor-pointer"
@@ -202,22 +214,22 @@ const Footer = () => {
               <li className="flex items-start gap-3">
                 <Mail size={20} className="text-white shrink-0 mt-1" />
                 <a
-                  href={`mailto:${data?.contact?.email}`}
+                  href={`mailto:${footerData?.contact?.email}`}
                   className="hover:text-[#f7a400] break-all"
                 >
-                  {data?.contact?.email}
+                  {footerData?.contact?.email}
                 </a>
               </li>
               <li className="flex items-start gap-3">
                 <Phone size={20} className="text-white shrink-0 mt-1" />
                 <a
-                  href={`tel:${data?.contact?.phone}`}
+                  href={`tel:${footerData?.contact?.phone}`}
                   className="hover:text-[#f7a400]"
                 >
-                  {data?.contact?.phone}
+                  {footerData?.contact?.phone}
                 </a>
               </li>
-              {data?.contact?.offices?.map((office, index) => (
+              {footerData?.contact?.offices?.map((office, index) => (
                 <li key={index} className="flex items-start gap-3">
                   <MapPin size={20} className="text-white shrink-0 mt-1" />
                   <div>
@@ -235,14 +247,14 @@ const Footer = () => {
         </div>
 
         {/* Hiring CTA Card */}
-        {data?.hiringStatus?.showCard && (
+        {footerData?.hiringStatus?.showCard && (
           <div className="bg-[#02050A] border border-white/10 rounded-[5px] p-8 md:p-6 flex flex-col lg:flex-row items-center justify-between gap-8 mb-16 shadow-lg">
             <div className="text-center lg:text-left">
               <h3 className="text-[20px] md:text-[22px] font-bold mb-2 text-white tracking-tight">
-                {data.hiringStatus.title}
+                {footerData.hiringStatus.title}
               </h3>
               <p className="text-white text-[16px] max-w-xl mb-5">
-                {data.hiringStatus.description}
+                {footerData.hiringStatus.description}
               </p>
 
               <style>{`
@@ -253,10 +265,10 @@ const Footer = () => {
                 .blinking-neon { font-weight: 800; letter-spacing: 1px; animation: whiteToOrange 2s ease-in-out infinite alternate; display: inline-block; }
               `}</style>
 
-              {data.hiringStatus.isHiring && (
+              {footerData.hiringStatus.isHiring && (
                 <div>
                   <h4 className="blinking-neon text-[14px] md:text-[16px] lg:text-[18px] font-semibold mb-4 ">
-                    {data.hiringStatus.hiringNotice}
+                    {footerData.hiringStatus.hiringNotice}
                   </h4>
                 </div>
               )}
@@ -278,7 +290,7 @@ const Footer = () => {
         <div className="border-t border-white/5 pt-10 text-center">
           <p className="text-white text-[14px] md:text-[18px] font-light">
             © {new Date().getFullYear()}{" "}
-            {data?.brandName || "CampaignSquat Ltd"}. All Rights Reserved.
+            {footerData?.brandName || "CampaignSquat Ltd"}. All Rights Reserved.
           </p>
         </div>
       </div>

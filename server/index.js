@@ -11,16 +11,18 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 
-// ১. এনভায়রনমেন্ট লোড (Current & Parent folder check)
-const currentDirEnv = path.join(__dirname, ".env");
-const parentDirEnv = path.join(__dirname, "..", ".env");
+// ১. এনভায়রনমেন্ট লোড (Try loading from multiple possible locations)
+const envPaths = [
+  path.join(__dirname, ".env"),
+  path.join(__dirname, "..", ".env"),
+  path.resolve(process.cwd(), ".env")
+];
 
-if (fs.existsSync(currentDirEnv)) {
-    dotenv.config({ path: currentDirEnv });
-} else if (fs.existsSync(parentDirEnv)) {
-    dotenv.config({ path: parentDirEnv });
-} else {
-    dotenv.config();
+for (const envPath of envPaths) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    break;
+  }
 }
 
 console.log("🔗 DB URI status:", !!process.env.MONGO_URI);
@@ -207,7 +209,10 @@ app.get("*", (req, res) => {
 mongoose.set("strictQuery", false);
 mongoose
   .connect(process.env.MONGO_URI, {
-    serverSelectionTimeoutMS: 10000,
+    serverSelectionTimeoutMS: 20000, // Increase to 20s
+    socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    connectTimeoutMS: 30000, // Give up initial connection after 30s
+    family: 4 // Force IPv4 to avoid hostinger DNS/IPv6 issues if any
   })
   .then(() => console.log("✅ MongoDB Connected!"))
   .catch((err) => console.error("❌ DB Error:", err));
