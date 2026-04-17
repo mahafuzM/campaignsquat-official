@@ -1,3 +1,15 @@
+const result = require("dotenv").config();
+
+if (result.error) {
+  console.error("❌ .env load korte error hochche:", result.error);
+} else {
+  console.log("✅ .env theke variable load hoyeche:", Object.keys(result.parsed));
+}
+
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
 const bcrypt = require("bcryptjs");
@@ -5,20 +17,19 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-// ২. মিডলওয়্যার কনফিগারেশন
+// ১. মিডলওয়্যার কনফিগারেশন
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
   "https://campaignsquat.com",
   "https://www.campaignsquat.com",
-  "http://campaignsquat.com", // অনেক সময় ব্রাউজার থেকে http রিকোয়েস্ট আসে
+  "http://campaignsquat.com", // অনেক সময় http থেকেও রিকোয়েস্ট আসে
   "https://campaignsquat-frontend.vercel.app"
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // হোস্টিং-এ অনেক সময় অরিজিন undefined থাকে, তাই !origin চেক করা জরুরি
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
@@ -32,8 +43,6 @@ app.use(
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
-
-// --- বাকি সব কোড (Admin Model, Routes, etc.) নিচেই থাকবে ---
 
 // --- 🛡️ Admin Model ---
 const Admin = require("./models/Admin");
@@ -145,27 +154,19 @@ app.use('/api/technical-edge', require('./routes/technicalEdgeRoutes'));
 app.use('/api/projects', require('./routes/projectAllruter'));
 app.use("/api/agency-comparison", require("./routes/agencyComparisonRoutes"));
 
-// --- ৫. ফ্রন্টএন্ড সার্ভ করার লজিক ---
-// 'server' ফোল্ডারের বাইরে 'dist' ফোল্ডারটি আছে কিনা তা নিশ্চিত করার জন্য:
-const frontendDistPath = path.resolve(__dirname, '..', 'dist');
-
+// --- ৫. ফ্রন্টএন্ড সার্ভ করার লজিক (নতুন যোগ করা হয়েছে) ---
+// আপনার ফাইল স্ট্রাকচার অনুযায়ী 'dist' ফোল্ডারটি 'server' এর এক লেভেল উপরে আছে।
+const frontendDistPath = path.join(__dirname, "../dist");
 app.use(express.static(frontendDistPath));
 
-// লগ দেখার জন্য (এটি আপনাকে সাহায্য করবে বুঝতে যে পাথটি ঠিক আছে কি না)
-console.log("Frontend Dist Path is:", frontendDistPath);
-
+// সব রুটকে index.html এ পাঠানো (SPA Routing এর জন্য)
 app.get("*", (req, res) => {
+  // যদি API রিকোয়েস্ট না হয়, তবেই ইন্ডেক্স ফাইল পাঠাবে
   if (!req.path.startsWith("/api")) {
-    const indexPath = path.join(frontendDistPath, "index.html");
-    
-    // ফাইলটি আসলেই আছে কি না চেক করে পাঠানো
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath);
-    } else {
-      res.status(404).send("Frontend build (index.html) not found in: " + indexPath);
-    }
+    res.sendFile(path.join(frontendDistPath, "index.html"));
   }
 });
+
 // ৬. ডাটাবেস কানেকশন
 mongoose.set("strictQuery", false);
 mongoose
@@ -185,14 +186,10 @@ process.on("uncaughtException", (err) => console.error("Uncaught Error:", err));
 process.on("unhandledRejection", (reason) => console.error("Unhandled Rejection:", reason));
 
 // ৮. সার্ভার লিসেনিং (More Stable for Hosting)
-// একদম শেষের অংশটি এভাবে আপডেট করুন
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; // হোস্টিংগারের জন্য ৩০০০ বা ৮০০০ পোর্টি বেশি নিরাপদ
 
-const server = app.listen(PORT, () => {
-    console.log(`🚀 Campaignsquat Backend is Live on Port: ${PORT}`);
-});
-
-// সার্ভার ক্র্যাশ হওয়া ঠেকাতে এই বাড়তি অংশটুকু যোগ করুন
-server.on('error', (err) => {
-    console.error("Server Error:", err);
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Campaignsquat Backend is Live!`);
+    console.log(`✅ Running on Port: ${PORT}`);
+    console.log(`🔗 URL: https://campaignsquat.com`);
 });
