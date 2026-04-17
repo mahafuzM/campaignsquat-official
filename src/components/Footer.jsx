@@ -42,8 +42,13 @@ const RunningIcons = () => (
 );
 
 const Footer = () => {
-  const [footerData, setFooterData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const CACHE_KEY = "footer_data";
+
+  const [footerData, setFooterData] = useState(() => {
+    const cached = sessionStorage.getItem(CACHE_KEY);
+    return cached ? JSON.parse(cached) : null;
+  });
+  const [loading, setLoading] = useState(!footerData);
 
   const socialIcons = {
     facebook: Facebook,
@@ -60,11 +65,10 @@ const Footer = () => {
   useEffect(() => {
     const fetchFooter = async () => {
       try {
-        // App.jsx এ baseURL দেওয়া থাকলে শুধু "/api/footer" দিলেও হবে
-        // তবে আমরা সেফটির জন্য পুরো URL অথবা পাথ টা ঠিক রাখব
-        const res = await axios.get("/api/footer"); 
+        const res = await axios.get("/api/footer");
         if (res.data) {
           setFooterData(res.data);
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify(res.data));
         }
       } catch (err) {
         console.error("Footer Fetch Error:", err);
@@ -75,9 +79,21 @@ const Footer = () => {
     fetchFooter();
   }, []);
 
-  // লোডিং অবস্থায় ফুটার এরিয়া খালি রাখা (Layout shift রোধ করতে)
-  if (loading) return <footer className="w-full bg-[#0A0A0A] h-[300px]"></footer>;
-  if (!footerData) return null;
+  // Default values to prevent returning null
+  const data = footerData || {
+    brandName: "CampaignSquat Ltd",
+    brandDescription: "Your Trusted Technology Partner",
+    socialLinks: [],
+    services: [],
+    quickLinks: [],
+    contact: { email: "info@campaignsquat.com", phone: "", offices: [] },
+    hiringStatus: { showCard: false }
+  };
+
+  // Improved placeholder to avoid layout shift
+  if (loading && !footerData) {
+    return <footer className="w-full bg-[#0A0A0A] min-h-[400px]"></footer>;
+  }
 
   return (
     <footer className="w-full bg-[#0A0A0A] text-white pt-12 md:pt-20 pb-10 font-poppins border-t border-white/5">
@@ -95,18 +111,19 @@ const Footer = () => {
               className="inline-block hover:opacity-80 transition-opacity"
             >
               <h2 className="text-[20px] md:text-[22px] font-bold text-white tracking-tight">
-                {footerData?.brandName || "CampaignSquat Ltd"}
+                {data?.brandName || "CampaignSquat Ltd"}
               </h2>
             </Link>
 
             <p className="text-white text-[14px] md:text-[16px] leading-[1.6] text-left max-w-[400px]">
-              {footerData?.brandDescription}
+              {data?.brandDescription}
             </p>
 
             <div className="flex flex-wrap justify-start gap-3 pt-2">
-              {footerData?.socialLinks?.map((social, index) => {
+              {data?.socialLinks?.map((social, index) => {
                 // platform নাম ছোট হাতের করে চেক করা হচ্ছে
-                const Icon = socialIcons[social.platform.toLowerCase()];
+                const platform = social?.platform || "";
+                const Icon = socialIcons[platform.toLowerCase()];
                 return (
                   <a
                     key={index}
@@ -130,7 +147,7 @@ const Footer = () => {
               </h4>
             </Link>
             <ul className="space-y-3 text-white text-[14px] md:text-[16px]">
-              {footerData?.services?.map((service, index) => (
+              {data?.services?.map((service, index) => (
                 <li
                   key={index}
                   className="flex items-center justify-start gap-2 group cursor-pointer"
@@ -156,7 +173,7 @@ const Footer = () => {
               Quick Links
             </h4>
             <ul className="space-y-3 text-white text-[14px] md:text-[16px]">
-              {footerData?.quickLinks?.map((link, index) => (
+              {data?.quickLinks?.map((link, index) => (
                 <li
                   key={index}
                   className="flex items-center justify-start gap-2 group cursor-pointer"
@@ -185,22 +202,22 @@ const Footer = () => {
               <li className="flex items-start gap-3">
                 <Mail size={20} className="text-white shrink-0 mt-1" />
                 <a
-                  href={`mailto:${footerData?.contact?.email}`}
+                  href={`mailto:${data?.contact?.email}`}
                   className="hover:text-[#f7a400] break-all"
                 >
-                  {footerData?.contact?.email}
+                  {data?.contact?.email}
                 </a>
               </li>
               <li className="flex items-start gap-3">
                 <Phone size={20} className="text-white shrink-0 mt-1" />
                 <a
-                  href={`tel:${footerData?.contact?.phone}`}
+                  href={`tel:${data?.contact?.phone}`}
                   className="hover:text-[#f7a400]"
                 >
-                  {footerData?.contact?.phone}
+                  {data?.contact?.phone}
                 </a>
               </li>
-              {footerData?.contact?.offices?.map((office, index) => (
+              {data?.contact?.offices?.map((office, index) => (
                 <li key={index} className="flex items-start gap-3">
                   <MapPin size={20} className="text-white shrink-0 mt-1" />
                   <div>
@@ -218,14 +235,14 @@ const Footer = () => {
         </div>
 
         {/* Hiring CTA Card */}
-        {footerData?.hiringStatus?.showCard && (
+        {data?.hiringStatus?.showCard && (
           <div className="bg-[#02050A] border border-white/10 rounded-[5px] p-8 md:p-6 flex flex-col lg:flex-row items-center justify-between gap-8 mb-16 shadow-lg">
             <div className="text-center lg:text-left">
               <h3 className="text-[20px] md:text-[22px] font-bold mb-2 text-white tracking-tight">
-                {footerData.hiringStatus.title}
+                {data.hiringStatus.title}
               </h3>
               <p className="text-white text-[16px] max-w-xl mb-5">
-                {footerData.hiringStatus.description}
+                {data.hiringStatus.description}
               </p>
 
               <style>{`
@@ -236,10 +253,10 @@ const Footer = () => {
                 .blinking-neon { font-weight: 800; letter-spacing: 1px; animation: whiteToOrange 2s ease-in-out infinite alternate; display: inline-block; }
               `}</style>
 
-              {footerData.hiringStatus.isHiring && (
+              {data.hiringStatus.isHiring && (
                 <div>
                   <h4 className="blinking-neon text-[14px] md:text-[16px] lg:text-[18px] font-semibold mb-4 ">
-                    {footerData.hiringStatus.hiringNotice}
+                    {data.hiringStatus.hiringNotice}
                   </h4>
                 </div>
               )}
@@ -261,7 +278,7 @@ const Footer = () => {
         <div className="border-t border-white/5 pt-10 text-center">
           <p className="text-white text-[14px] md:text-[18px] font-light">
             © {new Date().getFullYear()}{" "}
-            {footerData?.brandName || "CampaignSquat Ltd"}. All Rights Reserved.
+            {data?.brandName || "CampaignSquat Ltd"}. All Rights Reserved.
           </p>
         </div>
       </div>

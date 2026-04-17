@@ -171,8 +171,8 @@ const AppContent = () => {
     const fetchAllSEOData = async () => {
       try {
        const [gtmRes, seoRes] = await Promise.all([
-  axios.get("/gtm-config"), // ✅ শুধু পাথটুকু দিন
-  axios.get("/seo-settings"), // ✅ শুধু পাথটুকু দিন
+  axios.get("/api/gtm-config"), 
+  axios.get("/api/seo-settings"), 
 ]);
 
         const gtmData = gtmRes.data;
