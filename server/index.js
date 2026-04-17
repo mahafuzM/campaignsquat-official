@@ -6,22 +6,31 @@ const multer = require("multer");
 const fs = require("fs");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
-// ১. .env লোড করার সঠিক লজিক (Path fixing)
 const dotenv = require("dotenv");
-const envPath = path.resolve(__dirname, "..", ".env"); // এক ধাপ উপরের ফোল্ডারে খুঁজবে
 
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath });
-  console.log("✅ .env theke variable load hoyeche:", Object.keys(process.env).filter(key => key.includes('MONGO') || key.includes('JWT')));
+// ১. .env লোড করার সঠিক লজিক (১০০% রাইট পাথ)
+// আপনার ফাইল স্ট্রাকচার অনুযায়ী .env এবং index.js একই ফোল্ডারে আছে
+const currentDirEnv = path.join(__dirname, ".env");
+const parentDirEnv = path.join(__dirname, "..", ".env");
+
+if (fs.existsSync(currentDirEnv)) {
+    dotenv.config({ path: currentDirEnv });
+    console.log("✅ .env found in current folder (server/)");
+} else if (fs.existsSync(parentDirEnv)) {
+    dotenv.config({ path: parentDirEnv });
+    console.log("✅ .env found in parent folder (root/)");
 } else {
-  dotenv.config(); // fallback to default
-  console.log("⚠️  Direct .env file not found, using system environment variables.");
+    dotenv.config(); // ডিফল্ট সিস্টেম এনভায়রনমেন্ট চেক
+    console.log("⚠️ No .env file found! Using system environment variables.");
 }
+
+// লোড হয়েছে কি না চেক করার জন্য (সিকিউরিটি ঠিক রেখে)
+console.log("🔗 DB URI exists:", !!process.env.MONGO_URI);
 
 const app = express();
 
-// ২. মিডলওয়্যার কনফিগারেশন (CORS Update for Production)
+// ২. মিডলওয়্যার কনফিগারেশন (CORS Update)
+// আপনার নেটওয়ার্ক ট্যাবে আসা CORS এরর দূর করবে
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
@@ -37,6 +46,7 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
+      console.log("❌ CORS Blocked Origin:", origin);
       return callback(new Error("CORS policy error"), false);
     },
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
