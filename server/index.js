@@ -142,7 +142,9 @@ if (admin) {
 });
 
 // ৪. স্ট্যাটিক ফোল্ডার ও আপলোড কনফিগারেশন
-const uploadDir = path.join(__dirname, "../uploads");
+// Hostinger এর জন্য সরাসরি public_html/uploads এ সেভ করা হবে যাতে LiteSpeed সরাসরি সার্ভ করতে পারে
+const uploadDir = path.resolve(__dirname, "../../public_html/uploads");
+
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -150,7 +152,7 @@ app.use("/uploads", express.static(uploadDir));
 app.use("/api/uploads", express.static(uploadDir)); // Fix for Vite proxy requests
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "../uploads/"),
+  destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname.replace(/\s/g, "_")),
 });
 const upload = multer({ storage });
