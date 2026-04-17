@@ -1,3 +1,6 @@
+require('dotenv').config(); // এটি সবার উপরে থাকতে হবে
+
+// ... বাকি কোড
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -73,7 +76,9 @@ const authenticateAdmin = (req, res, next) => {
 };
 
 // --- 🔑 Admin Login Route ---
+// --- 🔑 Admin Login Route ---
 app.post("/api/admin-login", async (req, res) => {
+  console.log("📥 Login attempt received for:", req.body.email); // ডিবাগ লগ
   try {
     const inputEmail = req.body.email?.trim().toLowerCase();
     const inputPassword = req.body.password?.trim();
@@ -82,34 +87,43 @@ app.post("/api/admin-login", async (req, res) => {
       return res.status(400).json({ success: false, message: "Email and password are required!" });
     }
 
-    let admin = await Admin.findOne({ email: inputEmail });
-    let isMatch = false;
-    
-    if (admin) {
-      isMatch = await bcrypt.compare(inputPassword, admin.password);
-    } else {
-      const envEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-      const envPass = process.env.ADMIN_PASSWORD?.trim();
-      if (envEmail && envPass && inputEmail === envEmail && inputPassword === envPass) {
-        isMatch = true;
-      }
-    }
+    // ১. ডাটাবেসে চেক করা
+    // ১. প্রথমে ডাটাবেসে চেক করুন
+let admin = await Admin.findOne({ email: inputEmail });
+let isMatch = false;
+
+if (admin) {
+  // ডাটাবেসে ইউজার থাকলে পাসওয়ার্ড চেক করবে
+  isMatch = await bcrypt.compare(inputPassword, admin.password);
+} else {
+  // ২. ডাটাবেসে ইউজার না থাকলে .env থেকে চেক করবে (এটি আপনার ব্যাকআপ)
+  const envEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const envPass = process.env.ADMIN_PASSWORD?.trim();
+
+  if (envEmail && inputEmail === envEmail && inputPassword === envPass) {
+    isMatch = true;
+    console.log("⚠️ Logging in using Environment Credentials");
+  }
+}
 
     if (isMatch) {
       if (!process.env.JWT_SECRET) {
-        return res.status(500).json({ success: false, message: "Server Configuration Error: Missing Secret." });
+        console.error("❌ MISSING JWT_SECRET IN ENVIRONMENT!");
+        return res.status(500).json({ success: false, message: "Server Configuration Error." });
       }
+      
       const token = jwt.sign(
         { role: "admin", email: inputEmail },
         process.env.JWT_SECRET,
         { expiresIn: "24h" }
       );
-      return res.json({ success: true, token, message: "Access Granted! Welcome Back." });
+      return res.json({ success: true, token, message: "Access Granted!" });
     } else {
-      return res.status(401).json({ success: false, message: "Invalid Email or Security Key!" });
+      return res.status(401).json({ success: false, message: "Invalid Credentials!" });
     }
   } catch (err) {
-    res.status(500).json({ success: false, message: "Internal Server Error: " + err.message });
+    console.error("❌ Login Route Error:", err);
+    res.status(500).json({ success: false, message: "Internal Error" });
   }
 });
 
