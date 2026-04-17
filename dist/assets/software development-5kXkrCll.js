@@ -1,1 +1,0 @@
-const s="/assets/uiux%20design-6CxuMwHo.png",e="/assets/web%20development-CyERMJU4.png",t="/assets/mobile%20app%20development-CqQLRX5q.png",o="/assets/software%20development-CerQsAEy.png";export{t as m,o as s,s as u,e as w};

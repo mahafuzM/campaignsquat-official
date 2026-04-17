@@ -2,16 +2,33 @@
   RewriteEngine On
   RewriteBase /
 
-  # ১. এপিআই রিকোয়েস্টগুলো ব্যাকএন্ডে পাঠানোর জন্য (এটি সবার উপরে থাকবে)
-  # যদি আপনার ব্যাকএন্ড পোর্ট ৫০০০ হয়, তবে নিচের ৫০০০ নম্বরটি পরিবর্তন করবেন না
+  # ✅ ১. Force HTTPS (Security & SEO)
+  # আপনার .env তে যেহেতু https দেওয়া আছে, এটি থাকা বাধ্যতামূলক
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # ✅ ২. API Proxying (Node.js Port 3000)
+  # ফ্রন্টএন্ড /api দিয়ে রিকোয়েস্ট পাঠালে তা ব্যাকএন্ডের ৩০০০ পোর্টে ফরওয়ার্ড করবে
+  # Note: Hostinger-এ যদি এটি 503 দেয়, তবে [P] ফ্ল্যাগ সাপোর্ট না করার সম্ভাবনা থাকে
   RewriteCond %{REQUEST_URI} ^/api [NC]
-  RewriteRule ^api/(.*)$ http://localhost:5000/api/$1 [P,L]
+  RewriteRule ^api/(.*)$ http://127.0.0.1:3000/api/$1 [P,L]
 
-  # ২. ফ্রন্টএন্ডের ইনডেক্স ফাইল হ্যান্ডেল করা
-  RewriteRule ^index\.html$ - [L]
+  # ✅ ৩. Handle Static Files Directly
+  # ইমেজ বা সিএসএস রিকোয়েস্ট আসলে যেন রিঅ্যাক্ট রাউটারে না গিয়ে সরাসরি সার্ভ হয়
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
 
-  # ৩. রিঅ্যাক্ট রাউটিং সাপোর্ট (যাতে রিফ্রেশ করলে ৪MD৪ না আসে)
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
+  # ✅ ৪. React Routing Support
+  # ইউজার সরাসরি /admin বা /projects এ গেলে যেন 404 না আসে
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# ✅ ৫. Performance Optimization
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/css "access plus 1 year"
 </IfModule>

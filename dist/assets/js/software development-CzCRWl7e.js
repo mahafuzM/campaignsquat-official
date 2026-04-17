@@ -1,0 +1,1 @@
+const s="/assets/png/uiux%20design-6CxuMwHo.png",e="/assets/png/web%20development-CyERMJU4.png",n="/assets/png/mobile%20app%20development-CqQLRX5q.png",p="/assets/png/software%20development-CerQsAEy.png";export{n as m,p as s,s as u,e as w};
