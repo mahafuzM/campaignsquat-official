@@ -145,19 +145,27 @@ app.use('/api/technical-edge', require('./routes/technicalEdgeRoutes'));
 app.use('/api/projects', require('./routes/projectAllruter'));
 app.use("/api/agency-comparison", require("./routes/agencyComparisonRoutes"));
 
-// --- ৫. ফ্রন্টএন্ড সার্ভ করার লজিক (নতুন যোগ করা হয়েছে) ---
-// আপনার ফাইল স্ট্রাকচার অনুযায়ী 'dist' ফোল্ডারটি 'server' এর এক লেভেল উপরে আছে।
-const frontendDistPath = path.join(__dirname, "../dist");
+// --- ৫. ফ্রন্টএন্ড সার্ভ করার লজিক ---
+// 'server' ফোল্ডারের বাইরে 'dist' ফোল্ডারটি আছে কিনা তা নিশ্চিত করার জন্য:
+const frontendDistPath = path.resolve(__dirname, '..', 'dist');
+
 app.use(express.static(frontendDistPath));
 
-// সব রুটকে index.html এ পাঠানো (SPA Routing এর জন্য)
+// লগ দেখার জন্য (এটি আপনাকে সাহায্য করবে বুঝতে যে পাথটি ঠিক আছে কি না)
+console.log("Frontend Dist Path is:", frontendDistPath);
+
 app.get("*", (req, res) => {
-  // যদি API রিকোয়েস্ট না হয়, তবেই ইন্ডেক্স ফাইল পাঠাবে
   if (!req.path.startsWith("/api")) {
-    res.sendFile(path.join(frontendDistPath, "index.html"));
+    const indexPath = path.join(frontendDistPath, "index.html");
+    
+    // ফাইলটি আসলেই আছে কি না চেক করে পাঠানো
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send("Frontend build (index.html) not found in: " + indexPath);
+    }
   }
 });
-
 // ৬. ডাটাবেস কানেকশন
 mongoose.set("strictQuery", false);
 mongoose
