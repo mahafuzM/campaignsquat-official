@@ -8,14 +8,19 @@ const BrandEdit = () => {
   const [loading, setLoading] = useState(false);
 
   // ১. ডাইনামিক বেস ইউআরএল সেটআপ
-  const API_BASE_URL =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   // ২. ডাটাবেস থেকে সব লোগো আনা
   const fetchBrands = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/brands`);
-      setBrands(res.data);
+      const res = await axios.get(`/api/brands`);
+      if (Array.isArray(res.data)) {
+        setBrands(res.data);
+      } else if (res.data && Array.isArray(res.data.data)) {
+        setBrands(res.data.data);
+      } else {
+        setBrands([]);
+      }
     } catch (err) {
       console.error("Fetch error:", err);
     }
@@ -23,7 +28,7 @@ const BrandEdit = () => {
 
   useEffect(() => {
     fetchBrands();
-  }, [API_BASE_URL]);
+  }, []);
 
   // ৩. পিসি থেকে ফাইল সিলেক্ট এবং আপলোড
   const handleUpload = async (e) => {
@@ -38,7 +43,7 @@ const BrandEdit = () => {
       // Token thakle headers-e pathano uchit
       const token = localStorage.getItem("adminToken");
 
-      await axios.post(`${API_BASE_URL}/api/brands`, formData, {
+      await axios.post(`/api/brands`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: token ? `Bearer ${token}` : "",
@@ -62,7 +67,7 @@ const BrandEdit = () => {
     if (window.confirm("আপনি কি নিশ্চিত যে এই লোগোটি ডিলিট করতে চান?")) {
       try {
         const token = localStorage.getItem("adminToken");
-        await axios.delete(`${API_BASE_URL}/api/brands/${id}`, {
+        await axios.delete(`/api/brands/${id}`, {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
         fetchBrands();
@@ -122,7 +127,7 @@ const BrandEdit = () => {
                   src={
                     brand.url?.startsWith("http")
                       ? brand.url
-                      : `${API_BASE_URL}${brand.url}`
+                      : `${(axios.defaults.baseURL || "")}${brand.url}`
                   }
                   alt="Brand"
                   className="max-h-full max-w-full object-contain"

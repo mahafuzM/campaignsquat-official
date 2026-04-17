@@ -28,8 +28,7 @@ const BlogManager = () => {
   ]);
 
   // ✅ ডাইনামিক বেস ইউআরএল সেটআপ
-  const BASE_URL =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   // 🔥 ১০০% পারফেক্ট স্লাগ জেনারেটর লজিক
   const generateSlug = (text) => {
@@ -54,12 +53,13 @@ const BlogManager = () => {
 
   const fetchBlogs = useCallback(async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/blogs`);
-      setBlogs(res.data);
+      const res = await axios.get(`/api/blogs`);
+      const data = Array.isArray(res.data) ? res.data : (Array.isArray(res.data?.data) ? res.data.data : []);
+      setBlogs(data);
     } catch (err) {
       console.error("Error fetching blogs:", err);
     }
-  }, [BASE_URL]);
+  }, []);
 
   useEffect(() => {
     fetchBlogs();
@@ -131,10 +131,10 @@ const BlogManager = () => {
 
     try {
       if (editingId) {
-        await axios.put(`${BASE_URL}/api/blogs/${editingId}`, formData);
+        await axios.put(`/api/blogs/${editingId}`, formData);
         alert("Blog Updated Successfully! 🔥");
       } else {
-        await axios.post(`${BASE_URL}/api/blogs`, formData);
+        await axios.post(`/api/blogs`, formData);
         alert("Blog Published Successfully! 🚀");
       }
       setEditingId(null);
@@ -152,7 +152,7 @@ const BlogManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this blog? 🗑️")) {
       try {
-        await axios.delete(`${BASE_URL}/api/blogs/${id}`);
+        await axios.delete(`/api/blogs/${id}`);
         setBlogs(blogs.filter((blog) => blog._id !== id));
         alert("Blog deleted successfully!");
       } catch (err) {
@@ -165,7 +165,7 @@ const BlogManager = () => {
     if (!path) return "";
     return path.startsWith("http")
       ? path
-      : `${BASE_URL}/${path.replace(/\\/g, "/")}`;
+      : `/${path.replace(/\\/g, "/")}`;
   };
 
   return (

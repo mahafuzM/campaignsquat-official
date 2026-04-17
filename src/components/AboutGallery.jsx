@@ -5,7 +5,7 @@ const AboutGallery = () => {
   const [dbImages, setDbImages] = useState([]);
 
   // app.jsx থেকে আসা বেইজ URL
-  const API_BASE = axios.defaults.baseURL;
+  
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -51,7 +51,7 @@ const AboutGallery = () => {
               // ফুল ইউআরএল তৈরি
               const fullUrl = imgPath?.startsWith("http")
                 ? imgPath
-                : `${API_BASE}${cleanPath}`;
+                : `${(axios.defaults.baseURL || "")}${cleanPath}`;
 
               return (
                 <div

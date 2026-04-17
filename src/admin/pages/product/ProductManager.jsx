@@ -10,18 +10,14 @@ const ProductManager = () => {
   const [loading, setLoading] = useState(false);
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-      ? "http://localhost:5000"
-      : "/api";
+  
 
   const getImgUrl = (imagePath) => {
     if (!imagePath) return "";
     if (imagePath.startsWith("http")) return imagePath;
 
     const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
-    return `${BASE_URL}${cleanPath}`;
+    return `${(axios.defaults.baseURL || "")}${cleanPath}`;
   };
 
   // মেইন স্টেট
@@ -39,7 +35,7 @@ const ProductManager = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${BASE_URL}/api/products/all`);
+      const res = await axios.get(`/api/products/all`);
       // Data parsing safety
       const actualData = Array.isArray(res.data)
         ? res.data
@@ -54,7 +50,7 @@ const ProductManager = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [BASE_URL]);
+  }, []);
 
   // --- Dynamic Block Logic ---
   const addSection = (type) => {
@@ -114,10 +110,10 @@ const ProductManager = () => {
       };
 
       if (isEditing) {
-        await axios.put(`${BASE_URL}/api/products/${currentId}`, data, config);
+        await axios.put(`/api/products/${currentId}`, data, config);
         alert("Product Updated!");
       } else {
-        await axios.post(`${BASE_URL}/api/products/add`, data, config);
+        await axios.post(`/api/products/add`, data, config);
         alert("Product Added!");
       }
       resetForm();
@@ -149,12 +145,12 @@ const ProductManager = () => {
         // Jodi direct Cloudinary ba online link hoy
         imagePath = product.image;
       } else {
-        // Backend folder theke asle: BASE_URL + slash + image path
+        // Backend folder theke asle: (axios.defaults.baseURL || "") + slash + image path
         // path-er শুরুতে slash thakle seta bad diye amra safe vabe slash add korbo
         const cleanPath = product.image.startsWith("/")
           ? product.image
           : `/${product.image}`;
-        imagePath = `${BASE_URL}${cleanPath}`;
+        imagePath = `${(axios.defaults.baseURL || "")}${cleanPath}`;
       }
     }
 
@@ -165,7 +161,7 @@ const ProductManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.delete(`${BASE_URL}/api/products/${id}`);
+        await axios.delete(`/api/products/${id}`);
         fetchProducts();
       } catch (err) {
         console.error("Error deleting product:", err);
@@ -444,7 +440,7 @@ const ProductManager = () => {
                 >
                   <td className="p-6 w-32">
                     <img
-                      src={getImgUrl(p.image)} // Ekhan theke dynamic BASE_URL onujayi image asbe
+                      src={getImgUrl(p.image)} // Ekhan theke dynamic (axios.defaults.baseURL || "") onujayi image asbe
                       className="w-16 h-16 object-cover rounded-[5px] border border-white/10"
                       alt={p.name}
                     />

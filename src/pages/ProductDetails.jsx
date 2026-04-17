@@ -9,11 +9,7 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-      ? "http://localhost:5000"
-      : "/api";
+  
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -21,8 +17,8 @@ const ProductDetails = () => {
     const fetchProductDetails = async () => {
       try {
         setLoading(true);
-        // Dynamic BASE_URL use kora hoyeche
-        const res = await axios.get(`${BASE_URL}/api/products/${id}`);
+        // Dynamic (axios.defaults.baseURL || "") use kora hoyeche
+        const res = await axios.get(`/api/products/${id}`);
         setProduct(res.data);
       } catch (err) {
         console.error(
@@ -35,7 +31,7 @@ const ProductDetails = () => {
     };
 
     if (id) fetchProductDetails();
-  }, [id, BASE_URL]);
+  }, [id]);
 
   if (loading)
     return (
@@ -59,7 +55,7 @@ const ProductDetails = () => {
           src={
             product.image?.startsWith("http")
               ? product.image
-              : `${BASE_URL}${product.image?.startsWith("/") ? "" : "/"}${product.image}`
+              : `${(axios.defaults.baseURL || "")}${product.image?.startsWith("/") ? "" : "/"}${product.image}`
           }
           alt={product.name}
           className="w-full h-full object-contain md:object-cover"

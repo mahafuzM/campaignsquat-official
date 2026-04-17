@@ -9,7 +9,12 @@ export default defineConfig({
       // Matches any request starting with /api
       "/api": {
         // Change this to your actual backend server port
-        target: "http://localhost:5000", 
+        target: "http://localhost:3000", 
+        changeOrigin: true,
+        secure: false,
+      },
+      "/uploads": {
+        target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
         // Optional: removes /api from the path before sending to backend

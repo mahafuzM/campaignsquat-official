@@ -7,7 +7,7 @@ const { getBrands, addBrand, deleteBrand } = require('../controllers/brandContro
 // ফাইল কোথায় সেভ হবে তার কনফিগারেশন
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // নিশ্চিত করুন সার্ভার ফোল্ডারে 'uploads' ফোল্ডার আছে
+    cb(null, '../uploads/'); // নিশ্চিত করুন সার্ভার ফোল্ডারে 'uploads' ফোল্ডার আছে
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));

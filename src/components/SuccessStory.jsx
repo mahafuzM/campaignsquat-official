@@ -2,8 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 // ✅ ডাইনামিক বেস ইউআরএল সেটআপ
-const BASE_URL =
-  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+
 
 const SuccessStory = () => {
   const [data, setData] = useState(null);
@@ -14,8 +13,8 @@ const SuccessStory = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // ✅ হার্ডকোডেড লিঙ্কের বদলে BASE_URL ব্যবহার
-        const res = await axios.get(`${BASE_URL}/api/success-story`);
+        // ✅ হার্ডকোডেড লিঙ্কের বদলে (axios.defaults.baseURL || "") ব্যবহার
+        const res = await axios.get(`/api/success-story`);
         if (res.data) setData(res.data);
       } catch (err) {
         console.error("Fetch error:", err);
@@ -157,8 +156,8 @@ const Card = ({ item, accentColor }) => (
           item.image
             ? item.image.startsWith("http")
               ? item.image
-              : // ✅ এখানে BASE_URL ব্যবহার করা হয়েছে
-                `${BASE_URL}${item.image.startsWith("/") ? "" : "/"}${item.image}`
+              : // ✅ এখানে (axios.defaults.baseURL || "") ব্যবহার করা হয়েছে
+                `${(axios.defaults.baseURL || "")}${item.image.startsWith("/") ? "" : "/"}${item.image}`
             : ""
         }
         alt={item.name}

@@ -10,7 +10,7 @@ const AboutRecognitionEdit = () => {
   const [loading, setLoading] = useState(false);
 
   // app.jsx থেকে আসা বেইজ URL
-  const API_BASE = axios.defaults.baseURL;
+  
 
   // ১. ডাটাবেস থেকে বর্তমান ডাটা লোড করা
   useEffect(() => {
@@ -82,7 +82,7 @@ const AboutRecognitionEdit = () => {
   // ইমেজ পাথ হ্যান্ডলিং
   const fullImgUrl = image?.startsWith("http") 
     ? image 
-    : `${API_BASE}${image?.startsWith("/") ? "" : "/"}${image}`;
+    : `${(axios.defaults.baseURL || "")}${image?.startsWith("/") ? "" : "/"}${image}`;
 
   return (
     <div className="p-6 md:p-10 bg-[#F8FAFC] min-h-screen text-slate-900 font-poppins">

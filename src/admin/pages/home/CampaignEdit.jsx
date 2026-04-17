@@ -9,9 +9,8 @@ const CampaignEdit = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
-  // ✅ ১. ডাইনামিক API_BASE (লোকাল এবং লাইভ সুইচিং)
-  const API_BASE =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  // ✅ ১. ডাইনামিক (axios.defaults.baseURL || "") (লোকাল এবং লাইভ সুইচিং)
+  
 
   useEffect(() => {
     const fetchAboutData = async () => {
@@ -30,7 +29,7 @@ const CampaignEdit = () => {
             setPreview(
               imagePath.startsWith("http")
                 ? imagePath
-                : `${API_BASE}/${imagePath}`,
+                : `/${imagePath}`,
             );
           }
         }
@@ -39,7 +38,7 @@ const CampaignEdit = () => {
       }
     };
     fetchAboutData();
-  }, [API_BASE]);
+  }, []);
 
   // ২. ইনপুট হ্যান্ডলার
   const handleChange = (e) => {

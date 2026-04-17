@@ -17,14 +17,13 @@ const HeroEdit = () => {
     imageUrl: "",
   });
 
-  const API_BASE =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   // ১. ডাটা লোড করা (Fetch Data)
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/api/hero`);
+        const res = await axios.get(`/api/hero`);
         // ব্যাকএন্ডে res.json({ success: true, data }) পাঠানো হয়, তাই res.data.data ব্যবহার করা হয়েছে
         if (res.data && res.data.success && res.data.data) {
           const heroData = res.data.data;
@@ -39,7 +38,7 @@ const HeroEdit = () => {
           if (heroData.imageUrl) {
             const fullImgPath = heroData.imageUrl.startsWith("http")
               ? heroData.imageUrl
-              : `${API_BASE}/${heroData.imageUrl.replace(/^\//, "")}`;
+              : `/${heroData.imageUrl.replace(/^\//, "")}`;
             setPreviewUrl(fullImgPath);
           }
 
@@ -51,13 +50,13 @@ const HeroEdit = () => {
       }
     };
     fetchData();
-  }, [API_BASE]);
+  }, []);
 
   // ২. আইকন হ্যান্ডেলিং
   const handleAddIcon = async () => {
     if (!newIconName) return;
     try {
-      const res = await axios.post(`${API_BASE}/api/hero/icons/add`, {
+      const res = await axios.post(`/api/hero/icons/add`, {
         name: newIconName.toLowerCase().trim(),
       });
       if (res.data.success) {
@@ -73,7 +72,7 @@ const HeroEdit = () => {
     e.stopPropagation();
     if (!window.confirm("Remove this icon from history?")) return;
     try {
-      const res = await axios.delete(`${API_BASE}/api/hero/icons/${id}`);
+      const res = await axios.delete(`/api/hero/icons/${id}`);
       if (res.data.success) {
         setAvailableIcons(availableIcons.filter((icon) => icon._id !== id));
       }
@@ -103,7 +102,7 @@ const HeroEdit = () => {
     if (selectedFile) formData.append("heroImage", selectedFile);
 
     try {
-      const res = await axios.post(`${API_BASE}/api/hero`, formData, {
+      const res = await axios.post(`/api/hero`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (res.data.success) {

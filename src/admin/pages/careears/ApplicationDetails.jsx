@@ -21,11 +21,7 @@ const ApplicationDetails = () => {
   const [loading, setLoading] = useState(true);
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-      ? "http://localhost:5000"
-      : "/api";
+  
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -33,8 +29,8 @@ const ApplicationDetails = () => {
     const fetchApplicationDetails = async () => {
       try {
         setLoading(true);
-        // Dynamic BASE_URL use kora hoyeche
-        const res = await axios.get(`${BASE_URL}/api/applications/all`);
+        // Dynamic (axios.defaults.baseURL || "") use kora hoyeche
+        const res = await axios.get(`/api/applications/all`);
 
         // Data format safety check
         const dataList = Array.isArray(res.data)
@@ -59,7 +55,7 @@ const ApplicationDetails = () => {
     };
 
     if (id) fetchApplicationDetails();
-  }, [id, BASE_URL]);
+  }, [id]);
 
   if (loading) {
     return (

@@ -17,8 +17,6 @@ dist-ssr
 
 # Environment variables and sensitive files
 # .env (সরিয়ে দেওয়া হলো যাতে গিটহাবে যায়)
-.env.local
-.env.production
 uploads/
 
 # Editor directories and files
@@ -31,3 +29,4 @@ uploads/
 *.njsproj
 *.sln
 *.sw?
+config.bat

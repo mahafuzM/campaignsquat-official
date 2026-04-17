@@ -1,16 +1,67 @@
-# React + Vite
+# Campaignsquat Official - Production Guide & Documentation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repository contains the complete source code for the **Campaignsquat** official website, including the React/Vite frontend and Node.js backend.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Automated Workflows
 
-## React Compiler
+We have implemented two main scripts to simplify management from your local VS Code terminal.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Full Deployment
+Run this when you make changes to the code (Frontend or Backend).
+```bash
+./deploy.sh
+```
+**What it does:**
+- Builds the React frontend (`npm run build`).
+- Syncs the production files (`dist/`) to the server.
+- Syncs the backend files (`server/`) while protecting existing uploads.
+- Restarts the PM2 process on the server.
 
-## Expanding the ESLint configuration
+### 2. Quick Server Restart
+Run this if the website says "Server Error" or if the API is not responding.
+```bash
+./restart-server.sh
+```
+**What it does:**
+- Quickly connects to the server.
+- Restarts the `campaignsquat` process.
+- Starts it fresh if it was accidentally deleted from PM2.
+- Shows you the status (Uptime, Memory) in your terminal.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🔑 Security & Configuration Changes
+
+### Updating SSH Information
+If you ever change your Hostinger password or SSH configuration, you need to update the top section of these files:
+- `deploy.sh`
+- `restart-server.sh`
+
+**Lines to change:**
+```bash
+USER="u263673950"
+HOST="212.85.30.245"
+PORT="65002"
+REMOTE_DIR="/home/u263673950/domains/campaignsquat.com/public_html"
+```
+
+### Environment Variables
+The backend configuration is stored in `server/.env`.
+> [!IMPORTANT]
+> Never share your `.env` file or SSH keys in public forums. Ensure your local `.env` matches the server's database credentials.
+
+---
+
+## 📁 Repository Structure
+- `src/`: Frontend React components and logic.
+- `server/`: Node.js/Express backend.
+- `dist/`: Compiled production files (synced to server root).
+- `public/`: Static assets (favicon, logos).
+- `deploy.sh`: Primary deployment script.
+- `restart-server.sh`: Emergency restart script.
+
+---
+
+**Live Website:** [https://campaignsquat.com](https://campaignsquat.com)

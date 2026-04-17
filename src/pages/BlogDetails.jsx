@@ -22,8 +22,7 @@ const BlogDetails = () => {
   const [loading, setLoading] = useState(true);
 
   // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ অটোমেটিক হ্যান্ডেল করবে)
-  const BASE_URL =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -32,7 +31,7 @@ const BlogDetails = () => {
       try {
         setLoading(true);
         // নিশ্চিত করুন আপনার ব্যাকএন্ডে এই রাউটটি '/api/blogs/url/:url' এভাবে সেট করা আছে
-        const res = await axios.get(`${BASE_URL}/api/blogs/url/${url}`);
+        const res = await axios.get(`/api/blogs/url/${url}`);
         if (res.data) {
           setBlog(res.data);
         }
@@ -45,14 +44,14 @@ const BlogDetails = () => {
     };
 
     if (url) fetchBlog();
-  }, [url, BASE_URL]);
+  }, [url]);
 
   const fixImagePath = (path) => {
     if (!path) return "https://via.placeholder.com/1200x600";
     if (path.startsWith("http")) return path;
     let cleanPath = path.replace(/\\/g, "/");
     if (cleanPath.startsWith("/")) cleanPath = cleanPath.substring(1);
-    return `${BASE_URL}/${cleanPath}`;
+    return `/${cleanPath}`;
   };
 
   // সোশ্যাল শেয়ার লজিক

@@ -128,14 +128,15 @@ if (admin) {
 });
 
 // ৪. স্ট্যাটিক ফোল্ডার ও আপলোড কনফিগারেশন
-const uploadDir = path.join(__dirname, "uploads");
+const uploadDir = path.join(__dirname, "../uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 app.use("/uploads", express.static(uploadDir));
+app.use("/api/uploads", express.static(uploadDir)); // Fix for Vite proxy requests
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
+  destination: (req, file, cb) => cb(null, "../uploads/"),
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname.replace(/\s/g, "_")),
 });
 const upload = multer({ storage });
@@ -143,6 +144,16 @@ const upload = multer({ storage });
 app.post("/api/upload", upload.single("file"), (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
   res.status(200).json({ url: `/uploads/${req.file.filename}` });
+});
+
+// 💖 Health Check API
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Server is healthy and running",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
 });
 
 // ৫. এপিআই রাউট ইম্পোর্টস
@@ -187,6 +198,8 @@ app.use(express.static(frontendDistPath));
 app.get("*", (req, res) => {
   if (!req.path.startsWith("/api")) {
     res.sendFile(path.join(frontendDistPath, "index.html"));
+  } else {
+    res.status(404).json({ success: false, message: "API route not found" });
   }
 });
 

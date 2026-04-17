@@ -8,7 +8,7 @@ const projectAllcontrollers = require('../controllers/projectAllcontrollers');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // নিশ্চিত করুন আপনার রুট ডিরেক্টরিতে 'uploads' নামে একটি ফোল্ডার আছে
-    cb(null, 'uploads/'); 
+    cb(null, '../uploads/'); 
   },
   filename: (req, file, cb) => {
     // ফাইলের নাম ইউনিক করার জন্য টাইমস্ট্যাম্প + অরিজিনাল এক্সটেনশন

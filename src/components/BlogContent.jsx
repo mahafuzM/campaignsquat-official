@@ -31,13 +31,12 @@ const BlogContent = () => {
   ];
 
   // ✅ ডাইনামিক বেস ইউআরএল
-  const BASE_URL =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/blogs`);
+        const res = await axios.get(`/api/blogs`);
 
         if (res.data && Array.isArray(res.data)) {
           const sortedData = res.data.sort(
@@ -56,7 +55,7 @@ const BlogContent = () => {
       }
     };
     fetchBlogs();
-  }, [BASE_URL]);
+  }, []);
 
   // ২. ফিল্টারিং লজিক (আপনার অরিজিনাল লজিক অক্ষুণ্ণ রাখা হয়েছে)
   const filteredPosts = useMemo(() => {
@@ -87,7 +86,7 @@ const BlogContent = () => {
     if (!path) return "https://via.placeholder.com/800x400";
     let cleanPath = path.replace(/\\/g, "/");
     if (cleanPath.startsWith("/")) cleanPath = cleanPath.substring(1);
-    return path.startsWith("http") ? path : `${BASE_URL}/${cleanPath}`;
+    return path.startsWith("http") ? path : `/${cleanPath}`;
   };
 
   if (loading && allPosts.length === 0) {

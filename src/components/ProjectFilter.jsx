@@ -4,8 +4,7 @@ import axios from "axios";
 import { SearchX } from "lucide-react";
 
 // ✅ Global Axios Setup
-axios.defaults.baseURL =
-  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+
 
 const ProjectFilter = () => {
   const [cases, setCases] = useState(() => {
@@ -23,7 +22,7 @@ const ProjectFilter = () => {
     return sessionStorage.getItem("activeProjectTab") || "All";
   });
 
-  const API_BASE = axios.defaults.baseURL;
+  
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -77,7 +76,7 @@ const ProjectFilter = () => {
     const finalPath = fileName.startsWith("uploads/")
       ? fileName
       : `uploads/${fileName}`;
-    return `${API_BASE}/${finalPath}`;
+    return `/${finalPath}`;
   };
 
   if (loading && cases.length === 0) {

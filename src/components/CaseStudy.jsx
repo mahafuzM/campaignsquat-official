@@ -11,7 +11,7 @@ const CaseStudy = () => {
   const [loading, setLoading] = useState(dbData.length === 0);
 
   // ✅ ProjectFilter এর মতো সরাসরি baseURL ব্যবহার
-  const API_BASE = axios.defaults.baseURL || "/api";
+  
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -67,7 +67,7 @@ const CaseStudy = () => {
       ? fileName
       : `uploads/${fileName}`;
 
-    return `${API_BASE}/${finalPath}`;
+    return `/${finalPath}`;
   };
 
   if (!loading && dbData.length === 0) return null;

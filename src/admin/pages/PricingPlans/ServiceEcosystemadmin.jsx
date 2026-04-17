@@ -20,10 +20,9 @@ const ServiceEcosystemAdmin = () => {
   const [saving, setSaving] = useState(false);
 
   // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ দুই জায়গায় কাজ করবে)
-  const BASE_URL =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
-  const API_URL = `${BASE_URL}/api/creative-services`;
+  const API_URL = `/api/creative-services`;
 
   useEffect(() => {
     const fetchServices = async () => {

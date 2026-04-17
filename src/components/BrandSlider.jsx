@@ -6,19 +6,20 @@ const BrandSlider = () => {
   const [loading, setLoading] = useState(true);
 
   // ১. ডাইনামিক বেস ইউআরএল সেটআপ
-  const API_BASE_URL =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   useEffect(() => {
     let isMounted = true;
     const fetchBrands = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/brands`);
+        const res = await axios.get(`/api/brands`);
         if (isMounted) {
           // নিশ্চিত করা হচ্ছে যে ডাটা একটি অ্যারে
           const brandData = Array.isArray(res.data)
             ? res.data
-            : res.data?.brands || [];
+            : Array.isArray(res.data?.data)
+            ? res.data.data
+            : [];
           setBrands(brandData);
         }
       } catch (err) {
@@ -31,7 +32,7 @@ const BrandSlider = () => {
     return () => {
       isMounted = false;
     };
-  }, [API_BASE_URL]);
+  }, []);
 
   // লোডিং অবস্থায় বা ডাটা না থাকলে কিছুই দেখাবে না (যাতে সাইট ক্রাশ না করে)
   if (loading || !Array.isArray(brands) || brands.length === 0) {
@@ -47,7 +48,7 @@ const BrandSlider = () => {
     if (!brand?.url) return "";
     return brand.url.startsWith("http")
       ? brand.url
-      : `${API_BASE_URL}${brand.url}`;
+      : `${(axios.defaults.baseURL || "")}${brand.url}`;
   };
 
   return (

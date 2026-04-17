@@ -19,13 +19,12 @@ const PricingPlans = () => {
     return savedTab || (categories.length > 0 ? categories[0] : "");
   });
 
-  const BASE_URL =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/pricing/all`);
+        const res = await axios.get(`/api/pricing/all`);
 
         if (res.data && Array.isArray(res.data)) {
           const grouped = res.data.reduce((acc, plan) => {
@@ -54,7 +53,7 @@ const PricingPlans = () => {
       }
     };
     fetchPricing();
-  }, [activeCategory, BASE_URL]);
+  }, [activeCategory]);
 
   useEffect(() => {
     if (activeCategory) {

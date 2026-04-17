@@ -12,8 +12,7 @@ const ServiceDetails = () => {
   const [openIndex, setOpenIndex] = useState(0);
 
   // ✅ ১. এই অংশটি আপডেট করা হয়েছে (অটোমেটিক লোকাল বা লাইভ চিনে নেবে)
-  const API_BASE =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   useEffect(() => {
     const controller = new AbortController();
@@ -26,8 +25,8 @@ const ServiceDetails = () => {
 
       setLoading(true);
       try {
-        // ✅ ২. এখানে `${API_BASE}` ব্যবহার করা হচ্ছে
-        const res = await axios.get(`${API_BASE}/api/megamenu/${id}`, {
+        // ✅ ২. এখানে `${(axios.defaults.baseURL || "")}` ব্যবহার করা হচ্ছে
+        const res = await axios.get(`/api/megamenu/${id}`, {
           signal: controller.signal,
         });
 
@@ -50,7 +49,7 @@ const ServiceDetails = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     return () => controller.abort();
-  }, [id, API_BASE]); // API_BASE ডিপেন্ডেন্সিতে যোগ করা হয়েছে
+  }, [id]); // (axios.defaults.baseURL || "") ডিপেন্ডেন্সিতে যোগ করা হয়েছে
   // ইমেজ ইউআরএল হ্যান্ডলার
   const getFullImageUrl = (imagePath) => {
     if (!imagePath)
@@ -63,7 +62,7 @@ const ServiceDetails = () => {
       ? cleanPath.slice(1)
       : cleanPath;
 
-    return `${API_BASE}/${finalPath}`;
+    return `/${finalPath}`;
   };
 
   if (loading) {

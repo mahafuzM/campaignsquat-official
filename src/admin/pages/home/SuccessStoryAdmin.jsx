@@ -3,10 +3,9 @@ import axios from "axios";
 import { Trash2, Plus, Save, UploadCloud } from "lucide-react";
 
 // ✅ Dynamic Base URL - যা লোকাল এবং সার্ভার দুই জায়গাতেই কাজ করবে
-const BASE_URL =
-  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
 
-axios.defaults.baseURL = BASE_URL;
+
+
 
 const SuccessStoryAdmin = () => {
   const [formData, setFormData] = useState({
@@ -127,7 +126,7 @@ const SuccessStoryAdmin = () => {
     if (!path) return "";
     if (path.startsWith("http")) return path;
     const cleanPath = path.replace(/^\//, "");
-    return `${BASE_URL}/${cleanPath}`;
+    return `/${cleanPath}`;
   };
 
   // ইনপুট পরিবর্তনের জন্য কমন ফাংশন

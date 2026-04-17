@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Trash2, Edit, Save, X } from "lucide-react"; // আইকন ব্যবহারের জন্য
 
-const API_BASE_URL =
-  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+
 
 const IndustryAdd = () => {
   const [formData, setFormData] = useState({
@@ -31,7 +30,7 @@ const IndustryAdd = () => {
   const fetchHistory = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_BASE_URL}/api/industries`);
+      const res = await axios.get(`/api/industries`);
 
       // Console-e check koro data ki bhabe ashche
       console.log("Response from server:", res.data);
@@ -68,7 +67,7 @@ const IndustryAdd = () => {
 
     try {
       // --- এইখানে নিচের নতুন কোডটুকু বসাও ---
-      await axios.post(`${API_BASE_URL}/api/industries`, data, {
+      await axios.post(`/api/industries`, data, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
@@ -106,7 +105,7 @@ const IndustryAdd = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this card?")) {
       try {
-        await axios.delete(`${API_BASE_URL}/api/industries/${id}`, {
+        await axios.delete(`/api/industries/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
           },
@@ -166,7 +165,7 @@ const IndustryAdd = () => {
 
     try {
       const response = await axios.put(
-        `${API_BASE_URL}/api/industries/${editingItem._id}`,
+        `/api/industries/${editingItem._id}`,
         data,
         {
           headers: {
@@ -451,7 +450,7 @@ const IndustryAdd = () => {
                       <td className="p-4 flex items-center gap-3">
                         <div className="w-12 h-10 rounded border border-gray-200 bg-gray-100 overflow-hidden flex-shrink-0">
                           <img
-                            src={`${API_BASE_URL}${item.projectImg}`}
+                            src={`${(axios.defaults.baseURL || "")}${item.projectImg}`}
                             className="w-full h-full object-cover"
                             alt="thumb"
                             onError={(e) => {

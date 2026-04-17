@@ -116,7 +116,7 @@ const OtherPageManager = () => {
       console.error("Fetch Error:", err);
       toast.error("Failed to sync with registry");
     }
-  }, [API_BASE]);
+  }, []);
 
   useEffect(() => {
     fetchPages();

@@ -25,10 +25,9 @@ const AgencyComparisonAdmin = () => {
   const [saving, setSaving] = useState(false);
 
   // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ অটোমেটিক হ্যান্ডেল করবে)
-  const BASE_URL =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
-  const API_URL = `${BASE_URL}/api/agency-comparison`;
+  const API_URL = `/api/agency-comparison`;
 
   useEffect(() => {
     const fetchData = async () => {

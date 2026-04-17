@@ -17,7 +17,7 @@ const AboutVision = () => {
     const fetchVision = async () => {
       try {
         // ✅ এখানে পাথটা চেঞ্জ করে /api/about-vision-m করে দিলাম (তোর index.js অনুযায়ী)
-        const res = await axios.get(`${API_BASE}/api/about-vision-m`);
+        const res = await axios.get(`/api/about-vision-m`);
 
         if (res.data) {
           setContent({

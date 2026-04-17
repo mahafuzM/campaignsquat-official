@@ -7,7 +7,7 @@ const { getVisionM, updateVisionM } = require("../controllers/aboutVisionControl
 // মুল্টার স্টোরেজ কনফিগারেশন
 const storageM = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, "../uploads/");
   },
   filename: (req, file, cb) => {
     cb(null, "vision-" + Date.now() + path.extname(file.originalname));

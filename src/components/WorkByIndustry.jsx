@@ -235,8 +235,15 @@ useEffect(() => {
         // Full URL-er dorkar nai, shudhu endpoint dilei hobe
         const res = await axios.get("/api/industries"); 
         
-        if (res.data && res.data.length > 0) {
-          setIndustries(res.data);
+        const rawData = res.data;
+        const arr = Array.isArray(rawData)
+          ? rawData
+          : Array.isArray(rawData?.data)
+          ? rawData.data
+          : [];
+
+        if (arr.length > 0) {
+          setIndustries(arr);
         } else {
           setIndustries(demoData);
         }
