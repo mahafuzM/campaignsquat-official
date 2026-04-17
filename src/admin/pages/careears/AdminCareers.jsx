@@ -63,18 +63,14 @@ const AdminCareers = () => {
   ]);
 
   // ✅ Local vs Live Dynamic URL Logic
-  const BASE_URL =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-      ? "http://localhost:5000"
-      : "/api";
+  
 
   // --- API Interactions ---
   const fetchJobs = useCallback(async () => {
     setLoading(true);
     try {
-      // Axios-er default config thakle valo, na thakle ekhane BASE_URL force kora hoyeche
-      const res = await axios.get(`${BASE_URL}/api/jobs`);
+      // Axios-er default config thakle valo, na thakle ekhane (axios.defaults.baseURL || "") force kora hoyeche
+      const res = await axios.get(`/api/jobs`);
 
       if (Array.isArray(res.data)) {
         setJobs(res.data);
@@ -86,7 +82,7 @@ const AdminCareers = () => {
     } finally {
       setLoading(false);
     }
-  }, [BASE_URL]);
+  }, []);
 
   useEffect(() => {
     fetchJobs();
@@ -189,11 +185,11 @@ const AdminCareers = () => {
       let response;
       if (editingId) {
         response = await axios.put(
-          `${BASE_URL}/api/jobs/${editingId}`,
+          `/api/jobs/${editingId}`,
           payload,
         );
       } else {
-        response = await axios.post(`${BASE_URL}/api/jobs`, payload);
+        response = await axios.post(`/api/jobs`, payload);
       }
 
       if (response.status === 200 || response.status === 201) {
@@ -212,7 +208,7 @@ const AdminCareers = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure?")) {
       try {
-        const res = await axios.delete(`${BASE_URL}/api/jobs/${id}`);
+        const res = await axios.delete(`/api/jobs/${id}`);
         if (res.status === 200) {
           alert("Job deleted!");
           fetchJobs();

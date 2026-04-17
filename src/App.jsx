@@ -22,20 +22,7 @@ import TagManager from "react-gtm-module";
 import "react-quill/dist/quill.snow.css";
 import { Toaster } from "react-hot-toast";
 
-// // ✅ বিকল্প পদ্ধতি (সবচেয়ে সেফ)
-axios.defaults.baseURL =
-  window.location.hostname === "localhost" 
-    ? "http://localhost:5000/api" 
-    : "https://campaignsquat.com/api";
-    
-// 🛡️ Axios Interceptor
-axios.interceptors.request.use((config) => {
-  const token = localStorage.getItem("adminToken");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+import "./axiosConfig"; // Load global API config & interceptors
 
 /* Global Components */
 import Navbar from "./components/Navbar";

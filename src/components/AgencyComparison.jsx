@@ -7,13 +7,12 @@ const AgencyComparison = () => {
   const [loading, setLoading] = useState(true);
 
   // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ অটোমেটিক হ্যান্ডেল করবে)
-  const BASE_URL =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/agency-comparison`);
+        const res = await axios.get(`/api/agency-comparison`);
         if (res.data) {
           setData(res.data);
         }
@@ -24,7 +23,7 @@ const AgencyComparison = () => {
       }
     };
     fetchData();
-  }, [BASE_URL]);
+  }, []);
 
   if (loading && !data) return null;
 

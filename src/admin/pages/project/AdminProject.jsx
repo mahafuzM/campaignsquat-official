@@ -15,8 +15,7 @@ import {
 } from "lucide-react";
 
 // ✅ Global Axios Setup (এটি সাধারণত App.jsx এ থাকে, তবে এখানেও কাজ করবে)
-axios.defaults.baseURL =
-  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+
 
 const AdminProject = () => {
   const [projects, setProjects] = useState([]);
@@ -50,7 +49,8 @@ const AdminProject = () => {
   const fetchProjects = async () => {
     try {
       const res = await axios.get(API_URL);
-      setProjects(res.data);
+      const data = Array.isArray(res.data) ? res.data : (Array.isArray(res.data?.data) ? res.data.data : []);
+      setProjects(data);
     } catch (err) {
       console.error("Error fetching projects", err);
     }
@@ -674,7 +674,7 @@ const AdminProject = () => {
                     <td className="p-5">
                       {item.imageUrl && (
                         <img
-                          src={`http://localhost:5000/uploads/${item.imageUrl}`}
+                          src={`http://localhost:3000/uploads/${item.imageUrl}`}
                           alt={item.title}
                           className="w-24 h-16 object-cover rounded shadow-md border border-gray-200"
                         />

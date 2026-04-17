@@ -14,13 +14,12 @@ const AboutHeroEdit = () => {
   const [imagePreview, setImagePreview] = useState(null);
 
   // ডাইনামিক API BASE (আপনার আগের লজিক অনুযায়ী)
-  const API_BASE =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/api/about-content/hero`);
+        const res = await axios.get(`/api/about-content/hero`);
         if (res.data) {
           setFormData({
             title: res.data.title || "",
@@ -32,7 +31,7 @@ const AboutHeroEdit = () => {
             const imgPath = res.data.imageUrl.startsWith("/")
               ? res.data.imageUrl
               : `/${res.data.imageUrl}`;
-            setImagePreview(`${API_BASE}${imgPath}`);
+            setImagePreview(`${(axios.defaults.baseURL || "")}${imgPath}`);
           }
         }
       } catch (err) {
@@ -40,7 +39,7 @@ const AboutHeroEdit = () => {
       }
     };
     fetchData();
-  }, [API_BASE]);
+  }, []);
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -62,14 +61,14 @@ const AboutHeroEdit = () => {
         const uploadData = new FormData();
         uploadData.append("file", selectedFile);
         const uploadRes = await axios.post(
-          `${API_BASE}/api/upload`,
+          `/api/upload`,
           uploadData,
         );
         finalImageUrl = uploadRes.data.url;
       }
 
       const res = await axios.post(
-        `${API_BASE}/api/about-content/hero/update`,
+        `/api/about-content/hero/update`,
         {
           title: formData.title,
           description: formData.description,

@@ -50,21 +50,13 @@ const CareersPage = () => {
   const [jobOpenings, setJobOpenings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Local vs Production Dynamic API URL
-  const BASE_URL =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-      ? "http://localhost:5000"
-      : "/api";
-
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
 
     const fetchJobs = async () => {
       try {
         setLoading(true);
-        // Direct absolute URL use kora holo jate kono config-e jhamela na hoy
-        const res = await axios.get(`${BASE_URL}/api/jobs`);
+        const res = await axios.get("/api/jobs");
 
         if (res.data) {
           // Data format check: res.data direct array hote pare, abar res.data.data o hote pare
@@ -78,7 +70,7 @@ const CareersPage = () => {
       }
     };
     fetchJobs();
-  }, [BASE_URL]);
+  }, []);
 
   const benefits = [
     {

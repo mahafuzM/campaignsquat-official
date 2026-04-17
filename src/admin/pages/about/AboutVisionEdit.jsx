@@ -19,7 +19,7 @@ const AboutVisionEdit = () => {
     const fetchVisionData = async () => {
       try {
         // ✅ এখানে ইউআরএল অবশ্যই index.js এর সাথে মিলতে হবে
-        const res = await axios.get(`${API_BASE}/api/about-vision-m`);
+        const res = await axios.get(`/api/about-vision-m`);
         if (res.data) {
           setFormData({
             title: res.data.title || "",
@@ -28,7 +28,7 @@ const AboutVisionEdit = () => {
           if (res.data.imageUrl) {
             const fullUrl = res.data.imageUrl.startsWith("http")
               ? res.data.imageUrl
-              : `${API_BASE}/${res.data.imageUrl.replace(/^\//, "")}`;
+              : `/${res.data.imageUrl.replace(/^\//, "")}`;
             setPreview(fullUrl);
           }
         }
@@ -67,7 +67,7 @@ const AboutVisionEdit = () => {
 
     try {
       // ✅ ইউআরএল ফিক্সড: /api/about-vision-m
-      const res = await axios.post(`${API_BASE}/api/about-vision-m`, data, {
+      const res = await axios.post(`/api/about-vision-m`, data, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // নিশ্চিত হ যে কী-এর নাম 'token' নাকি 'adminToken'
           "Content-Type": "multipart/form-data",
@@ -75,7 +75,7 @@ const AboutVisionEdit = () => {
       });
 
       if (res.data.data && res.data.data.imageUrl) {
-        setPreview(`${API_BASE}/${res.data.data.imageUrl.replace(/^\//, "")}`);
+        setPreview(`/${res.data.data.imageUrl.replace(/^\//, "")}`);
       }
 
       setMessage({
