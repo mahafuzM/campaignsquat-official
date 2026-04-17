@@ -185,10 +185,14 @@ process.on("uncaughtException", (err) => console.error("Uncaught Error:", err));
 process.on("unhandledRejection", (reason) => console.error("Unhandled Rejection:", reason));
 
 // ৮. সার্ভার লিসেনিং (More Stable for Hosting)
-const PORT = process.env.PORT || 3000; // হোস্টিংগারের জন্য ৩০০০ বা ৮০০০ পোর্টি বেশি নিরাপদ
+// একদম শেষের অংশটি এভাবে আপডেট করুন
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 Campaignsquat Backend is Live!`);
-    console.log(`✅ Running on Port: ${PORT}`);
-    console.log(`🔗 URL: https://campaignsquat.com`);
+const server = app.listen(PORT, () => {
+    console.log(`🚀 Campaignsquat Backend is Live on Port: ${PORT}`);
+});
+
+// সার্ভার ক্র্যাশ হওয়া ঠেকাতে এই বাড়তি অংশটুকু যোগ করুন
+server.on('error', (err) => {
+    console.error("Server Error:", err);
 });
