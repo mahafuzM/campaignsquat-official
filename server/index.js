@@ -1,15 +1,3 @@
-const result = require("dotenv").config();
-
-if (result.error) {
-  console.error("❌ .env load korte error hochche:", result.error);
-} else {
-  console.log("✅ .env theke variable load hoyeche:", Object.keys(result.parsed));
-}
-
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
 const bcrypt = require("bcryptjs");
@@ -17,18 +5,20 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-// ১. মিডলওয়্যার কনফিগারেশন
+// ২. মিডলওয়্যার কনফিগারেশন
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
   "https://campaignsquat.com",
   "https://www.campaignsquat.com",
+  "http://campaignsquat.com", // অনেক সময় ব্রাউজার থেকে http রিকোয়েস্ট আসে
   "https://campaignsquat-frontend.vercel.app"
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
+      // হোস্টিং-এ অনেক সময় অরিজিন undefined থাকে, তাই !origin চেক করা জরুরি
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
@@ -42,6 +32,8 @@ app.use(
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+// --- বাকি সব কোড (Admin Model, Routes, etc.) নিচেই থাকবে ---
 
 // --- 🛡️ Admin Model ---
 const Admin = require("./models/Admin");
