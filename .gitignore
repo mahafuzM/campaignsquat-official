@@ -7,16 +7,19 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# dependencies
 node_modules
-dist
+
+# build files
+# dist (সরিয়ে দেওয়া হলো যাতে গিটহাবে যায়)
 dist-ssr
 *.local
 
-# --- এই অংশটুকু অবশ্যই যোগ করুন ---
-.env
+# Environment variables and sensitive files
+# .env (সরিয়ে দেওয়া হলো যাতে গিটহাবে যায়)
 .env.local
+.env.production
 uploads/
-# ------------------------------
 
 # Editor directories and files
 .vscode/*
