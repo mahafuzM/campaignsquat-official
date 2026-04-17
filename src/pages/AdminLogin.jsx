@@ -20,13 +20,17 @@ const AdminLogin = () => {
     }
   }, [navigate]);
 
-const handleLogin = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      // ✅ এখানে আলাদা করে URL দেওয়ার দরকার নেই, baseURL অটোমেটিক বসে যাবে
+      /**
+       * ⚠️ অত্যন্ত গুরুত্বপূর্ণ: 
+       * আপনার App.jsx-এ যদি baseURL-এ "/api" থাকে, 
+       * তবে এখানে শুধু "/admin-login" দিন।
+       */
       const response = await axios.post("/admin-login", {
         email: email.trim().toLowerCase(),
         password: password,
@@ -35,15 +39,26 @@ const handleLogin = async (e) => {
       if (response.data.success || response.data.token) {
         const token = response.data.token;
         localStorage.setItem("adminToken", token);
+        
+        // টোকেন সেট করার পর হেডার আপডেট
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        
+        // ড্যাশবোর্ডে পাঠানো
         window.location.href = "/admin";
       } else {
-        setError("Invalid response from server.");
+        setError("Unexpected response from server.");
       }
     } catch (err) {
-      console.error("Login Error:", err);
-      const msg = err.response?.data?.message || "Login failed. Server is unreachable!";
-      setError(msg);
+      console.error("Login Error Details:", err.response);
+      
+      // সার্ভার অফলাইন থাকলে বা ভুল পাথে রিকোয়েস্ট গেলে ৫০৩/৪৪৪ এরর হ্যান্ডেলিং
+      if (!err.response) {
+        setError("Network error: Server is unreachable!");
+      } else if (err.response.status === 503) {
+        setError("Server is busy or starting up. Try again in 10 seconds.");
+      } else {
+        setError(err.response.data?.message || "Invalid credentials. Try again!");
+      }
     } finally {
       setLoading(false);
     }

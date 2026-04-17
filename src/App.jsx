@@ -1,4 +1,5 @@
-if (
+ /*
+ if (
   window.location.hostname !== "localhost" &&
   window.location.hostname !== "127.0.0.1"
 ) {
@@ -6,7 +7,7 @@ if (
   console.error = () => {};
   console.warn = () => {};
 }
-
+*/
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
@@ -182,10 +183,10 @@ const AppContent = () => {
   useEffect(() => {
     const fetchAllSEOData = async () => {
       try {
-        const [gtmRes, seoRes] = await Promise.all([
-          axios.get("/api/gtm-config"),
-          axios.get("/api/seo-settings"),
-        ]);
+       const [gtmRes, seoRes] = await Promise.all([
+  axios.get("/gtm-config"), // ✅ শুধু পাথটুকু দিন
+  axios.get("/seo-settings"), // ✅ শুধু পাথটুকু দিন
+]);
 
         const gtmData = gtmRes.data;
         const seoData = seoRes.data;
