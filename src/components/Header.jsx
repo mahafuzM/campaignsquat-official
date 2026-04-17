@@ -90,7 +90,7 @@ const Header = () => {
           className="mb-12 md:mb-16 fade-in-up"
           style={{ animationDelay: "0.2s" }}
         >
-          <div className="flex flex-col items-center justify-center gap-8 md:gap-12">
+          <div className="flex flex-col items-center justify-center gap-2 md:gap-12">
             <div className="flex flex-col items-center gap-3">
               <div className="flex -space-x-3 items-center mb-1">
                 <div className="w-9 h-9 md:w-11 md:h-11 rounded-full bg-white flex items-center justify-center p-2 shadow-lg z-[3] border border-white/20">

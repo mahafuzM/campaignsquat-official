@@ -1,11 +1,3 @@
-const result = require("dotenv").config();
-
-if (result.error) {
-  console.error("❌ .env load korte error hochche:", result.error);
-} else {
-  console.log("✅ .env theke variable load hoyeche:", Object.keys(result.parsed));
-}
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -15,15 +7,27 @@ const fs = require("fs");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// ১. .env লোড করার সঠিক লজিক (Path fixing)
+const dotenv = require("dotenv");
+const envPath = path.resolve(__dirname, "..", ".env"); // এক ধাপ উপরের ফোল্ডারে খুঁজবে
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+  console.log("✅ .env theke variable load hoyeche:", Object.keys(process.env).filter(key => key.includes('MONGO') || key.includes('JWT')));
+} else {
+  dotenv.config(); // fallback to default
+  console.log("⚠️  Direct .env file not found, using system environment variables.");
+}
+
 const app = express();
 
-// ১. মিডলওয়্যার কনফিগারেশন
+// ২. মিডলওয়্যার কনফিগারেশন (CORS Update for Production)
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
   "https://campaignsquat.com",
   "https://www.campaignsquat.com",
-  "http://campaignsquat.com", // অনেক সময় http থেকেও রিকোয়েস্ট আসে
+  "http://campaignsquat.com",
   "https://campaignsquat-frontend.vercel.app"
 ];
 
@@ -47,7 +51,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 // --- 🛡️ Admin Model ---
 const Admin = require("./models/Admin");
 
-// ২. অথেনটিকেশন মিডলওয়্যার
+// ৩. অথেনটিকেশন মিডলওয়্যার
 const authenticateAdmin = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "Access Denied. No token provided." });
@@ -73,6 +77,7 @@ app.post("/api/admin-login", async (req, res) => {
 
     let admin = await Admin.findOne({ email: inputEmail });
     let isMatch = false;
+    
     if (admin) {
       isMatch = await bcrypt.compare(inputPassword, admin.password);
     } else {
@@ -101,7 +106,7 @@ app.post("/api/admin-login", async (req, res) => {
   }
 });
 
-// ৩. স্ট্যাটিক ফোল্ডার ও আপলোড কনফিগারেশন
+// ৪. স্ট্যাটিক ফোল্ডার ও আপলোড কনফিগারেশন
 const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -119,7 +124,7 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
   res.status(200).json({ url: `/uploads/${req.file.filename}` });
 });
 
-// ৪. এপিআই রাউট ইম্পোর্টস
+// ৫. এপিআই রাউট ইম্পোর্টস
 app.use("/api/hero", require("./routes/heroRoutes"));
 app.use("/api/gtm-config", require("./routes/gtmRoutes"));
 app.use("/api/seo-settings", require("./routes/seoRoutes"));
@@ -154,20 +159,17 @@ app.use('/api/technical-edge', require('./routes/technicalEdgeRoutes'));
 app.use('/api/projects', require('./routes/projectAllruter'));
 app.use("/api/agency-comparison", require("./routes/agencyComparisonRoutes"));
 
-// --- ৫. ফ্রন্টএন্ড সার্ভ করার লজিক (নতুন যোগ করা হয়েছে) ---
-// আপনার ফাইল স্ট্রাকচার অনুযায়ী 'dist' ফোল্ডারটি 'server' এর এক লেভেল উপরে আছে।
-const frontendDistPath = path.join(__dirname, "../dist");
+// --- ৬. ফ্রন্টএন্ড সার্ভ করার লজিক ---
+const frontendDistPath = path.resolve(__dirname, "..", "dist");
 app.use(express.static(frontendDistPath));
 
-// সব রুটকে index.html এ পাঠানো (SPA Routing এর জন্য)
 app.get("*", (req, res) => {
-  // যদি API রিকোয়েস্ট না হয়, তবেই ইন্ডেক্স ফাইল পাঠাবে
   if (!req.path.startsWith("/api")) {
     res.sendFile(path.join(frontendDistPath, "index.html"));
   }
 });
 
-// ৬. ডাটাবেস কানেকশন
+// ৭. ডাটাবেস কানেকশন
 mongoose.set("strictQuery", false);
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -176,7 +178,7 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected!"))
   .catch((err) => console.error("❌ DB Error:", err));
 
-// ৭. এরর হ্যান্ডলিং
+// ৮. এরর হ্যান্ডলিং
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ success: false, message: "Something went wrong!" });
@@ -185,8 +187,8 @@ app.use((err, req, res, next) => {
 process.on("uncaughtException", (err) => console.error("Uncaught Error:", err));
 process.on("unhandledRejection", (reason) => console.error("Unhandled Rejection:", reason));
 
-// ৮. সার্ভার লিসেনিং (More Stable for Hosting)
-const PORT = process.env.PORT || 3000; // হোস্টিংগারের জন্য ৩০০০ বা ৮০০০ পোর্টি বেশি নিরাপদ
+// ৯. সার্ভার লিসেনিং
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 Campaignsquat Backend is Live!`);
