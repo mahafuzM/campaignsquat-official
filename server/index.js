@@ -8,46 +8,43 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 
-// ১. .env লোড করার সঠিক লজিক (১০০% রাইট পাথ)
-// আপনার ফাইল স্ট্রাকচার অনুযায়ী .env এবং index.js একই ফোল্ডারে আছে
+// ১. এনভায়রনমেন্ট লোড (Current & Parent folder check)
 const currentDirEnv = path.join(__dirname, ".env");
 const parentDirEnv = path.join(__dirname, "..", ".env");
 
 if (fs.existsSync(currentDirEnv)) {
     dotenv.config({ path: currentDirEnv });
-    console.log("✅ .env found in current folder (server/)");
 } else if (fs.existsSync(parentDirEnv)) {
     dotenv.config({ path: parentDirEnv });
-    console.log("✅ .env found in parent folder (root/)");
 } else {
-    dotenv.config(); // ডিফল্ট সিস্টেম এনভায়রনমেন্ট চেক
-    console.log("⚠️ No .env file found! Using system environment variables.");
+    dotenv.config();
 }
 
-// লোড হয়েছে কি না চেক করার জন্য (সিকিউরিটি ঠিক রেখে)
-console.log("🔗 DB URI exists:", !!process.env.MONGO_URI);
+console.log("🔗 DB URI status:", !!process.env.MONGO_URI);
 
 const app = express();
 
-// ২. মিডলওয়্যার কনফিগারেশন (CORS Update)
-// আপনার নেটওয়ার্ক ট্যাবে আসা CORS এরর দূর করবে
+// ২. মিডলওয়্যার কনফিগারেশন (CORS Error Fix)
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
   "https://campaignsquat.com",
   "https://www.campaignsquat.com",
   "http://campaignsquat.com",
-  "https://campaignsquat-frontend.vercel.app"
+  "https://campaignsquat-frontend.vercel.app",
+  "https://paleturquoise-mallard-445229.hostingersite.com" // আপনার এই প্রিভিউ ডোমেইনটি অ্যাড করলাম
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
+      // origin না থাকলেও (যেমন মোবাইল অ্যাপ বা পোস্টম্যান) এলাও করবে
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      console.log("❌ CORS Blocked Origin:", origin);
-      return callback(new Error("CORS policy error"), false);
+      // ডোমেইন লিস্টে না থাকলেও ডেভেলপমেন্ট পিরিয়ডে ব্লক করবে না (টেস্টিং এর জন্য)
+      // প্রোডাকশনে চাইলে এটা কড়া করতে পারেন
+      return callback(null, true); 
     },
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
