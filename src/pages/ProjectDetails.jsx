@@ -14,8 +14,7 @@ import {
 import axios from "axios";
 
 // ✅ Global Axios Setup (নিশ্চিত করুন এটি কাজ করছে)
-axios.defaults.baseURL =
-  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+
 
 const ProjectDetails = () => {
   const { slug } = useParams();
@@ -26,7 +25,7 @@ const ProjectDetails = () => {
   const [loading, setLoading] = useState(!project);
   const [error, setError] = useState(null);
 
-  const API_BASE = axios.defaults.baseURL;
+  
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -90,7 +89,7 @@ const ProjectDetails = () => {
     const finalPath = cleanPath.startsWith("uploads/")
       ? cleanPath
       : `uploads/${cleanPath.startsWith("/") ? cleanPath.slice(1) : cleanPath}`;
-    return `${API_BASE}/${finalPath}`;
+    return `/${finalPath}`;
   };
 
   if (loading) {

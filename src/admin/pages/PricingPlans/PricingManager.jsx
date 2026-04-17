@@ -3,8 +3,7 @@ import axios from "axios";
 import { Plus, Trash2, Edit, Save, X, CheckCircle } from "lucide-react";
 
 // ✅ ডাইনামিক বেস ইউআরএল সেটআপ
-const BASE_URL =
-  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+
 
 const PricingManager = () => {
   const [plans, setPlans] = useState([]);
@@ -36,7 +35,7 @@ const PricingManager = () => {
   // ১. সকল প্ল্যান ফেচ করা
   const fetchPlans = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/pricing/all`);
+      const res = await axios.get(`/api/pricing/all`);
       setPlans(res.data);
     } catch (err) {
       console.error("Fetch Error:", err);
@@ -65,11 +64,11 @@ const PricingManager = () => {
     try {
       if (isEditing) {
         // আপডেট করার জন্য PUT রিকোয়েস্ট
-        await axios.put(`${BASE_URL}/api/pricing/${currentId}`, payload);
+        await axios.put(`/api/pricing/${currentId}`, payload);
         alert("Plan Updated Successfully!");
       } else {
         // নতুন প্ল্যান যোগ করার জন্য POST রিকোয়েস্ট
-        await axios.post(`${BASE_URL}/api/pricing/add`, payload);
+        await axios.post(`/api/pricing/add`, payload);
         alert("New Plan Added Successfully!");
       }
       resetForm();
@@ -98,7 +97,7 @@ const PricingManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this plan?")) {
       try {
-        await axios.delete(`${BASE_URL}/api/pricing/${id}`);
+        await axios.delete(`/api/pricing/${id}`);
         fetchPlans();
         alert("Deleted Successfully!");
       } catch (err) {

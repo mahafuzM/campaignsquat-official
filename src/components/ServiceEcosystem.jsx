@@ -13,13 +13,12 @@ const ServiceEcosystem = () => {
   const [loading, setLoading] = useState(!data);
 
   // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ দুই জায়গায় কাজ করবে)
-  const BASE_URL =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/creative-services`);
+        const res = await axios.get(`/api/creative-services`);
         if (res.data) {
           setData(res.data);
           sessionStorage.setItem(
@@ -34,7 +33,7 @@ const ServiceEcosystem = () => {
       }
     };
     fetchData();
-  }, [BASE_URL]);
+  }, []);
 
   // ✅ পারফেক্ট লিঙ্ক হ্যান্ডলার ফাংশন (আপনার লজিক অক্ষুণ্ণ রাখা হয়েছে)
   const renderLink = (service, index) => {

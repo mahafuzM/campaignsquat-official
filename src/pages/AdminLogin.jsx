@@ -31,7 +31,7 @@ const AdminLogin = () => {
        * আপনার App.jsx-এ যদি baseURL-এ "/api" থাকে, 
        * তবে এখানে শুধু "/admin-login" দিন।
        */
-      const response = await axios.post("/admin-login", {
+      const response = await axios.post("/api/admin-login", {
         email: email.trim().toLowerCase(),
         password: password,
       });

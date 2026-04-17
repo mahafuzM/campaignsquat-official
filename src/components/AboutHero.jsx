@@ -5,7 +5,7 @@ import heroImg from "../assets/images/pexels-fauxels-3184421.jpg";
 
 const AboutHero = () => {
   // ডাইনামিক বেস ইউআরএল (axios থেকে নেওয়া)
-  const API_BASE = axios.defaults.baseURL;
+  
 
   // ২. ডাইনামিক কন্টেন্ট স্টেট
   const [content, setContent] = useState({
@@ -30,7 +30,7 @@ const AboutHero = () => {
             title: res.data.title,
             description: res.data.description,
             imageUrl: res.data.imageUrl 
-              ? `${API_BASE}/${cleanPath}` 
+              ? `/${cleanPath}` 
               : heroImg,
           });
         }
@@ -40,7 +40,7 @@ const AboutHero = () => {
       }
     };
     fetchHeroData();
-  }, [API_BASE]);
+  }, []);
 
   return (
     <section className="w-full bg-[#050505] pt-16 md:pt-24 pb-16 md:pb-24 px-6 md:px-10 lg:px-16 font-poppins overflow-hidden">

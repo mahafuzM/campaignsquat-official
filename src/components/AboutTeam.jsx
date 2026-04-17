@@ -5,7 +5,7 @@ const AboutTeam = () => {
   const [data, setData] = useState(null);
 
   // app.jsx থেকে আসা বেইজ URL
-  const API_BASE = axios.defaults.baseURL;
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,7 +24,7 @@ const AboutTeam = () => {
 
   // ইমেজ পাথ হ্যান্ডলিং
   const cleanImagePath = data.image?.startsWith('/') ? data.image : `/${data.image}`;
-  const fullImageUrl = data.image?.startsWith('http') ? data.image : `${API_BASE}${cleanImagePath}`;
+  const fullImageUrl = data.image?.startsWith('http') ? data.image : `${(axios.defaults.baseURL || "")}${cleanImagePath}`;
 
   return (
     <section className="w-full py-16 md:py-24 font-poppins overflow-hidden">

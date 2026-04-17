@@ -240,8 +240,8 @@ const MegaMenuAdmin = () => {
       sec7Desc: item.sec7Desc || "",
     });
 
-    if (item.image) setPreview(`${API_BASE}/${item.image}`);
-    if (item.sideImg) setSidePreview(`${API_BASE}/${item.sideImg}`);
+    if (item.image) setPreview(`/${item.image}`);
+    if (item.sideImg) setSidePreview(`/${item.sideImg}`);
     if (item.points) setPoints(item.points);
 
     if (item.expertiseCards) {
@@ -250,7 +250,7 @@ const MegaMenuAdmin = () => {
           title: card.title,
           desc: card.desc,
           img: null,
-          preview: card.img ? `${API_BASE}/${card.img}` : null,
+          preview: card.img ? `/${card.img}` : null,
         })),
       );
     }
@@ -261,7 +261,7 @@ const MegaMenuAdmin = () => {
           title: card.title,
           desc: card.desc,
           img: null,
-          preview: card.img ? `${API_BASE}/${card.img}` : null,
+          preview: card.img ? `/${card.img}` : null,
         })),
       );
     }
@@ -272,7 +272,7 @@ const MegaMenuAdmin = () => {
           title: step.title,
           desc: step.desc,
           img: null,
-          preview: step.img ? `${API_BASE}/${step.img}` : null,
+          preview: step.img ? `/${step.img}` : null,
         })),
       );
     }
@@ -284,7 +284,7 @@ const MegaMenuAdmin = () => {
           title: card.title,
           desc: card.desc,
           img: null,
-          preview: card.img ? `${API_BASE}/${card.img}` : null,
+          preview: card.img ? `/${card.img}` : null,
         })),
       );
     }
@@ -305,7 +305,7 @@ const MegaMenuAdmin = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure?")) {
       try {
-        await axios.delete(`${API_BASE}/api/megamenu/${id}`);
+        await axios.delete(`/api/megamenu/${id}`);
         fetchMenus();
       } catch (err) {
         console.error(err);
@@ -343,7 +343,7 @@ const MegaMenuAdmin = () => {
           desc: item.desc,
           // ২. যদি নতুন ইমেজ না থাকে, তবে আগের ইমেজ পাথটা পাঠাতে হবে (uploads/filename.jpg)
           // আপনার preview-তে /apiuploads/... থাকে, তাই শুধু uploads/... টুকু নিতে হবে
-          img: item.preview ? item.preview.replace(`${API_BASE}/`, "") : "",
+          img: item.preview ? item.preview.replace(`/`, "") : "",
         };
       });
       data.append(dataName, JSON.stringify(metaData));
@@ -357,8 +357,8 @@ const MegaMenuAdmin = () => {
     // --- ৫. API কল ---
     try {
       const url = formData.id
-        ? `${API_BASE}/api/megamenu/${formData.id}`
-        : `${API_BASE}/api/megamenu`;
+        ? `/api/megamenu/${formData.id}`
+        : `/api/megamenu`;
       const method = formData.id ? "put" : "post";
 
       const response = await axios({
@@ -1134,7 +1134,7 @@ const MegaMenuAdmin = () => {
                   {item.image && (
                     <img
                       // এখানে URL-টি ডাইনামিক করে দিন যাতে লোকাল এবং লাইভ দুই জায়গাতেই পায়
-                      src={`${window.location.hostname === "localhost" ? "http://localhost:5000" : "/api"}/${item.image}`}
+                      src={`${window.location.hostname === "localhost" ? "http://localhost:3000" : "/api"}/${item.image}`}
                       className="w-20 h-20 object-cover rounded-[5px] border border-black"
                       alt={item.title}
                       // যদি ইমেজ লোড হতে ফেইল করে তবে কনসোলে এরর দেখাবে

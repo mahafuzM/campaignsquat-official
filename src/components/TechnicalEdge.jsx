@@ -12,13 +12,12 @@ const TechnicalEdge = () => {
   const [loading, setLoading] = useState(!data);
 
   // ✅ ডাইনামিক বেস ইউআরএল (লোকাল এবং লাইভ দুই জায়গায় কাজ করবে)
-  const BASE_URL =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/technical-edge`);
+        const res = await axios.get(`/api/technical-edge`);
         if (res.data) {
           setData(res.data);
           sessionStorage.setItem("cached_tech_edge", JSON.stringify(res.data));
@@ -30,7 +29,7 @@ const TechnicalEdge = () => {
       }
     };
     fetchData();
-  }, [BASE_URL]);
+  }, []);
 
   // ✅ আইকন রেন্ডার করার পারফেক্ট লজিক
   const DynamicIcon = ({ name, size = 22 }) => {

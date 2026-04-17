@@ -5,7 +5,7 @@ const AboutRecognition = () => {
   const [data, setData] = useState(null);
 
   // app.jsx থেকে আসা বেইজ URL
-  const API_BASE = axios.defaults.baseURL;
+  
 
   useEffect(() => {
     // সরাসরি এন্ডপয়েন্ট ব্যবহার করা হয়েছে
@@ -24,7 +24,7 @@ const AboutRecognition = () => {
 
   // ইমেজ পাথ হ্যান্ডলিং (স্লাশ চেক করা)
   const cleanImagePath = data.image?.startsWith('/') ? data.image : `/${data.image}`;
-  const fullImageUrl = data.image?.startsWith('http') ? data.image : `${API_BASE}${cleanImagePath}`;
+  const fullImageUrl = data.image?.startsWith('http') ? data.image : `${(axios.defaults.baseURL || "")}${cleanImagePath}`;
 
   return (
     <section className="w-full bg-[#02050A] py-16 md:py-24 font-poppins overflow-hidden pt-4 md:pt-6">

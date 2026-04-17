@@ -13,8 +13,7 @@ import {
 import * as LucideIcons from "lucide-react";
 
 // ✅ ডাইনামিক বেস ইউআরএল সেটআপ
-const BASE_URL =
-  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+
 
 const TechnicalEdgeAdmin = () => {
   const [mainHeader, setMainHeader] = useState("");
@@ -41,7 +40,7 @@ const TechnicalEdgeAdmin = () => {
   // ১. আগের ডাটা লোড করা (Fetch Data)
   const fetchData = useCallback(async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/technical-edge`);
+      const res = await axios.get(`/api/technical-edge`);
       if (res.data) {
         setMainHeader(res.data.mainHeader || "");
         setSubTitle(res.data.subTitle || "");
@@ -82,8 +81,8 @@ const TechnicalEdgeAdmin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // ✅ এখানেও ডাইনামিক BASE_URL কাজ করবে
-      await axios.post(`${BASE_URL}/api/technical-edge`, {
+      // ✅ এখানেও ডাইনামিক (axios.defaults.baseURL || "") কাজ করবে
+      await axios.post(`/api/technical-edge`, {
         mainHeader,
         subTitle,
         assets,

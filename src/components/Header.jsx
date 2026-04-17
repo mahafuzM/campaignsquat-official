@@ -16,14 +16,13 @@ const Header = () => {
     imageUrl: "",
   });
 
-  const API_BASE =
-    window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
+  
 
   useEffect(() => {
     const fetchHeroData = async () => {
       try {
         const res = await axios.get(
-          `${API_BASE}/api/hero?t=${new Date().getTime()}`,
+          `/api/hero?t=${new Date().getTime()}`,
         );
 
         if (res.data) {
@@ -33,7 +32,7 @@ const Header = () => {
             const cleanPath = rawImageUrl.replace(/\\/g, "/");
             finalImageUrl = cleanPath.startsWith("http")
               ? cleanPath
-              : `${API_BASE}/${cleanPath.replace(/^\//, "")}`;
+              : `/${cleanPath.replace(/^\//, "")}`;
           }
 
           setContent({
@@ -51,7 +50,7 @@ const Header = () => {
     };
 
     fetchHeroData();
-  }, [API_BASE]);
+  }, []);
 
   return (
     <section className="relative w-full bg-[#02050A] pt-2 md:pt-6 lg:pt-8 font-poppins overflow-hidden perspective-container">

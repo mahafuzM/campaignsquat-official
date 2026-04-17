@@ -19,7 +19,7 @@ const AboutTeamEdit = () => {
   const [loading, setLoading] = useState(false);
 
   // app.jsx থেকে আসা baseURL ব্যবহার করার জন্য
-  const API_BASE = axios.defaults.baseURL;
+  
 
   useEffect(() => {
     axios.get("/api/about-team")
@@ -88,7 +88,7 @@ const AboutTeamEdit = () => {
   // ইমেজ পাথ ক্লিন করা
   const fullImageUrl = formData.image?.startsWith("http")
     ? formData.image
-    : `${API_BASE}${formData.image?.startsWith("/") ? "" : "/"}${formData.image}`;
+    : `${(axios.defaults.baseURL || "")}${formData.image?.startsWith("/") ? "" : "/"}${formData.image}`;
 
   return (
     <div className="p-6 md:p-10 bg-[#F4F7F6] min-h-screen font-poppins text-slate-800">

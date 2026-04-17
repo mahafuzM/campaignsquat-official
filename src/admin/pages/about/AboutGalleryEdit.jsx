@@ -7,7 +7,7 @@ const AboutGalleryEdit = () => {
   const [uploading, setUploading] = useState(false);
 
   // app.jsx থেকে আসা বেইজ URL
-  const API_BASE = axios.defaults.baseURL;
+  
 
   useEffect(() => {
     const fetchGallery = async () => {
@@ -118,7 +118,7 @@ const AboutGalleryEdit = () => {
           {/* Gallery Items */}
           {images.map((img, idx) => {
             const cleanPath = img.startsWith("/") ? img : `/${img}`;
-            const fullImgUrl = img.startsWith("http") ? img : `${API_BASE}${cleanPath}`;
+            const fullImgUrl = img.startsWith("http") ? img : `${(axios.defaults.baseURL || "")}${cleanPath}`;
 
             return (
               <div

@@ -17,11 +17,7 @@ const ApplyjobPage = () => {
   const [fileName, setFileName] = useState("No file selected");
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-      ? "http://localhost:5000"
-      : "/api";
+  
 
   // ক্যারিয়ার পেজ থেকে আসা জবের টাইটেল ধরা হচ্ছে
   const jobTitle = location.state?.jobTitle || "General Application";
@@ -53,8 +49,8 @@ const ApplyjobPage = () => {
     const formDataObj = new FormData(formRef.current);
 
     try {
-      // ১. ব্যাকএন্ডে ডেটা পাঠানো (Dynamic BASE_URL use kora hoyeche)
-      await axios.post(`${BASE_URL}/api/applications/apply`, formDataObj, {
+      // ১. ব্যাকএন্ডে ডেটা পাঠানো (Dynamic (axios.defaults.baseURL || "") use kora hoyeche)
+      await axios.post(`/api/applications/apply`, formDataObj, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

@@ -24,16 +24,12 @@ const AdminApplications = () => {
   const searchTerm = queryParams.get("search") || "";
 
   // ✅ Local vs Production Dynamic API URL
-  const BASE_URL =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-      ? "http://localhost:5000"
-      : "/api";
+  
 
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${BASE_URL}/api/applications/all`);
+      const response = await axios.get(`/api/applications/all`);
       // Data safety parsing
       const actualData = Array.isArray(response.data)
         ? response.data
@@ -48,7 +44,7 @@ const AdminApplications = () => {
 
   useEffect(() => {
     fetchApplications();
-  }, [BASE_URL]);
+  }, []);
 
   const handleDownloadCSV = () => {
     const dataToExport =
@@ -93,7 +89,7 @@ const AdminApplications = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this candidate?")) {
       try {
-        await axios.delete(`${BASE_URL}/api/applications/${id}`);
+        await axios.delete(`/api/applications/${id}`);
         setApplications(applications.filter((app) => app._id !== id));
         setSelectedIds(selectedIds.filter((sid) => sid !== id));
       } catch (error) {
