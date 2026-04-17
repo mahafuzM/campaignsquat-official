@@ -64,5 +64,4 @@ The backend configuration is stored in `server/.env`.
 
 ---
 
-**Developed & Stabilized by:** Antigravity AI
 **Live Website:** [https://campaignsquat.com](https://campaignsquat.com)
