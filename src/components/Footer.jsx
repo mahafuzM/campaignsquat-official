@@ -210,12 +210,12 @@ const Footer = () => {
             <h4 className="text-[20px] md:text-[22px] font-bold mb-4 md:mb-6 text-white tracking-wider">
               Contact Us
             </h4>
-            <ul className="space-y-4 text-white text-[16px]">
+            <ul className="space-y-4 text-white text-[14px] lg:text-[15px] xl:text-[16px]">
               <li className="flex items-start gap-3">
                 <Mail size={20} className="text-white shrink-0 mt-1" />
                 <a
                   href={`mailto:${footerData?.contact?.email}`}
-                  className="hover:text-[#f7a400] break-all"
+                  className="hover:text-[#f7a400] transition-colors"
                 >
                   {footerData?.contact?.email}
                 </a>
@@ -245,54 +245,55 @@ const Footer = () => {
             </ul>
           </div>
         </div>
+      </div>
 
-        {/* Hiring CTA Card */}
-        {footerData?.hiringStatus?.showCard && (
-          <div className="bg-[#02050A] border border-white/10 rounded-[5px] p-8 md:p-6 flex flex-col lg:flex-row items-center justify-between gap-8 mb-16 shadow-lg">
-            <div className="text-center lg:text-left">
-              <h3 className="text-[20px] md:text-[22px] font-bold mb-2 text-white tracking-tight">
-                {footerData.hiringStatus.title}
-              </h3>
-              <p className="text-white text-[16px] max-w-xl mb-5">
-                {footerData.hiringStatus.description}
-              </p>
-
-              <style>{`
-                @keyframes whiteToOrange {
-                  0% { color: #ffffff; text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff; }
-                  100% { color: #F7A400; text-shadow: 0 0 10px #F7A400, 0 0 20px #F7A400, 0 0 40px #F7A400; }
-                }
-                .blinking-neon { font-weight: 800; letter-spacing: 1px; animation: whiteToOrange 2s ease-in-out infinite alternate; display: inline-block; }
-              `}</style>
-
-              {footerData.hiringStatus.isHiring && (
-                <div>
-                  <h4 className="blinking-neon text-[14px] md:text-[16px] lg:text-[18px] font-semibold mb-4 ">
-                    {footerData.hiringStatus.hiringNotice}
-                  </h4>
-                </div>
-              )}
-            </div>
-
-            <Link
-              to="/careers"
-              className="w-full sm:w-auto bg-[#f7a400] text-black font-semibold px-6 py-2 rounded-[5px] border-2 border-[#F7A400] flex items-center justify-center hover:bg-[#0A0A0A] hover:border-[#F7A400] transition-all text-[12px] md:text-[15px] group hover:text-white"
-            >
-              <div className="flex items-center">
-                <span>Click Here</span>
-                <RunningIcons />
-              </div>
-            </Link>
-          </div>
-        )}
-
-        {/* Footer Bottom Bar */}
-        <div className="border-t border-white/5 pt-10 text-center">
-          <p className="text-white text-[14px] md:text-[18px] font-light">
-            © {new Date().getFullYear()}{" "}
-            {footerData?.brandName || "CampaignSquat Ltd"}. All Rights Reserved.
-          </p>
+      {/* Payment Gateways Banner */}
+      <div className="w-full border-t border-white/5 pt-6 pb-6 flex items-center justify-center overflow-hidden">
+        <div className="max-w-[1445px] mx-auto px-4 w-full flex justify-center">
+          <img 
+            src="https://securepay.sslcommerz.com/public/image/SSLCommerz-Pay-With-logo-All-Size-01.png" 
+            alt="Payment Methods" 
+            className="w-full max-w-[85%] sm:max-w-[65%] md:max-w-[450px] lg:max-w-[550px] h-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "https://shop.sslwireless.com/wp-content/uploads/2020/05/SSLCommerz-Pay-With-logo-All-Size-01.png";
+            }}
+          />
         </div>
+      </div>
+
+      {/* Footer Bottom Bar with AI Pattern */}
+      <div className="w-full relative border-t border-white/5 py-8 text-center overflow-hidden bg-[#0A0A0A]">
+        {/* AI Network Grid Pattern */}
+        <div 
+          className="absolute inset-0 z-0 opacity-[0.6] pointer-events-none transition-all duration-1000"
+          style={{
+            backgroundImage: `
+              radial-gradient(ellipse at top, rgba(247, 164, 0, 0.25) 0%, transparent 70%),
+              linear-gradient(to right, rgba(247, 164, 0, 0.3) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(247, 164, 0, 0.3) 1px, transparent 1px)
+            `,
+            backgroundSize: '100% 100%, 30px 30px, 30px 30px',
+            transform: 'perspective(400px) rotateX(60deg) scale(3) translateY(-10px)',
+            transformOrigin: 'top center'
+          }}
+        ></div>
+        {/* Fading mask to integrate pattern smoothly and eliminate straight edge lines */}
+        <div 
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background: `
+              linear-gradient(to bottom, #0A0A0A 0%, transparent 40%),
+              linear-gradient(to top, #0A0A0A 0%, transparent 40%),
+              radial-gradient(ellipse at center, transparent 20%, #0A0A0A 80%)
+            `
+          }}
+        ></div>
+
+        <p className="relative z-10 px-4 text-[#aeb1b8] text-[14px] md:text-[15px] font-normal tracking-wide max-w-[1445px] mx-auto pt-2">
+          © {new Date().getFullYear()}{" "}
+          <span className="text-[#f7a400] font-medium">{footerData?.brandName || "CampaignSquat Ltd"}</span> – All rights reserved.
+        </p>
       </div>
     </footer>
   );

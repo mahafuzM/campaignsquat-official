@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Upload, X, Image as ImageIcon, Plus, Loader2, Trash2 } from "lucide-react";
+import axios from "../../../axiosConfig";
+import toast from "react-hot-toast";
+import { Upload, Image as ImageIcon, Plus, Loader2, Trash2 } from "lucide-react";
 
 const AboutGalleryEdit = () => {
   const [images, setImages] = useState([]);
   const [uploading, setUploading] = useState(false);
-
-  // app.jsx থেকে আসা বেইজ URL
-  
 
   useEffect(() => {
     const fetchGallery = async () => {
@@ -17,6 +15,7 @@ const AboutGalleryEdit = () => {
         if (Array.isArray(data)) setImages(data);
       } catch (err) {
         console.error("Fetch Error:", err);
+        toast.error("Failed to load gallery images.");
       }
     };
     fetchGallery();
@@ -43,12 +42,15 @@ const AboutGalleryEdit = () => {
 
       if (updateRes.data) {
         setImages(updateRes.data.images || updatedImages);
+        toast.success("Image uploaded successfully! ✅");
       }
     } catch (err) {
       console.error(err);
-      alert("❌ Upload failed!");
+      toast.error("Upload failed! ❌");
     } finally {
       setUploading(false);
+      // Reset the file input block so the same file could be uploaded again if needed
+      e.target.value = null;
     }
   };
 
@@ -61,111 +63,124 @@ const AboutGalleryEdit = () => {
 
       try {
         await axios.post("/api/about-gallery/update", { images: updatedImages });
+        toast.success("Image removed successfully! 🗑️");
       } catch (err) {
-        alert("❌ Delete sync failed!");
+        console.error("Delete sync error:", err);
+        toast.error("Delete sync failed! ❌");
         setImages(originalImages); // ভুল হলে আগের ডাটা ফিরিয়ে আনা
       }
     }
   };
 
   return (
-    <div className="p-6 md:p-10 bg-[#F8FAFC] min-h-screen font-poppins text-slate-900">
-      
-      {/* Header Section */}
-      <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
-        <div>
-          <h2 className="text-3xl font-black text-black tracking-tighter uppercase italic">
-            Gallery <span className="text-[#F7A400]">Manager</span>
-          </h2>
-          <p className="text-slate-500 text-sm mt-1">Organize and maintain your office & team memories</p>
-        </div>
-
-        <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
-          <div className="px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
-            <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Total Images</span>
-            <span className="text-xl font-black text-black">{images.length}</span>
+    <div className="min-h-screen bg-gray-50/30 text-gray-900 font-poppins p-6 md:p-10">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900 border-l-4 border-[#F7A400] pl-3">
+              About: Gallery Section
+            </h1>
+            <p className="text-sm text-gray-500 mt-2">
+              Organize and maintain your office and team visual memories.
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-all shadow-sm"
+            >
+              Back
+            </button>
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-md shadow-sm border border-gray-200">
+              <span className="text-xs text-gray-500 font-bold uppercase tracking-wider block">Total Images:</span>
+              <span className="text-sm font-black text-[#F7A400]">{images.length}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-[1600px] mx-auto">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 md:gap-8">
-          
-          {/* Add New Image Card */}
-          <label className="group relative flex flex-col items-center justify-center aspect-[3/4] rounded-3xl border-3 border-dashed border-slate-200 bg-white hover:border-[#F7A400] hover:bg-orange-50/30 transition-all cursor-pointer overflow-hidden order-first">
-            <input
-              type="file"
-              hidden
-              onChange={handleUpload}
-              disabled={uploading}
-              accept="image/*"
-            />
-            {uploading ? (
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="h-10 w-10 text-[#F7A400] animate-spin" />
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">Uploading...</span>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-[#F7A400] group-hover:text-white transition-colors">
-                  <Plus size={32} />
+        <div className="bg-white p-6 md:p-8 rounded-lg border border-gray-100 shadow-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+            
+            {/* Add New Image Card */}
+            <label className="group relative flex flex-col items-center justify-center aspect-[3/4] rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/50 hover:border-[#F7A400] hover:bg-orange-50/30 transition-all cursor-pointer overflow-hidden order-first">
+              <input
+                type="file"
+                hidden
+                onChange={handleUpload}
+                disabled={uploading}
+                accept="image/*"
+              />
+              {uploading ? (
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="h-8 w-8 text-[#F7A400] animate-spin" />
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Uploading...</span>
                 </div>
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-black transition-colors">Add Memory</span>
-              </div>
-            )}
-          </label>
+              ) : (
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center group-hover:bg-[#F7A400] group-hover:text-white transition-colors border border-gray-200 group-hover:border-[#F7A400]">
+                    <Plus size={24} />
+                  </div>
+                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest group-hover:text-gray-900 transition-colors">Add Memory</span>
+                </div>
+              )}
+            </label>
 
-          {/* Gallery Items */}
-          {images.map((img, idx) => {
-            const cleanPath = img.startsWith("/") ? img : `/${img}`;
-            const fullImgUrl = img.startsWith("http") ? img : `${(axios.defaults.baseURL || "")}${cleanPath}`;
+            {/* Gallery Items */}
+            {images.map((img, idx) => {
+              const cleanPath = img.startsWith("/") ? img : `/${img}`;
+              const fullImgUrl = img.startsWith("http") ? img : `${(axios.defaults.baseURL || "")}${cleanPath}`;
 
-            return (
-              <div
-                key={idx}
-                className="group relative aspect-[3/4] rounded-3xl overflow-hidden bg-slate-200 shadow-sm hover:shadow-2xl hover:shadow-orange-200/50 transition-all duration-500 border-4 border-white"
-              >
-                {/* Main Image */}
-                <img
-                  src={fullImgUrl}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  alt="Gallery Item"
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/600x800?text=Error+Loading";
-                  }}
-                />
+              return (
+                <div
+                  key={idx}
+                  className="group relative aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 shadow-sm hover:shadow-lg hover:shadow-orange-200/50 transition-all duration-300 border border-gray-200"
+                >
+                  {/* Main Image */}
+                  <img
+                    src={fullImgUrl}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    alt={`Gallery Item ${idx + 1}`}
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/600x800?text=Error+Loading";
+                    }}
+                  />
 
-                {/* Overlays & Actions */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <button
-                      onClick={() => removeImage(idx)}
-                      className="w-full bg-white/10 backdrop-blur-md hover:bg-red-500 text-white py-3 rounded-2xl flex items-center justify-center gap-2 transition-all border border-white/20 active:scale-95"
-                    >
-                      <Trash2 size={16} />
-                      <span className="text-xs font-bold uppercase tracking-wider">Remove</span>
-                    </button>
+                  {/* Overlays & Actions */}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end">
+                    <div className="p-3 w-full">
+                      <button
+                        onClick={() => removeImage(idx)}
+                        className="w-full bg-white/10 backdrop-blur-sm hover:bg-red-500 text-white py-2.5 rounded-md flex items-center justify-center gap-1.5 transition-colors border border-white/20 active:scale-95"
+                      >
+                        <Trash2 size={14} />
+                        <span className="text-[11px] font-bold uppercase tracking-wider">Remove</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Number Badge */}
+                  <div className="absolute top-2 left-2 w-6 h-6 bg-black/60 backdrop-blur-sm rounded-md flex items-center justify-center text-[10px] font-bold text-white border border-white/20">
+                    {idx + 1}
                   </div>
                 </div>
+              );
+            })}
 
-                {/* Number Badge */}
-                <div className="absolute top-4 left-4 w-7 h-7 bg-white/20 backdrop-blur-md rounded-lg flex items-center justify-center text-[10px] font-bold text-white border border-white/30">
-                  {idx + 1}
-                </div>
-              </div>
-            );
-          })}
+          </div>
 
+          {/* Empty State */}
+          {images.length === 0 && !uploading && (
+            <div className="flex flex-col items-center justify-center py-24 text-gray-400">
+              <ImageIcon size={48} strokeWidth={1.5} className="text-gray-300" />
+              <p className="mt-3 font-medium uppercase tracking-widest text-xs">No images in gallery yet</p>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Empty State */}
-      {images.length === 0 && !uploading && (
-        <div className="flex flex-col items-center justify-center py-32 text-slate-300">
-          <ImageIcon size={64} strokeWidth={1} />
-          <p className="mt-4 font-medium uppercase tracking-widest text-sm">No images in gallery yet</p>
-        </div>
-      )}
     </div>
   );
 };

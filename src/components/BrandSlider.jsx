@@ -8,22 +8,35 @@ const BrandSlider = () => {
   // ১. ডাইনামিক বেস ইউআরএল সেটআপ
   
 
+  const demoBrands = [
+    { name: "Google", url: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" },
+    { name: "Microsoft", url: "https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg" },
+    { name: "Amazon", url: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" },
+    { name: "Meta", url: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg" },
+    { name: "Microsoft", url: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" },
+    { name: "Apple", url: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" },
+    { name: "Stripe", url: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" },
+    { name: "Netflix", url: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" },
+  ];
+
   useEffect(() => {
     let isMounted = true;
     const fetchBrands = async () => {
       try {
         const res = await axios.get(`/api/brands`);
         if (isMounted) {
-          // নিশ্চিত করা হচ্ছে যে ডাটা একটি অ্যারে
           const brandData = Array.isArray(res.data)
             ? res.data
             : Array.isArray(res.data?.data)
             ? res.data.data
             : [];
-          setBrands(brandData);
+          
+          // If no data from server, use demo brands
+          setBrands(brandData.length > 0 ? brandData : demoBrands);
         }
       } catch (err) {
         console.error("স্লাইডার ডাটা লোড হচ্ছে না:", err);
+        if (isMounted) setBrands(demoBrands);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -34,8 +47,8 @@ const BrandSlider = () => {
     };
   }, []);
 
-  // লোডিং অবস্থায় বা ডাটা না থাকলে কিছুই দেখাবে না (যাতে সাইট ক্রাশ না করে)
-  if (loading || !Array.isArray(brands) || brands.length === 0) {
+  // Always show something if we have brands (demo or real)
+  if (loading && brands.length === 0) {
     return null;
   }
 
@@ -43,18 +56,21 @@ const BrandSlider = () => {
   const firstRow = brands.slice(0, midIndex);
   const secondRow = brands.slice(midIndex);
 
-  // ইমেজ ইউআরএল জেনারেট করার ফাংশন (কোড ক্লিন রাখার জন্য)
+  // Image fallback URL for demo/broken images
+  const defaultBrandLogo = "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg";
+
   const getImageUrl = (brand) => {
-    if (!brand?.url) return "";
+    if (!brand?.url) return defaultBrandLogo;
     return brand.url.startsWith("http")
       ? brand.url
       : `${(axios.defaults.baseURL || "")}${brand.url}`;
   };
 
   return (
-    <section className="w-full bg-[#02050A] md:py-4 overflow-hidden font-poppins relative z-10">
-      <div className="w-full py-10 md:py-16">
-        <div className="relative w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_10%,_black_90%,transparent_100%)] flex flex-col gap-3 md:gap-10">
+    <section className="relative w-full bg-[#000000] pt-0 md:pt-4 pb-8 md:pb-16 overflow-hidden font-poppins">
+
+      <div className="relative z-10 w-full">
+        <div className="relative w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_15%,_black_85%,transparent_100%)] flex flex-col gap-6 md:gap-12">
           {/* Row 1: Left to Right */}
           <div className="flex overflow-hidden">
             <div className="flex animate-scroll-right whitespace-nowrap items-center pause-on-hover">
@@ -68,7 +84,8 @@ const BrandSlider = () => {
                     src={getImageUrl(brand)}
                     alt={brand.name || "Brand"}
                     loading="lazy"
-                    className="w-full h-full object-contain brightness-110 filter grayscale hover:grayscale-0 transition-all duration-300"
+                    onError={(e) => { e.target.src = defaultBrandLogo; }}
+                    className="w-full h-full object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-500 cursor-pointer scale-90 hover:scale-100"
                   />
                 </div>
               ))}
@@ -87,7 +104,8 @@ const BrandSlider = () => {
                     src={getImageUrl(brand)}
                     alt={brand.name || "Brand"}
                     loading="lazy"
-                    className="w-full h-full object-contain brightness-110 filter grayscale hover:grayscale-0 transition-all duration-300"
+                    onError={(e) => { e.target.src = defaultBrandLogo; }}
+                    className="w-full h-full object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-500 cursor-pointer scale-90 hover:scale-100"
                   />
                 </div>
               ))}

@@ -9,8 +9,8 @@ const AboutHero = () => {
 
   // ২. ডাইনামিক কন্টেন্ট স্টেট
   const [content, setContent] = useState({
-    title: "About Campaignsquat Ltd. \n Empowering Brands Through Digital Innovation",
-    description: "We don't just build digital products; we craft experiences that drive growth. We are a full-service digital agency dedicated to transforming complex challenges into seamless, user-centric solutions.",
+    title: "Digital Excellence, Engineered.\nEmpowering Brands Through Innovation",
+    description: "We don't merely build software; we engineer scalable digital experiences that drive measurable business growth. As your strategic technology partner, we transform complex challenges into seamless, user-centric solutions that dominate the market.",
     imageUrl: heroImg,
   });
 
@@ -43,7 +43,7 @@ const AboutHero = () => {
   }, []);
 
   return (
-    <section className="w-full bg-[#050505] pt-16 md:pt-24 pb-16 md:pb-24 px-6 md:px-10 lg:px-16 font-poppins overflow-hidden">
+    <section className="w-full bg-[#050505] pt-10 md:pt-[100px] pb-10 md:pb-16 px-6 md:px-10 lg:px-16 font-poppins overflow-hidden">
       <style>{`
         @keyframes rotate-border {
           from { transform: rotate(0deg); }
@@ -79,12 +79,12 @@ const AboutHero = () => {
 
       <div className="max-w-[1250px] mx-auto flex flex-col items-center">
         {/* ৪. ডাইনামিক টাইটেল - whitespace-pre-line ব্যবহার করা হয়েছে */}
-        <h1 className="text-white text-[28px] md:text-[40px] lg:text-[48px] font-bold text-center mb-10 md:mb-14 max-w-[1000px] leading-[1.2] md:leading-tight whitespace-pre-line tracking-tight">
+        <h1 className="text-white text-[24px] sm:text-[32px] md:text-[40px] lg:text-[48px] font-bold text-center mb-6 md:mb-10 max-w-[1000px] leading-[1.2] md:leading-tight whitespace-pre-line tracking-tight">
           {content.title}
         </h1>
 
         {/* ৫. ডাইনামিক ডেসক্রিপশন */}
-        <p className="text-white text-[16px] md:text-[18px] lg:text-[20px] text-center mb-12 md:mb-20 max-w-8xl leading-relaxed">
+        <p className="text-white/80 text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] text-center mb-8 md:mb-14 max-w-[800px] leading-relaxed">
           {content.description}
         </p>
 
@@ -92,7 +92,7 @@ const AboutHero = () => {
         <div className="w-full running-border-wrapper rounded-[15px] shadow-[0_25px_60px_-15px_rgba(247,164,0,0.2)] border border-white/5">
           <div className="running-border-line"></div>
 
-          <div className="inner-img-box rounded-[13px] h-[250px] sm:h-[400px] md:h-[500px] lg:h-[600px]">
+          <div className="inner-img-box rounded-[13px] h-[200px] sm:h-[300px] md:h-[450px] lg:h-[550px]">
             <img
               src={content.imageUrl}
               alt="Campaignsquat Digital"

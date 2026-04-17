@@ -30,4 +30,5 @@ uploads/
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.sw?*.exp
+deploy-env.sh

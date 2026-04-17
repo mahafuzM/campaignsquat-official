@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async'; // ১. এই লাইনটা অ্যাড করবি
 
 /* 1. Importing all components for the Home Page */
-import Header from '../components/Header';
+import Hero from '../components/Hero';
 import BrandSlider from '../components/BrandSlider'; 
 import CampaignSquat from '../components/campaignsquat'; 
 import SkillsGrid from '../components/SkillsGrid'; 
@@ -51,8 +51,8 @@ const Home = () => {
         <meta name="twitter:image" content="https://campaignsquat.com/campaignsquat-open-graph-image.png" />
       </Helmet>
 
-      {/* 2. Hero Header Section */}
-      <Header />
+      {/* 2. Hero Section */}
+      <Hero />
 
       {/* 3. Trusted Brand Logos Slider */}
       <BrandSlider />

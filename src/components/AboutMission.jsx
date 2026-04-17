@@ -22,7 +22,7 @@ const AboutMission = () => {
   if (!data) return null;
 
   return (
-    <section className="w-full bg-[#02050A] py-16 md:py-24 font-poppins pt-4 md:pt-6 px- md:px-6">
+    <section className="w-full bg-[#02050A] py-8 md:py-12 font-poppins pt-4 md:pt-6 px-4 md:px-6">
       <div className="max-w-[1445px] mx-auto px- md:px-12 lg:px-12 xl:px-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
           

@@ -30,16 +30,12 @@ const CampaignSquat = () => {
     imageUrl: defaultAboutBanner,
     title: "We Don’t Just Code, We Engineer Growth.",
     description:
-      "Campaignsquat Ltd is a premier tech agency where technical complexity meets aesthetic excellence.",
+      "Campaignsquat Ltd is a premier tech agency where technical complexity meets aesthetic excellence. We specialize in Software Development, UI/UX Design, and scalable Website Design & Development.",
   });
-
-  // ✅ ১. স্মার্ট এপিআই ইউআরএল সেটআপ
-  
 
   useEffect(() => {
     const fetchAbout = async () => {
       try {
-        // ✅ এক্সিওস এখন লোকাল বা লাইভ চিনে ডাটা আনবে
         const res = await axios.get(`/api/about`);
         if (res.data) setAboutData(res.data);
       } catch (err) {
@@ -83,14 +79,30 @@ const CampaignSquat = () => {
   ];
 
   return (
-    <section className="relative w-full bg-[#050505] py-6 md:py-10 overflow-hidden font-poppins">
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#F7A400]/5 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2"></div>
+    <section className="relative w-full bg-[#000000] py-16 md:py-24 lg:py-32 overflow-hidden font-poppins">
+      
+      {/* Refined Brand Color Ambient Blobs */}
+      <div className="absolute inset-0 pointer-events-none flex justify-center items-center z-0">
+        <div className="absolute top-[5%] left-[-10%] w-[500px] h-[500px] bg-[#00ffd1]/10 rounded-full blur-[140px] opacity-40"></div>
+        <div className="absolute bottom-[20%] right-[-5%] w-[600px] h-[600px] bg-[#F7A400]/10 rounded-full blur-[160px] opacity-30"></div>
+        
+        {/* Subtle Amber Background Grid */}
+        <div 
+          className="absolute inset-0 opacity-[0.25]" 
+          style={{ 
+            backgroundImage: 'radial-gradient(rgba(247, 164, 0, 0.5) 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+            maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'
+          }}
+        ></div>
+      </div>
 
-      <div className="max-w-[1440px] mx-auto px-2 md:px-16 lg:px-24 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center mb-24">
+      <div className="max-w-[1440px] mx-auto px-4 md:px-16 lg:px-24 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center mb-20 lg:mb-32">
+          
+          {/* Image Display */}
           <div className="relative group order-2 lg:order-1">
-            {/* ✅ ইমেজটি এখন শুধু ডেস্কটপে শো করবে */}
-            <div className="hidden md:block relative z-10 rounded-[5px] overflow-hidden border border-white/10 aspect-[4/5] md:aspect-auto">
+            <div className="relative z-10 rounded-3xl overflow-hidden border border-white/5 shadow-[0_0_60px_rgba(0,0,0,0.8)] aspect-[4/3] lg:aspect-auto lg:h-[600px]">
               <img
                 src={
                   aboutData.imageUrl &&
@@ -99,71 +111,102 @@ const CampaignSquat = () => {
                     : aboutData.imageUrl || defaultAboutBanner
                 }
                 alt="About Us"
-                className="w-full h-full min-h-[400px] object-cover transition-transform duration-1000 group-hover:scale-110"
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                 onError={(e) => {
                   e.target.src = defaultAboutBanner;
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
             </div>
 
-            {/* ✅ ৬+ বছরের এক্সপেরিয়েন্স কার্ডটিও শুধু ডেস্কটপে শো করবে */}
-            <div className="hidden md:block absolute bottom-6 left-4 md:bottom-12 md:-left-2 z-20 bg-white/5 backdrop-blur-xl border border-white/20 p-5 md:p-8 rounded-[5px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-float">
-              <div className="flex items-center gap-4">
-                <div className="text-[#F7A400] text-4xl md:text-6xl font-black">
-                  6<span className="text-xl md:text-2xl">+</span>
+            {/* Glowing Years Badge */}
+            <div className="hidden lg:block absolute bottom-12 -left-12 z-20 bg-[#050505]/80 backdrop-blur-3xl border border-white/10 px-8 py-6 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.8),0_0_40px_rgba(247,164,0,0.15)] animate-float">
+              <div className="flex items-center gap-6">
+                <div className="text-transparent bg-clip-text bg-gradient-to-r from-[#F7A400] to-[#ffd670] text-7xl font-black drop-shadow-sm">
+                  6<span className="text-4xl text-[#00ffd1]">+</span>
                 </div>
-                <div className="text-white text-[11px] md:text-[15px] font-semibold leading-tight">
+                <div className="text-white/90 text-[15px] font-bold leading-snug uppercase tracking-widest border-l-2 border-[#00ffd1]/40 pl-4 py-1">
                   Years of <br /> Industry <br /> Mastery
                 </div>
               </div>
             </div>
 
-            {/* ✅ ফুঁটা ফুঁটা ডিজাইনটিও এখন শুধু ডেস্কটপে শো করবে (hidden md:block) */}
-            <div className="hidden md:block absolute -top-10 -right-10 w-32 h-32 opacity-20 bg-[radial-gradient(#F7A400_2px,transparent_2px)] [background-size:16px_16px]"></div>
+            {/* Decorative Dots Pattern overlapping image */}
+            <div className="hidden lg:block absolute -top-8 -right-8 w-32 h-32 opacity-40 bg-[radial-gradient(#00ffd1_2px,transparent_2px)] [background-size:16px_16px] animate-pulse"></div>
+
+            {/* Mobile Small Badge inside image */}
+            <div className="lg:hidden absolute bottom-4 left-4 z-20 bg-[#050505]/80 backdrop-blur-xl border border-white/10 px-5 py-3 rounded-2xl shadow-2xl">
+              <div className="flex items-center gap-3">
+                <div className="text-transparent bg-clip-text bg-gradient-to-r from-[#F7A400] to-[#ffd670] text-3xl font-black">6<span className="text-xl text-[#00ffd1]">+</span></div>
+                <div className="text-white/90 text-[10px] font-bold leading-tight uppercase tracking-widest border-l border-[#00ffd1]/40 pl-2">
+                  Years of <br /> Mastery
+                </div>
+              </div>
+            </div>
           </div>
 
+          {/* Text & Content Block */}
           <div className="flex flex-col space-y-8 order-1 lg:order-2">
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-[5px] bg-[#F7A400]/10 border border-[#F7A400]/20 w-fit">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F7A400] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F7A400]"></span>
-              </span>
-              <span className="text-[#F7A400] font-bold">Established 2021</span>
+            
+            {/* Glowing Established Pill */}
+            <div className="relative group cursor-pointer inline-flex w-fit">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#F7A400] to-[#00ffd1] rounded-full blur opacity-30 group-hover:opacity-60 transition duration-500 animate-pulse"></div>
+              <div className="relative inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#050505] border border-white/10">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ffd1] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00ffd1]"></span>
+                </span>
+                <span className="text-[#F7A400] text-[13px] font-bold tracking-wide">Established 2021</span>
+              </div>
             </div>
 
+            {/* Title with highlighted Shimmering keywords */}
             <h2
-              className="text-white text-[26px] md:text-[32px] lg:text-[40px] font-semibold leading-[1.2] md:leading-[1.3] tracking-tight "
-              dangerouslySetInnerHTML={{ __html: aboutData.title }}
+              className="text-white text-[32px] md:text-[45px] lg:text-[55px] font-extrabold leading-[1.15] tracking-tight"
+              dangerouslySetInnerHTML={{ 
+                __html: aboutData.title.replace(
+                  'Engineer Growth', 
+                  '<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#F7A400] via-[#ffd670] to-[#00ffd1] animate-text-shimmer bg-[length:200%_auto] inline-block">Engineer Growth</span>'
+                ).replace(
+                  'Engineer Growth.', 
+                  '<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#F7A400] via-[#ffd670] to-[#00ffd1] animate-text-shimmer bg-[length:200%_auto] inline-block">Engineer Growth.</span>'
+                )
+              }}
             ></h2>
 
-            <p className="text-white text-[16px] md:text-[18px] leading-relaxed max-w-4xl ">
+            <p className="text-white/70 text-[16px] md:text-[18px] leading-relaxed max-w-2xl font-medium">
               {aboutData.description}
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Service Highlight Boxes */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">
               {[
                 { t: "Future-Proof Tech", d: "Scalable solutions only." },
                 { t: "User-First Design", d: "UI that converts." },
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="flex flex-col gap-1 p-4 rounded-[5px] bg-white/5 border border-white/5 hover:border-[#F7A400]/30 transition-all"
+                  className="group relative flex flex-col gap-3 p-6 rounded-[20px] bg-[#050505]/60 backdrop-blur-xl border border-white/10 hover:border-[#00ffd1]/40 transition-all duration-500 shadow-xl overflow-hidden"
                 >
-                  <span className="text-[#F7A400] font-bold">0{i + 1}.</span>
-                  <h4 className="text-white text-[16px] md:text-[18px] font-semibold">
-                    {item.t}
-                  </h4>
-                  <p className="text-white text-[12px] md:text-[14px] ">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#00ffd1]/0 to-[#F7A400]/0 group-hover:from-[#00ffd1]/5 group-hover:to-[#F7A400]/5 transition-colors duration-500"></div>
+                  <div className="flex items-center gap-4 relative z-10">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#F7A400] to-[#00ffd1] font-black text-2xl drop-shadow-sm">0{i + 1}.</span>
+                    <h4 className="text-white text-[17px] font-extrabold tracking-wide">
+                      {item.t}
+                    </h4>
+                  </div>
+                  <p className="text-white/60 text-[14px] md:text-[15px] relative z-10 leading-relaxed font-medium">
                     {item.d}
                   </p>
                 </div>
               ))}
             </div>
-            <div className="pt-4">
+
+            {/* Modern CTA Button */}
+            <div className="pt-6">
               <Link to="/about-us">
-                <button className="group relative px-8 py-2 bg-[#F7A400] border-2 border-[#F7A400] rounded-[5px] font-semibold text-black transition-all duration-300 hover:text-white hover:bg-[#02050A] active:scale-95 text-[12px] md:text-[15px]">
-                  <span className="relative z-10 flex items-center gap-2">
+                <button className="group relative overflow-hidden bg-[#F7A400] text-black font-bold py-3.5 px-10 rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(247,164,0,0.2)] hover:shadow-[0_0_40px_rgba(247,164,0,0.4)] transform hover:-translate-y-1">
+                  <span className="relative z-10 flex items-center gap-2 text-[14px] md:text-[16px] tracking-wide">
                     Explore More
                     <svg
                       width="20"
@@ -171,43 +214,49 @@ const CampaignSquat = () => {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="3"
+                      strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="transition-all duration-300 group-hover:translate-x-2"
+                      className="transition-transform duration-300 group-hover:translate-x-1"
                     >
-                      <path
-                        d="M5 12h14"
-                        className="opacity-0 group-hover:opacity-100 transition-all duration-300"
-                      />
+                      <path d="M5 12h14" />
                       <path d="M12 5l7 7-7 7" />
                     </svg>
                   </span>
+                  <div className="absolute inset-0 h-full w-full bg-white/30 -translate-x-full group-hover:animate-[sweep_0.75s_forwards] skew-x-12 z-0"></div>
                 </button>
               </Link>
             </div>
+
           </div>
         </div>
 
-        <div className="border-t border-white/10 pt-16 -mt-24 md:mt-10">
-          <div className="max-w-[1440px] mx-auto px- md:px-16 lg:px-22">
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-12 md:gap-x-12 lg:gap-x-20">
+        {/* Stats Grid */}
+        {/* Stats Grid */}
+        <div className="mt-16 lg:mt-24">
+          <div className="max-w-[1440px] mx-auto relative">
+            {/* Ambient Line */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[1px] bg-gradient-to-r from-transparent via-[#F7A400]/30 to-transparent"></div>
+            
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 pt-12 md:pt-16 pb-6 px-3 sm:px-4 md:px-0">
               {stats.map((stat, index) => (
                 <div
-                  key={index}
-                  className="flex flex-col items-center sm:flex-row sm:items-center gap-3 md:gap-6 group"
+                   key={index}
+                   className="flex flex-col xl:flex-row items-start xl:items-center gap-3 sm:gap-5 group p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-[24px] bg-[#050505]/60 backdrop-blur-xl border border-white/5 hover:bg-white/[0.04] hover:border-[#00ffd1]/20 transition-all duration-500 shadow-lg hover:shadow-[0_10px_40px_rgba(0,255,209,0.05)]"
                 >
-                  <div className="flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
+                  <div className="flex-shrink-0 p-3 sm:p-4 rounded-[14px] sm:rounded-2xl bg-[#000] border border-white/5 group-hover:border-[#00ffd1]/30 relative overflow-hidden transition-all duration-500 shadow-inner">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#00ffd1]/0 to-[#F7A400]/0 group-hover:from-[#00ffd1]/20 group-hover:to-[#F7A400]/10 transition-colors duration-500"></div>
                     {React.cloneElement(stat.icon, {
-                      className: "w-10 h-10 md:w-14 md:h-14 text-[#f7A400]",
+                      className: "w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-[#F7A400] relative z-10 transition-colors duration-500 group-hover:text-[#00ffd1]",
+                      strokeWidth: 1.5
                     })}
                   </div>
-                  <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-                    <h3 className="text-white transition-colors duration-300 group-hover:text-[#F7A400] text-[22px] sm:text-[32px] lg:text-[40px] font-bold leading-none mb-1 sm:mb-3">
-                      <Counter endValue={stat.value} />
+                  <div className="flex flex-col text-left">
+                    <h3 className="text-white text-[22px] sm:text-[32px] md:text-[40px] font-black leading-none mb-1 sm:mb-1.5 transition-colors duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#F7A400] group-hover:to-[#00ffd1]">
+                       <Counter endValue={stat.value} />
                     </h3>
-                    <p className="text-white text-[16px] sm:text-[16px] lg:text-[20px] font-medium leading-tight tracking-widesm:capitalize">
-                      {stat.label}
+                    <p className="text-white/60 group-hover:text-white/80 text-[10px] sm:text-[12px] md:text-[14px] font-bold leading-tight uppercase tracking-wider transition-colors duration-300">
+                       {stat.label}
                     </p>
                   </div>
                 </div>
@@ -216,7 +265,22 @@ const CampaignSquat = () => {
           </div>
         </div>
       </div>
-      <style>{` @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } } .animate-float { animation: float 6s ease-in-out infinite; } `}</style>
+      <style>{` 
+        @keyframes float { 
+          0% { transform: translateY(0px); } 
+          50% { transform: translateY(-20px); } 
+          100% { transform: translateY(0px); } 
+        } 
+        @keyframes textShimmer {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
+        }
+        @keyframes sweep {
+          100% { transform: translateX(100%); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; } 
+        .animate-text-shimmer { animation: textShimmer 4s linear infinite; }
+      `}</style>
     </section>
   );
 };

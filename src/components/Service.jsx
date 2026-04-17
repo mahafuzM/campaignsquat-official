@@ -10,7 +10,7 @@ import imgSoftware from '../assets/images/software development.png';
 const Services = () => {
   const services = [
     {
-      title: "Ui/Ux Design",
+      title: "UI/UX Design",
       description:
         "Crafting intuitive and user-centered interfaces that make digital interaction effortless and delightful.",
       image: img1,
@@ -18,7 +18,7 @@ const Services = () => {
       link: "/service/ui-ux-design",
     },
     {
-      title: "Web design & Development",
+      title: "Web Design & Development",
       description:
         "Building high-performance, future-proof websites designed to grow alongside your business.",
       image: img2,
@@ -78,33 +78,52 @@ const Services = () => {
           setCurrentIndex((prev) => prev - 1);
         }
       }
-    }, 3000);
+    }, 4000);
 
     return () => clearInterval(timer);
   }, [currentIndex, direction, isPaused, services.length, visibleCount]);
 
   return (
-    <section className="w-full bg-[#02050A]  pb-16 md:pb-24 font-poppins overflow-hidden pt-20 md:pt-20">
-      <div className="max-w-[1445px] mx-auto px- sm:px-10 md:px-12 lg:px-14">
+    <section className="relative w-full bg-[#000000] py-16 md:py-24 font-poppins overflow-hidden border-t border-white/5">
+      
+      {/* Background Ambient Glowing Orbs */}
+      <div className="absolute inset-0 pointer-events-none flex justify-center items-center z-0">
+        <div className="absolute top-[20%] left-[-10%] w-[500px] h-[500px] bg-[#F7A400]/10 rounded-full blur-[140px] opacity-30"></div>
+        <div className="absolute bottom-[20%] right-[-10%] w-[600px] h-[600px] bg-[#00ffd1]/10 rounded-full blur-[160px] opacity-20"></div>
+        
+        {/* Subtle Dots Background */}
+        <div 
+          className="absolute inset-0 opacity-[0.2]" 
+          style={{ 
+            backgroundImage: 'radial-gradient(rgba(247, 164, 0, 0.4) 1px, transparent 1px)',
+            backgroundSize: '35px 35px',
+            maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'
+          }}
+        ></div>
+      </div>
+
+      <div className="max-w-[1445px] mx-auto px-4 sm:px-6 md:px-12 lg:px-14 relative z-10">
+        
         {/* Header */}
-        <div className="flex flex-col items-center text-center mb-10 md:mb-16">
-          <h2 className="text-white text-[26px] md:text-[32px] lg:text-[40px] font-semibold">
-            Service we provides
+        <div className="flex flex-col items-center text-center mb-12 md:mb-16">
+          <h2 className="text-white text-[32px] md:text-[45px] lg:text-[50px] font-extrabold tracking-tight leading-tight">
+            Services <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F7A400] via-[#ffd670] to-[#00ffd1] animate-text-shimmer bg-[length:200%_auto]">We Provide</span>
           </h2>
-          <p className="text-white text-[16px] md:text-[20px] mt-4 ">
-            Simplifying the complex through elite engineering and design
+          <div className="w-24 h-1 bg-[#F7A400] mt-5 rounded-full shadow-[0_0_10px_#F7A400]"></div>
+          <p className="text-white/60 text-[15px] md:text-[18px] mt-6 max-w-2xl leading-relaxed font-medium">
+            Simplifying the complex through elite engineering and user-centric design
           </p>
         </div>
 
         <div className="relative w-full flex flex-col items-center">
-          {/* Slider */}
+          {/* Slider Container */}
           <div
             className="w-full lg:max-w-[1300px] overflow-hidden"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
           >
             <div
-              className="flex transition-transform duration-700 ease-in-out"
+              className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
               style={{
                 transform: `translateX(-${
                   currentIndex * (100 / visibleCount)
@@ -114,31 +133,42 @@ const Services = () => {
               {services.map((item, index) => (
                 <div
                   key={index}
-                  className="px-1.5 flex-shrink-0"
+                  className="px-3 md:px-4 flex-shrink-0"
                   style={{ flex: `0 0 ${100 / visibleCount}%` }}
                 >
-                  <div className="group mx-auto flex flex-col items-center bg-white/5 border border-white/10 overflow-hidden w-full h-[480px] md:h-[520px] transition-all duration-300 hover:border-[#F7A400]/40 hover:bg-white/[0.08] hover:-translate-y-2">
-                    <div className="w-full h-[240px] md:h-[320px] overflow-hidden">
+                  <div className="group relative mx-auto flex flex-col items-center bg-[#050505]/60 backdrop-blur-xl border border-white/5 overflow-hidden w-full h-[480px] md:h-[540px] transition-all duration-500 hover:border-[#00ffd1]/30 hover:bg-white/[0.04] hover:-translate-y-2 rounded-[24px] shadow-xl hover:shadow-[0_20px_40px_rgba(0,255,209,0.1)]">
+                    
+                    {/* Inner glowing hover effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#00ffd1]/0 to-[#F7A400]/0 group-hover:from-[#00ffd1]/5 group-hover:to-[#F7A400]/5 transition-colors duration-500 z-0"></div>
+
+                    {/* Image Section */}
+                    <div className="w-full h-[240px] md:h-[300px] overflow-hidden border-b border-white/5 relative z-10 flex-shrink-0">
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10 pointer-events-none"></div>
                       <img
                         src={item.image}
                         alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                       />
                     </div>
 
-                    <div className="flex flex-col items-center justify-between flex-grow text-center w-full">
-                      <div className="px-6 pt-6">
-                        <h3 className="text-white text-[18px] md:text-[22px] font-bold mb-3 ">
+                    {/* Content Section */}
+                    <div className="flex flex-col items-center justify-between flex-grow text-center w-full p-6 md:p-8 relative z-10">
+                      <div>
+                        <h3 className="text-white text-[20px] md:text-[22px] font-extrabold mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#F7A400] group-hover:to-[#00ffd1] transition-all duration-300">
                           {item.title}
                         </h3>
-                        <p className="text-white text-[13px] md:text-[15px] line-clamp-3">
+                        <p className="text-white/50 group-hover:text-white/70 text-[13px] md:text-[14px] line-clamp-3 leading-relaxed transition-colors duration-300 font-medium tracking-wide">
                           {item.description}
                         </p>
                       </div>
 
-                      <Link to={item.link} className="w-full">
-                        <button className="w-full bg-[#F7A400] text-black hover:text-white text-[14px] md:text-[15px] font-semibold py-2 md:py-2 border-2 border-[#F7A400] hover:bg-transparent transition-all">
-                          {item.btnText}
+                      {/* Card Button */}
+                      <Link to={item.link} className="w-full mt-6 block">
+                        <button className="group/btn relative overflow-hidden w-full bg-white/5 backdrop-blur-sm text-white hover:text-[#000000] text-[14px] md:text-[15px] font-bold py-3.5 border border-white/10 hover:border-[#F7A400] transition-all rounded-[14px] shadow-sm">
+                          <span className="relative z-10 flex items-center justify-center gap-2">
+                             {item.btnText}
+                          </span>
+                          <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-[#F7A400] to-[#ffd670] -translate-x-full group-hover/btn:translate-x-0 transition-transform duration-300 ease-out z-0"></div>
                         </button>
                       </Link>
                     </div>
@@ -148,32 +178,46 @@ const Services = () => {
             </div>
           </div>
 
-          {/* Dots */}
-          <div className="flex justify-center items-center gap-3 mt-10">
-            <button
-              onClick={() => setCurrentIndex(0)}
-              className={`h-2 w-2 rounded-full transition-all ${
-                currentIndex === 0 ? "bg-[#F7A400] scale-125" : "bg-white/20"
-              }`}
-            />
-            <button
-              onClick={() => setCurrentIndex(services.length - visibleCount)}
-              className={`h-2 w-2 rounded-full transition-all ${
-                currentIndex === services.length - visibleCount ? "bg-[#F7A400] scale-125" : "bg-white/20"
-              }`}
-            />
+          {/* Dots Indicator */}
+          <div className="flex justify-center items-center gap-2.5 mt-10 md:mt-12">
+            {[...Array(Math.max(1, services.length - visibleCount + 1))].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentIndex(i)}
+                className={`h-1.5 transition-all duration-500 rounded-full ${
+                  currentIndex === i 
+                  ? "w-8 bg-gradient-to-r from-[#F7A400] to-[#00ffd1] shadow-[0_0_10px_rgba(247,164,0,0.5)]" 
+                  : "w-2 bg-white/20 hover:bg-white/40"
+                }`}
+              />
+            ))}
           </div>
         </div>
 
         {/* Bottom Button */}
         <div className="flex justify-center mt-12 md:mt-16">
           <Link to="/service">
-            <button className="px-6 md:px-8 py-2 md:py-2 bg-[#F7A400] text-black hover:text-white text-[14px] md:text-[15px] rounded-[5px] font-semibold border-2 border-[#F7A400] hover:bg-transparent transition-all">
-              Explore All Service
+            <button className="group relative overflow-hidden bg-[#050505] text-[#F7A400] text-[15px] sm:text-[16px] font-bold py-3.5 px-10 rounded-full border border-[#F7A400]/30 transition-all duration-300 hover:border-[#F7A400]">
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                Explore All Services
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </span>
+              <div className="absolute inset-0 h-full w-full bg-[#F7A400]/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out z-0"></div>
             </button>
           </Link>
         </div>
       </div>
+
+      <style>{`
+        @keyframes textShimmer {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
+        }
+        @keyframes sweep {
+          100% { transform: translateX(100%); }
+        }
+        .animate-text-shimmer { animation: textShimmer 4s linear infinite; }
+      `}</style>
     </section>
   );
 };

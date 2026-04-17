@@ -37,6 +37,8 @@ const PageLoader = () => (
   </div>
 );
 
+const OverviewDashboard = lazy(() => import("./admin/pages/OverviewDashboard"));
+
 /* --- Admin Components (Lazy Loaded) --- */
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -241,7 +243,7 @@ const AppContent = () => {
 
       {/* ✅ নোটিফিকেশন টোস্টার */}
       <Toaster
-        position="top-center"
+        position="top-right"
         reverseOrder={false}
         toastOptions={{
           style: {
@@ -256,7 +258,7 @@ const AppContent = () => {
       {!isAdminPage && <FloatingContact />}
 
       <Suspense fallback={<PageLoader />}>
-        <main className={`flex-grow ${hideLayout ? "pt-0" : "pt-24 md:pt-28"}`}>
+        <main className={`flex-grow ${hideLayout ? "pt-0" : "pt-20 md:pt-24"}`}>
           <Routes>
             {/* --- 🔑 Admin Routes --- */}
             <Route path="/admin-login" element={<AdminLogin />} />
@@ -268,7 +270,7 @@ const AppContent = () => {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<HomeDashboard />} />
+              <Route index element={<OverviewDashboard />} />
               <Route path="home" element={<HomeDashboard />} />
               <Route path="home/hero" element={<HeroEdit />} />
               <Route path="home/about" element={<AboutEdit />} />

@@ -256,13 +256,13 @@ useEffect(() => {
   }, []);
 
   return (
-    <section className="w-full bg-[#050505] relative overflow-clip pt-6 md:pt-8 pb-20">
+    <section className="w-full bg-[#000000] relative overflow-clip pt-12 md:pt-16 pb-20 font-poppins">
       <div className="max-w-[1440px] px- sm:px-10 md:px-16 mx-auto">
         <div className="text-center mb-16 space-y-3 px-4">
-          <h2 className="text-white text-[26px] md:text-[32px] lg:text-[40px] font-semibold tracking-tighter leading-[1.2] md:leading-[1.3]">
-            Global Excellence — Showcased on Behance
+          <h2 className="text-white text-[32px] md:text-[40px] lg:text-[46px] font-extrabold tracking-tight leading-[1.2] md:leading-[1.3]">
+            Global Excellence — <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F7A400] via-[#ffd670] to-[#00ffd1] animate-text-shimmer bg-[length:200%_auto]">Showcased on Behance</span>
           </h2>
-          <p className="text-white text-[16px] md:text-[20px] max-w-[500px] md:max-w-[850px] mx-auto font-medium leading-[1.3] ">
+          <p className="text-white/60 text-[16px] md:text-[18px] max-w-[500px] md:max-w-[850px] mx-auto font-medium leading-[1.3] pt-2">
             Explore our high-impact UI/UX Design gallery...
           </p>
         </div>
@@ -293,6 +293,14 @@ useEffect(() => {
           </a>
         </div>
       </div>
+      
+      <style>{`
+        @keyframes textShimmer {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
+        }
+        .animate-text-shimmer { animation: textShimmer 4s linear infinite; }
+      `}</style>
     </section>
   );
 };

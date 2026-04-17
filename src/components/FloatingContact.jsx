@@ -41,23 +41,24 @@ const FloatingContact = () => {
   };
 
   return (
-    <div className="fixed bottom-[80px] md:bottom-[40px] left-0 w-full z-[9999] pointer-events-none">
+    <div className="fixed bottom-[90px] md:bottom-[50px] left-0 w-full z-[9999] pointer-events-none">
       <div className="mx-auto px-[24px] md:px-[48px] lg:px-[72px] flex justify-end">
         <div className="flex flex-col items-end pointer-events-auto">
           {isOpen && (
-            <div className="flex flex-col items-end gap-[12px] mb-[16px]">
+            <div className="flex flex-col items-end gap-[14px] mb-[20px]">
               {menuItems.map((item, index) => (
                 <a
                   key={index}
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-[12px] bg-white px-[16px] py-[8px] rounded-[5px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-xl transition-all border border-gray-50 group animate-in fade-in slide-in-from-bottom-2 duration-300"
+                  className="flex items-center gap-[14px] bg-white/90 backdrop-blur-md px-[20px] py-[10px] rounded-[10px] shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgba(247,164,0,0.15)] transition-all border border-white/20 group animate-in fade-in slide-in-from-bottom-4 duration-500"
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <span className="text-black font-semibold text-[10px] md:text-[12px] whitespace-nowrap">
+                  <span className="text-[#02050A] font-bold text-[11px] md:text-[13px] tracking-wide whitespace-nowrap">
                     {item.text}
                   </span>
-                  <div className="flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="flex items-center justify-center p-2 bg-gray-50 rounded-full group-hover:scale-110 group-hover:bg-[#F7A400]/10 transition-all duration-300">
                     {renderIcon(item.icon)}
                   </div>
                 </a>
@@ -67,14 +68,18 @@ const FloatingContact = () => {
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`w-[40px] h-[40px] md:w-[48px] md:h-[48px] rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 transform active:scale-95 bg-[#035A3E] text-white ${isOpen ? "rotate-90" : ""}`}
+            className={`w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full flex items-center justify-center shadow-[0_10px_40px_rgba(3,90,62,0.3)] hover:shadow-[0_10px_40px_rgba(247,164,0,0.3)] transition-all duration-500 transform active:scale-90 bg-[#035A3E] text-white overflow-hidden group relative`}
           >
-            {isOpen ? <X size={20} /> : <MessageSquare size={22} />}
+            <div className={`absolute inset-0 bg-[#F7A400] transition-transform duration-500 ${isOpen ? "translate-y-0" : "translate-y-full"}`}></div>
+            <div className="relative z-10 transition-transform duration-500 group-hover:rotate-12">
+              {isOpen ? <X size={26} strokeWidth={2.5} /> : <MessageSquare size={26} strokeWidth={2} />}
+            </div>
           </button>
         </div>
       </div>
     </div>
   );
+
 };
 
 export default FloatingContact;

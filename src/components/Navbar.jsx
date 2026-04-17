@@ -65,7 +65,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="w-full h-20 md:h-24 bg-[#02050A] fixed top-0 left-0 z-[100] font-poppins">
+    <nav className="w-full h-20 md:h-24 bg-[#02050A]/80 backdrop-blur-xl fixed top-0 left-0 z-[100] font-poppins border-b border-white/5">
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Jost:wght@500;600&display=swap');
@@ -156,30 +156,12 @@ const Navbar = () => {
           >
             Our Project
           </Link>
-          <Link
-            to="/our-product"
-            className="text-[15px] lg:text-[16px] xl:text-[18px] font-medium text-white hover:text-[#F7A400] transition-colors whitespace-nowrap"
-          >
-            Our Product
-          </Link>
-          {/* Pricing link added after Our Product */}
+          {/* Pricing link added after Our Project */}
           <Link
             to="/pricing"
             className="text-[15px] lg:text-[16px] xl:text-[18px] font-medium text-white hover:text-[#F7A400] transition-colors whitespace-nowrap"
           >
             Pricing
-          </Link>
-          <Link
-            to="/blog"
-            className="text-[15px] lg:text-[16px] xl:text-[18px] font-medium text-white hover:text-[#F7A400] transition-colors whitespace-nowrap"
-          >
-            Blog
-          </Link>
-          <Link
-            to="/careers"
-            className="text-[15px] lg:text-[16px] xl:text-[18px] font-medium text-white hover:text-[#F7A400] transition-colors whitespace-nowrap"
-          >
-            Careers
           </Link>
           <Link
             to="/contact"
@@ -309,10 +291,7 @@ const Navbar = () => {
 
           {[
             "Our Project",
-            "Our Product",
             "Pricing",
-            "Blog",
-            "Careers",
             "Contact",
           ].map((item) => (
             <Link

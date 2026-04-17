@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Shield, Zap, Target, Activity } from 'lucide-react';
 
-// ইমেজ ইমপোর্ট (পাথ চেক করে নিন)
+// ইমেজ ইমপোর্ট
 import img1 from '../assets/images/Amar Vote Kendra app 01.webp';
 import img2 from '../assets/images/Amar Vote Kendra app 02.webp';
 import img3 from '../assets/images/Amar Vote Kendra app 03.webp';
@@ -18,94 +19,153 @@ const DigitalKendro = () => {
     return () => clearInterval(interval);
   }, [images.length]);
 
+  const features = [
+    { 
+      title: "Real-Time Intelligence", 
+      icon: <Activity className="w-5 h-5 sm:w-6 sm:h-6" />, 
+      desc: "Centrally monitoring the security pulse of every polling station in real-time." 
+    },
+    { 
+      title: "Tactical Response", 
+      icon: <Zap className="w-5 h-5 sm:w-6 sm:h-6" />, 
+      desc: "Engineered ultra-fast communication bridges for lightning-speed reactions." 
+    },
+    { 
+      title: "Bank-Grade Security", 
+      icon: <Shield className="w-5 h-5 sm:w-6 sm:h-6" />, 
+      desc: "Military-grade encryption ensuring electoral data integrity and security." 
+    }
+  ];
+
   return (
-    <section className="w-full bg-[#050505] text-white">
-      <div className="max-w-[1445px] mx-auto lg:px-20 py-16 md:py-24">
+    <section className="relative w-full bg-[#000000] text-white py-16 md:py-24 overflow-hidden font-poppins border-t border-white/5">
+      {/* Background Ambient Glowing Orbs */}
+      <div className="absolute inset-0 pointer-events-none flex justify-center items-center z-0">
+        <div className="absolute top-[30%] left-[-10%] w-[400px] h-[400px] bg-[#00ffd1]/10 rounded-full blur-[140px] opacity-40"></div>
+        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#F7A400]/10 rounded-full blur-[160px] opacity-30"></div>
         
-        {/* CENTERED HEADER SECTION */}
-        <div className="text-center max-w-7xl mx-auto mb-20 ">
-          <h1 className="font-semibold leading-tight text-[26px] md:text-[32px] lg:text-[40px] mb-6">
-            Campaignsquat Ltd’s Tech-Partnership with <span className="text-[#F7A400]">Jhenaidah District Police</span>
-          </h1>
-          <p className="text-[16px] lg:text-[20px] leading-relaxed ">
-            At Campaignsquat Ltd., we believe technology should serve a greater purpose. Our strategic partnership with the Jhenaidah District Police led to the development of the mobile application—a pioneering digital solution designed to secure the 13th National Election.
+        {/* Subtle Background Pattern */}
+        <div 
+          className="absolute inset-0 opacity-[0.25]" 
+          style={{ 
+            backgroundImage: 'radial-gradient(rgba(0, 255, 209, 0.3) 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+            maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)'
+          }}
+        ></div>
+      </div>
+
+      <div className="max-w-[1440px] mx-auto px-4 md:px-16 lg:px-24 relative z-10">
+        
+        {/* Partnership Header */}
+        <div className="max-w-4xl mb-12 md:mb-16">
+          <div className="flex flex-wrap items-center gap-3 mb-6 lg:mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F7A400]/10 border border-[#F7A400]/20 text-[#F7A400] text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(247,164,0,0.1)]">
+              <Target className="w-3.5 h-3.5" /> Strategic Case Study
+            </div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#00ffd1]/10 border border-[#00ffd1]/20 text-[#00ffd1] text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(0,255,209,0.1)]">
+              <Shield className="w-3.5 h-3.5" /> Official Gov-Tech Integration
+            </div>
+          </div>
+          
+          <h2 className="text-[28px] sm:text-[40px] md:text-[50px] lg:text-[55px] font-extrabold leading-[1.1] mb-5 tracking-tight">
+            Partnering with{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F7A400] via-[#ffd670] to-[#00ffd1] animate-text-shimmer bg-[length:200%_auto] inline-block">
+              Jhenaidah District Police
+            </span>
+          </h2>
+          <p className="text-[15px] sm:text-[18px] text-white/70 leading-relaxed max-w-3xl mb-8 font-medium">
+            A pioneering digital transformation securing democratic processes through real-time intelligence and mission-critical response technology.
           </p>
+          
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 py-3 sm:py-4 px-5 rounded-[14px] bg-[#050505]/60 backdrop-blur-md border border-white/10 w-fit shadow-xl">
+            <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-full bg-green-500/10 border border-green-500/30">
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_#22c55e]"></div>
+            </div>
+            <p className="text-white/80 text-[13px] md:text-[15px] font-semibold leading-tight">
+              Successfully secured the <span className="text-[#F7A400]">13th National Election</span> through seamless digital coordination.
+            </p>
+          </div>
         </div>
 
-        {/* BOTTOM SECTION */}
-        <div className="flex flex-col lg:flex-row items-stretch justify-between gap-10 md:gap-16 lg:gap-18">
+        {/* Main Content Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           
-          {/* Left Side: Features List - মোবাইলে এই পুরো অংশটি হিডেন থাকবে */}
-          <div className="hidden lg:block lg:w-[90%] space-y-12">
-            <h2 className="text-[20px] md:text-[22px] font-semibold text-white border-b border-white/10 pb-4">
-              Key Features of "Amar Vote Kendra"
-            </h2>
-            
-            <div className="space-y-6">
-              {[
-                { 
-                  title: "Live Sentinel Monitoring", 
-                  icon: <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />, 
-                  desc: "Beyond simple tracking, we built a centralized command center to visualize and monitor the security pulse of every polling station across Jhenaidah’s 4 constituencies in real-time." 
-                },
-                { 
-                  title: "Zero-Lag Response Protocol", 
-                  icon: <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />, 
-                  desc: "We engineered an ultra-fast digital bridge between field officers and headquarters, ensuring that law enforcement can react to any situation with lightning speed." 
-                },
-                { 
-                  title: "Precision Geo-Navigation", 
-                  icon: <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z M12 13a3 3 0 100-6 3 3 0 000 6z" />, 
-                  desc: "No more guessing. Our smart location intelligence provides high-accuracy GPS mapping to guide both citizens and security forces to their exact designated booths effortlessly." 
-                },
-                { 
-                  title: "Ironclad Data Integrity", 
-                  icon: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />, 
-                  desc: "Security is in our DNA. We implemented military-grade encryption to ensure that sensitive electoral data and tactical protocols remain impenetrable to any digital threat." 
-                },
-                { 
-                  title: "The Commander’s Dashboard", 
-                  icon: <path d="M3 9h18M3 15h18M3 3h18a2 2 0 012 2v14a2 2 0 01-2 2H3a2 2 0 01-2-2V5a2 2 0 012-2z" />, 
-                  desc: "A sophisticated, data-driven interface that grants the Superintendent of Police a bird’s-eye view, turning complex ground data into actionable strategic insights instantly." 
-                }
-              ].map((feature, idx) => (
-                <div key={idx}>
-                  <h3 className="text-[18px] md:text-[20px] font-semibold text-white mb-2 flex items-center gap-3">
-                    <span className="inline-flex text-[#F7A400]">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        {feature.icon}
-                      </svg>
-                    </span>
-                    {feature.title}:
-                  </h3>
-                  <p className="text-[13px] md:text-[15px] leading-relaxed">
-                    {feature.desc}
-                  </p>
+          {/* Left: Simplified Feature Highlights */}
+          <div className="lg:col-span-12 xl:col-span-6 space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:gap-5">
+              {features.map((feature, idx) => (
+                <div 
+                  key={idx} 
+                  className="group relative flex flex-col gap-3 p-5 sm:p-6 rounded-[20px] bg-[#050505]/60 backdrop-blur-xl border border-white/5 hover:border-[#00ffd1]/40 transition-all duration-500 shadow-xl overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#00ffd1]/0 to-[#F7A400]/0 group-hover:from-[#00ffd1]/10 group-hover:to-[#F7A400]/5 transition-colors duration-500"></div>
+                  
+                  <div className="flex items-start sm:items-center gap-4 relative z-10">
+                    <div className="flex-shrink-0 p-3 sm:p-4 rounded-xl bg-[#000] border border-white/5 group-hover:border-[#F7A400]/40 text-[#F7A400] group-hover:text-[#00ffd1] transition-all duration-500 shadow-inner relative overflow-hidden">
+                       <div className="absolute inset-0 bg-gradient-to-br from-[#F7A400]/0 to-transparent group-hover:from-[#00ffd1]/20 transition-colors duration-500"></div>
+                       <span className="relative z-10">{feature.icon}</span>
+                    </div>
+                    <div>
+                      <h3 className="text-[17px] sm:text-[19px] font-extrabold text-white mb-1 transition-colors duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#F7A400] group-hover:to-[#00ffd1]">
+                        {feature.title}
+                      </h3>
+                      <p className="text-[13px] sm:text-[15px] text-white/50 group-hover:text-white/70 leading-relaxed font-medium transition-colors duration-300">
+                        {feature.desc}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Right Side: Image slider */}
-<div className="w-full lg:w-[50%] flex flex-col">
-  {/* মোবাইলে গ্যাপ দূর করতে এবং ফুল উইডথ পেতে w-screen আর -mx-6 ব্যবহার করা হয়েছে */}
-  <div className="relative flex-grow w-screen -mx-6  md:w-full md:mx-0 min-h-[500px] lg:min-h-full overflow-hidden">
-    {images.map((img, index) => (
-      <img
-        key={index}
-        src={img}
-        alt={`App Screenshot ${index + 1}`}
-        /* object-cover নিশ্চিত করবে যেন ডানে-বামে কোনো সাদা বা খালি জায়গা না থাকে */
-        className={`absolute inset-0 w-full h-full object-contain transition-all duration-1000 ease-in-out ${
-          index === currentIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-        }`}
-      />
-    ))}
-  </div>
-</div>
+          {/* Right: Mockup Display (Slider) */}
+          <div className="lg:col-span-12 xl:col-span-6 relative h-[400px] sm:h-[500px] xl:h-[600px] w-full flex items-center justify-center mt-10 lg:mt-0">
+            {/* Extremely glowing radial background for the mockup */}
+            <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
+              <div className="w-[80%] h-[80%] bg-[radial-gradient(circle_at_center,rgba(247,164,0,0.15)_0%,rgba(0,255,209,0.05)_50%,transparent_80%)] rounded-full blur-[50px] animate-pulse"></div>
+            </div>
+            
+            <div className="relative h-full w-full flex items-center justify-center">
+              {images.map((img, index) => (
+                <div
+                  key={index}
+                  className={`absolute inset-0 transition-all duration-1000 ease-in-out flex items-center justify-center p-2 ${
+                    index === currentIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.9] pointer-events-none'
+                  }`}
+                >
+                  <img
+                    src={img}
+                    alt={`App Performance ${index + 1}`}
+                    className="w-auto h-full max-h-full object-contain drop-shadow-[0_0_40px_rgba(247,164,0,0.3)] hover:drop-shadow-[0_0_60px_rgba(0,255,209,0.4)] transition-all duration-500 cursor-pointer"
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination Indicators - Animated Bars */}
+            <div className="absolute -bottom-6 sm:-bottom-8 left-1/2 -translate-x-1/2 flex gap-2 sm:gap-3 z-20">
+              {images.map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`h-1 sm:h-1.5 transition-all duration-500 rounded-full cursor-pointer ${i === currentIndex ? 'w-8 sm:w-12 bg-gradient-to-r from-[#F7A400] to-[#00ffd1] shadow-[0_0_10px_rgba(247,164,0,0.5)]' : 'w-2 sm:w-3 bg-white/20 hover:bg-white/40'}`}
+                  onClick={() => setCurrentIndex(i)}
+                ></div>
+              ))}
+            </div>
+          </div>
 
         </div>
       </div>
+
+      <style>{`
+        @keyframes textShimmer {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
+        }
+        .animate-text-shimmer { animation: textShimmer 4s linear infinite; }
+      `}</style>
     </section>
   );
 };

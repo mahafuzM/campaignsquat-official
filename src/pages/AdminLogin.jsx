@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../axiosConfig";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import logo from "../assets/images/campaign-squat-2-1.png";
+import { GoogleLogin } from '@react-oauth/google';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -20,48 +17,34 @@ const AdminLogin = () => {
     }
   }, [navigate]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
     setError("");
-
     try {
-      /**
-       * ⚠️ অত্যন্ত গুরুত্বপূর্ণ: 
-       * আপনার App.jsx-এ যদি baseURL-এ "/api" থাকে, 
-       * তবে এখানে শুধু "/admin-login" দিন।
-       */
-      const response = await axios.post("/api/admin-login", {
-        email: email.trim().toLowerCase(),
-        password: password,
+      // Send the credential to our newly created backend route
+      const response = await axios.post("/api/auth/google-login", {
+        credential: credentialResponse.credential
       });
 
       if (response.data.success || response.data.token) {
         const token = response.data.token;
         localStorage.setItem("adminToken", token);
         
-        // টোকেন সেট করার পর হেডার আপডেট
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        
-        // ড্যাশবোর্ডে পাঠানো
-        window.location.href = "/admin";
+        window.location.href = "/admin"; // Redirect to dashboard
       } else {
-        setError("Unexpected response from server.");
+        setError("Unexpected response from Google login server.");
       }
     } catch (err) {
-      console.error("Login Error Details:", err.response);
-      
-      // সার্ভার অফলাইন থাকলে বা ভুল পাথে রিকোয়েস্ট গেলে ৫০৩/৪৪৪ এরর হ্যান্ডেলিং
-      if (!err.response) {
-        setError("Network error: Server is unreachable!");
-      } else if (err.response.status === 503) {
-        setError("Server is busy or starting up. Try again in 10 seconds.");
-      } else {
-        setError(err.response.data?.message || "Invalid credentials. Try again!");
-      }
+      console.error("Google Login Error Details:", err.response);
+      setError(err.response?.data?.message || "Google Authentication failed!");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleFailure = () => {
+    setError("Google Login was closed or failed.");
   };
 
   return (
@@ -100,75 +83,31 @@ const AdminLogin = () => {
               <div className="w-12 h-[2px] bg-[#F7A400] mx-auto mt-4 rounded-full"></div>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-8">
+            <div className="space-y-6">
               {error && (
-                <div className="bg-red-500/20 text-white p-4 rounded-xl text-sm border border-red-500/30 animate-shake text-center">
+                <div className="bg-red-500/20 text-white p-4 rounded-xl text-sm border border-red-500/30 animate-shake text-center mb-6">
                   {error}
                 </div>
               )}
-
-              <div className="space-y-2">
-                <label className="text-white font-medium ml-1">
-                  Email Address
-                </label>
-                <div className="relative group">
-                  <Mail
-                    className="absolute left-4 top-4 text-gray-400 group-focus-within:text-[#F7A400] transition-colors"
-                    size={20}
-                  />
-                  <input
-                    type="email"
-                    required
-                    autoComplete="email"
-                    className="w-full pl-12 pr-4 py-4 bg-white/5 rounded-xl border border-white/10 text-white focus:ring-2 focus:ring-[#F7A400] outline-none transition-all"
-                    placeholder="admin@campaignsquat.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+              {loading && (
+                <div className="flex justify-center my-4 mb-6">
+                  <div className="w-8 h-8 border-4 border-[#0B1120] border-t-[#F7A400] rounded-full animate-spin"></div>
                 </div>
-              </div>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <label className="text-white font-medium ml-1">Password</label>
-                <div className="relative group">
-                  <Lock
-                    className="absolute left-4 top-4 text-gray-400 group-focus-within:text-[#F7A400] transition-colors"
-                    size={20}
-                  />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    required
-                    autoComplete="current-password"
-                    className="w-full pl-12 pr-12 py-4 bg-white/5 rounded-xl border border-white/10 text-white focus:ring-2 focus:ring-[#F7A400] outline-none transition-all"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-4 text-gray-500 hover:text-white transition-colors"
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="relative group p-[1px] rounded-xl overflow-hidden mt-4">
-                <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#F7A400_0%,#3b82f6_50%,#F7A400_100%)] opacity-0 group-hover:opacity-100 transition-opacity" />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="relative w-full py-4 bg-[#F7A400] hover:bg-[#ffb31a] text-[#02050A] font-bold tracking-widest rounded-[5px] transition-all active:scale-[0.98] flex items-center justify-center disabled:opacity-70"
-                >
-                  {loading ? (
-                    <div className="w-6 h-6 border-2 border-[#02050A] border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    "SECURE LOGIN"
-                  )}
-                </button>
-              </div>
-            </form>
+            <div className="mt-6 flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleFailure}
+                useOneTap
+                theme="filled_black"
+                shape="rectangular"
+                size="large"
+                text="continue_with"
+                width="310"
+              />
+            </div>
 
             <div className="mt-10 text-center border-t border-white/5 pt-6 text-sm text-gray-400">
               © 2026{" "}

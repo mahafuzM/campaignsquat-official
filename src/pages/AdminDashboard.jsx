@@ -1,420 +1,266 @@
-import React, { useState, useEffect } from 'react'; // useEffect যোগ করা হয়েছে
+import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { 
+  Home, Info, Zap, Briefcase, FileText, Package, LayoutDashboard, 
+  Settings, Globe, MessageSquare, LogOut, ChevronDown, PhoneCall, 
+  ScrollText, DollarSign, Layers, Users, CircleDot, Settings2, Activity
+} from 'lucide-react';
+
+const SidebarLink = ({ to, icon: Icon, children, isActive }) => (
+  <Link 
+    to={to} 
+    className={`flex items-center gap-2.5 px-3 py-1.5 text-[12px] transition-all duration-200 group ${
+      isActive 
+        ? 'text-[#F7A400] font-medium bg-[#F7A400]/5 rounded-md' 
+        : 'text-gray-400 hover:text-gray-100 hover:bg-[#1a1a1a] rounded-md'
+    }`}
+  >
+    {Icon ? (
+      <Icon size={14} className={isActive ? "text-[#F7A400]" : "text-gray-500 group-hover:text-gray-300"} />
+    ) : (
+      <CircleDot size={8} className={`ml-1 ${isActive ? "text-[#F7A400]" : "text-gray-600 group-hover:text-gray-400"}`} />
+    )}
+    <span className="truncate">{children}</span>
+  </Link>
+);
+
+const SidebarGroup = ({ title, icon: Icon, isOpen, toggle, children }) => (
+  <div className="mb-0.5">
+    <button 
+      onClick={toggle}
+      className={`w-full flex items-center justify-between px-3 py-2 rounded-md transition-all duration-200 ${
+        isOpen ? 'bg-[#111] text-white' : 'text-gray-300 hover:bg-[#1a1a1a]'
+      }`}
+    >
+      <div className="flex items-center gap-3 text-[13px] font-medium tracking-wide">
+        <Icon size={16} className={isOpen ? "text-[#F7A400]" : "text-gray-500"} />
+        {title}
+      </div>
+      <ChevronDown size={14} className={`transition-transform duration-300 text-gray-500 ${isOpen ? 'rotate-180' : ''}`} />
+    </button>
+    
+    <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[800px] opacity-100 mt-1 mb-2' : 'max-h-0 opacity-0'}`}>
+      <div className="ml-7 pl-1 space-y-0.5 border-l border-[#222]">
+        {children}
+      </div>
+    </div>
+  </div>
+);
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // মেনু ওপেন-ক্লোজ স্টেট
-  const [isHomeOpen, setIsHomeOpen] = useState(false); 
-  const [isAboutOpen, setIsAboutOpen] = useState(false); 
-  const [isProductOpen, setIsProductOpen] = useState(false); 
-  const [isBlogOpen, setIsBlogOpen] = useState(false); 
-  const [isCareerOpen, setIsCareerOpen] = useState(false); 
-  const [isProjectOpen, setIsProjectOpen] = useState(false);
-  const [isPricingOpen, setIsPricingOpen] = useState(false); // Pricing এর জন্য নতুন স্টেট
-  const [isTechEdgeOpen, setIsTechEdgeOpen] = useState(false);
-  const [isSEOOpen, setIsSEOOpen] = useState(false); // এটা আছে কি না দেখুন
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  // Menu Open States
+  const [openMenus, setOpenMenus] = useState({
+    home: true,
+    about: false,
+    mega: false,
+    career: false,
+    blog: false,
+    product: false,
+    portfolio: false,
+    pricing: false,
+    seo: false,
+    settings: false,
+  });
 
- //// 🛡️ অটো-লগআউট ও সেশন চেক লজিক (২ ঘণ্টা/১০ সেকেন্ড ইন্টারভাল)
+  const toggleMenu = (key) => {
+    setOpenMenus(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // 🛡️ Auto-Logout & Session Check (10s interval)
   useEffect(() => {
     const checkTokenExpiration = () => {
       const token = localStorage.getItem('adminToken');
       if (token) {
         try {
-          // JWT টোকেনের Payload অংশ ডিকোড করা
           const payload = JSON.parse(atob(token.split('.')[1]));
           const expiryTime = payload.exp * 1000; 
           const currentTime = Date.now();
 
-          // যদি সেশনের সময় পার হয়ে যায়
+          // Role Validation Check
+          if (payload.role !== "admin" && payload.role !== "moderator") {
+            console.warn("Security Alert: Non-admin token detected. Booting user...");
+            handleLogout();
+            return;
+          }
+
           if (currentTime > expiryTime) {
             console.log("Session expired. Logging out...");
             handleLogout();
-            alert("Security Alert: Your 12h session has expired! Please login again.");
+            alert("Security Alert: Your session has expired! Please login again.");
           }
         } catch (error) {
           console.error("Token verification failed:", error);
           handleLogout();
         }
       } else {
-        // টোকেন না থাকলে সরাসরি লগইন পেজে রিডাইরেক্ট
         navigate('/admin-login');
       }
     };
 
-    // ✅ প্রতি ১০ সেকেন্ড পর পর চেক করবে (পারফরম্যান্স ফ্রেন্ডলি)
     const interval = setInterval(checkTokenExpiration, 10000); 
-
-    // ক্লিনিং ফাংশন: কম্পোনেন্ট আনমাউন্ট হলে টাইমার বন্ধ হবে
     return () => clearInterval(interval);
   }, [navigate]);
 
-  // 🛡️ লগআউট ফাংশন
   const handleLogout = () => {
     localStorage.removeItem('isAdmin'); 
     localStorage.removeItem('adminToken'); 
     navigate('/admin-login'); 
   };
 
-  const isActive = (path) => location.pathname === path ? "bg-[#F7A400] text-black" : "text-gray-400 hover:bg-gray-800 hover:text-white";
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="flex min-h-screen bg-[#02050A] text-white font-poppins selection:bg-[#F7A400] selection:text-black">
+    <div className="flex min-h-screen bg-[#050505] text-white font-poppins selection:bg-[#F7A400] selection:text-black">
       
-      {/* ১. প্রফেশনাল সাইডবার */}
-      <aside className="w-72 bg-black border-r border-gray-800 p-6 flex flex-col sticky top-0 h-screen overflow-y-auto">
-        <div className="mb-10 px-2">
-          <h2 className="text-[#F7A400] text-3xl font-bold tracking-tighter">AGENCY CMS</h2>
-          <p className="text-[16px] text-white">Control Panel</p>
+      {/* ERP Style Premium Compact Sidebar */}
+      <aside className="w-[260px] bg-[#0a0a0a] border-r border-[#151515] flex flex-col sticky top-0 h-screen shadow-2xl">
+        
+        {/* Brand Header */}
+        <div className="p-5 border-b border-[#151515] flex items-center gap-3 shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#F7A400] to-[#c78500] flex items-center justify-center shadow-[0_0_15px_rgba(247,164,0,0.2)]">
+            <LayoutDashboard size={18} className="text-black" />
+          </div>
+          <div>
+            <h2 className="text-white text-[14px] font-bold tracking-tight">CAMPAIGNSQUAT</h2>
+            <p className="text-[9px] text-[#F7A400] uppercase tracking-[0.2em] font-bold">Admin Console</p>
+          </div>
         </div>
         
-        <nav className="flex-grow space-y-2">
-          {/* --- Home Page Parent Menu --- */}
-          <div>
-            <button 
-              onClick={() => setIsHomeOpen(!isHomeOpen)}
-              className="w-full flex items-center justify-between p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-all font-semibold"
-            >
-              <div className="flex items-center text-[16px] gap-3">
-                <span>🏠</span> Home Page
-              </div>
-              <span className={`transition-transform duration-300 ${isHomeOpen ? 'rotate-180' : ''}`}>▼</span>
-            </button>
-
-            {isHomeOpen && (
-              <div className="ml-6 mt-2 space-y-1 border-l border-white">
-                <Link to="/admin/home/hero" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all  ${isActive('/admin/home/hero')}`}>Header Section</Link>
-                <Link to="/admin/home/brands" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/home/brands')}`}>Brand Logos</Link>
-                <Link to="/admin/home/about" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/home/about')}`}>About/Campaign</Link>
-                <Link to="/admin/home/industries" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/home/industries')}`}>Industries Cards</Link>
-                <Link to="/admin/home/work-process" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/home/work-process')}`}>Work Process</Link>
-                <Link to="/admin/home/recent-projects" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/home/recent-projects')}`}>Recent Projects</Link>
-                <Link to="/admin/home/success-stories" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/home/success-stories')}`}>Success Stories</Link>
-                <Link to="/admin/home/faqs" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/home/faqs')}`}>Questions/FAQ</Link>
-               <Link to="/admin/home/footer" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/home/footer')}`}>Footer Management</Link>
-              </div>
-            )}
-          </div>
-
-          {/* ✅ ২. About Page Parent Menu */}
-          <div>
-            <button 
-              onClick={() => setIsAboutOpen(!isAboutOpen)}
-              className="w-full flex items-center justify-between p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-all font-semibold"
-            >
-              <div className="flex items-center gap-3 text-[16px]">
-                <span>ℹ️</span> About Page
-              </div>
-              <span className={`transition-transform duration-300 ${isAboutOpen ? 'rotate-180' : ''}`}>▼</span>
-            </button>
-
-            {isAboutOpen && (
-              <div className="ml-6 mt-2 space-y-1 border-l border-gray-800">
-                <Link to="/admin/about/hero" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/about/hero')}`}>About Hero</Link>
-                <Link 
-  to="/admin/about/vision" 
-  className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/about/vision') ? 'bg-[#F7A400] text-black font-bold' : 'hover:bg-white/10'}`}
->
-  <span className="w-2 h-2 rounded-full bg-[#F7A400]"></span> {/* ছোট একটি ডট স্টাইলের জন্য */}
-  About Vision
-</Link>
-                <Link to="/admin/about/gallery" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/about/gallery')}`}>About Gallery</Link>
-                <Link to="/admin/about/mission" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/about/mission')}`}>Mission & Vision</Link>
-                <Link to="/admin/about/features" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/about/features')}`}>About Features</Link>
-                <Link to="/admin/about/recognition" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/about/recognition')}`}>Global Recognition</Link>
-                <Link to="/admin/about/team" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/about/team')}`}>CEO Message Edit</Link>
-              </div>
-            )}
-          </div>
-
-              
-          {/* --- 🚀 Mega Menu (ড্রপডাউন স্টাইল) --- */}
-          <div>
-            <button 
-              onClick={() => setIsProjectOpen(!isProjectOpen)} 
-              className="w-full flex items-center justify-between p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-all font-semibold"
-            >
-              <div className="flex items-center text-[16px] gap-3">
-                <span>⚡</span> Mega Menu
-              </div>
-              <span className={`transition-transform duration-300 ${isProjectOpen ? 'rotate-180' : ''}`}>▼</span>
-            </button>
-
-            {isProjectOpen && (
-              <div className="ml-6 mt-2 space-y-1 border-l border-white/20">
-                <Link 
-                  to="/admin/mega-menu" 
-                  className={`flex items-center gap-3 p-2 pl-6 text-[12px] rounded-r-lg transition-all ${isActive('/admin/mega-menu')}`}
-                >
-                  Manage Mega Menu
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* ✅ ৩. Career Page Parent Menu */}
-          <div>
-            <button 
-              onClick={() => setIsCareerOpen(!isCareerOpen)}
-              className="w-full flex items-center justify-between p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-all font-semibold"
-            >
-              <div className="flex items-center gap-3 text-[16px]">
-                <span>💼</span> Career Page
-              </div>
-              <span className={`transition-transform duration-300 ${isCareerOpen ? 'rotate-180' : ''}`}>▼</span>
-            </button>
-
-            {isCareerOpen && (
-              <div className="ml-6 mt-2 space-y-1 border-l border-gray-800">
-                <Link to="/admin/careers" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/careers')}`}>Manage Openings</Link>
-              </div>
-            )}
-          </div>
-
-          {/* ✅ ৪. Blog Page Parent Menu */}
-          <div>
-            <button 
-              onClick={() => setIsBlogOpen(!isBlogOpen)}
-              className="w-full flex items-center justify-between p-3 rounded-lg text-white hover:bg-gray-800 transition-all font-semibold"
-            >
-              <div className="flex items-center gap-3 text-[14px]">
-                <span>📝</span> Blog Page
-              </div>
-              <span className={`transition-transform duration-300 ${isBlogOpen ? 'rotate-180' : ''}`}>▼</span>
-            </button>
-
-            {isBlogOpen && (
-              <div className="ml-6 mt-2 space-y-1 border-l border-gray-800">
-                <Link to="/admin/blogs" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/blogs')}`}>Manage Blogs</Link>
-              </div>
-            )}
-          </div>
-
-          {/* ✅ ৫. Product Page Parent Menu */}
-          <div>
-            <button 
-              onClick={() => setIsProductOpen(!isProductOpen)}
-              className="w-full flex items-center justify-between p-3 rounded-lg text-white hover:bg-gray-800 transition-all font-semibold"
-            >
-              <div className="flex items-center gap-3 text-[14px] text-white">
-                <span>📦</span> Product Page
-              </div>
-              <span className={`transition-transform duration-300 ${isProductOpen ? 'rotate-180' : ''}`}>▼</span>
-            </button>
-
-            {isProductOpen && (
-              <div className="ml-6 mt-2 space-y-1 border-l border-gray-800">
-                <Link to="/admin/product" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/product')}`}>Manage Products</Link>
-              </div>
-            )}
-          </div>
-
-          {/* ✅ ৬. Portfolio/Project Page Parent Menu */}
-          <div>
-            <button 
-              onClick={() => setIsProjectOpen(!isProjectOpen)}
-              className="w-full flex items-center justify-between p-3 rounded-lg text-white hover:bg-gray-800 transition-all font-semibold"
-            >
-              <div className="flex items-center gap-3 text-[14px]">
-                <span>💼</span> Portfolio Page
-              </div>
-              <span className={`transition-transform duration-300 ${isProjectOpen ? 'rotate-180' : ''}`}>▼</span>
-            </button>
-
-            {isProjectOpen && (
-              <div className="ml-6 mt-2 space-y-1 border-l border-gray-800">
-                <Link to="/admin/projects" className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all ${isActive('/admin/projects')}`}>Manage Projects</Link>
-              </div>
-            )}
-          </div>
-
-{/* ✅ ৭. Pricing Page Parent Menu (With Nested Sub-menus) */}
-<div>
-  <button 
-    onClick={() => setIsPricingOpen(!isPricingOpen)}
-    className="w-full flex items-center justify-between p-3 rounded-lg text-white hover:bg-gray-800 transition-all font-semibold"
-  >
-    <div className="flex items-center gap-3 text-[14px]">
-      <span>💰</span> Pricing Strategy
-    </div>
-    <span className={`text-[10px] transition-transform duration-300 ${isPricingOpen ? 'rotate-180' : ''}`}>
-      ▼
-    </span>
-  </button>
-
-  {isPricingOpen && (
-    <div className="ml-6 mt-2 space-y-1 border-l border-gray-800">
-      
-      {/* Sub-menu 1: Manage Pricing */}
-      <Link 
-        to="/admin/pricing" 
-        className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all hover:bg-gray-800/50 ${isActive('/admin/pricing') ? 'bg-gray-800 text-[#F7A400] font-bold border-l-2 border-[#F7A400]' : ''}`}
-      >
-        <span>•</span> Manage Pricing
-      </Link>
-
-      {/* Sub-menu 2: Technical Edge */}
-      <Link 
-        to="/admin/technical-edge" 
-        className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all hover:bg-gray-800/50 ${isActive('/admin/technical-edge') ? 'bg-gray-800 text-[#F7A400] font-bold border-l-2 border-[#F7A400]' : ''}`}
-      >
-        <span>•</span> Technical Edge
-      </Link>
-
-      {/* Sub-menu 3: Service Ecosystem */}
-      <Link 
-        to="/admin/service-ecosystem" 
-        className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all hover:bg-gray-800/50 ${isActive('/admin/service-ecosystem') ? 'bg-gray-800 text-[#F7A400] font-bold border-l-2 border-[#F7A400]' : ''}`}
-      >
-        <span>•</span> Service Ecosystem
-      </Link>
-
-      {/* ✅ Sub-menu 4: Agency Comparison (নতুন অ্যাড করা হলো) */}
-      <Link 
-        to="/admin/agency-comparison" 
-        className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all hover:bg-gray-800/50 ${isActive('/admin/agency-comparison') ? 'bg-gray-800 text-[#F7A400] font-bold border-l-2 border-[#F7A400]' : ''}`}
-      >
-        <span>•</span> Agency Comparison
-      </Link>
-
-    </div>
-  )}
-</div>
-
-{/* ✅ ৮. SEO Dynamic Pages Parent Menu */}
-<div className="mt-2">
-  <button 
-    onClick={() => setIsSEOOpen(!isSEOOpen)}
-    className="w-full flex items-center justify-between p-3 rounded-lg text-white hover:bg-gray-800 transition-all font-semibold"
-  >
-    <div className="flex items-center gap-3 text-[14px]">
-      <span className="text-[#F7A400]">🌍</span> SEO Dynamic 
-    </div>
-    <span className={`text-[10px] transition-transform duration-300 ${isSEOOpen ? 'rotate-180' : ''}`}>
-      ▼
-    </span>
-  </button>
-
-  {isSEOOpen && (
-    <div className="ml-6 mt-2 space-y-1 border-l border-gray-800">
-      <Link 
-        to="/admin/other-pages" 
-        className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all hover:bg-gray-800/50 ${location.pathname === '/admin/other-pages' ? 'bg-gray-800 text-[#F7A400] font-bold border-l-2 border-[#F7A400]' : ''}`}
-      >
-        <span className="opacity-50">•</span> Manage SEO 
-      </Link>
-    </div>
-  )}
-</div>
-
-{/* ✅ ৯. Settings & Security Parent Menu */}
-<div className="mt-2 border-t border-gray-800 pt-2">
-  <button 
-    onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-    className="w-full flex items-center justify-between p-3 rounded-lg text-white hover:bg-gray-800 transition-all font-semibold"
-  >
-    <div className="flex items-center gap-3 text-[14px]">
-      <span className="text-[#F7A400]">⚙️</span> Settings
-    </div>
-    <span className={`text-[10px] transition-transform duration-300 ${isSettingsOpen ? 'rotate-180' : ''}`}>
-      ▼
-    </span>
-  </button>
-
-  {isSettingsOpen && (
-    <div className="ml-6 mt-2 space-y-1 border-l border-gray-800">
-      
-      {/* 📊 GTM Configuration Link */}
-      <Link 
-        to="/admin/gtm-management" 
-        className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all hover:bg-gray-800/50 ${isActive('/admin/gtm-management') ? 'bg-gray-800 text-[#F7A400] font-bold border-l-2 border-[#F7A400]' : ''}`}
-      >
-        <span className={`text-[10px] ${isActive('/admin/gtm-management') ? 'opacity-100' : 'opacity-50'}`}>📊</span> 
-        GTM Tracking
-      </Link>
-
-      {/* 🔍 Search Console Link */}
-      <Link 
-        to="/admin/seo-management" 
-        className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all hover:bg-gray-800/50 ${isActive('/admin/seo-management') ? 'bg-gray-800 text-[#F7A400] font-bold border-l-2 border-[#F7A400]' : ''}`}
-      >
-        <span className={`text-[10px] ${isActive('/admin/seo-management') ? 'opacity-100' : 'opacity-50'}`}>🔍</span> 
-        Search Console
-      </Link>
-
-      {/* 🔒 Change Password Link */}
-      <Link 
-        to="/admin/settings/change-password" 
-        className={`flex items-center gap-3 p-2 pl-6 text-[12px] text-white rounded-r-lg transition-all hover:bg-gray-800/50 ${isActive('/admin/settings/change-password') ? 'bg-gray-800 text-[#F7A400] font-bold border-l-2 border-[#F7A400]' : ''}`}
-      >
-        <span className={`text-[10px] ${isActive('/admin/settings/change-password') ? 'opacity-100' : 'opacity-50'}`}>🔒</span> 
-        Change Password
-      </Link>
-
-    </div>
-    
-  )}
-  
-</div>
-
-{/* ✅ ১০. Floating Contact (সম্পূর্ণ আলাদা মেনু - সেটিংস এর বাইরে) */}
-<div className="mt-1">
-  <Link 
-    to="/admin/home/floating-contact" 
-    className={`w-full flex items-center gap-3 p-3 rounded-lg font-semibold transition-all text-[12px] 
-      ${location.pathname === '/admin/home/floating-contact' 
-        ? 'bg-[#F7A400] text-black shadow-lg shadow-[#F7A400]/20' 
-        : 'text-white hover:bg-gray-800 hover:text-[#F7A400]'}`}
-  >
-    <span className="text-[16px]">🔘</span> 
-    Floating Contact
-  </Link>
-</div>
-
-          <Link to="/admin/home/contacts" className={`flex items-center gap-3 p-3 rounded-lg font-semibold transition-all text-white text-[12px] ${isActive('/admin/home/contacts')}`}>
-            <span>📩</span> Client Messages
+        {/* Scrollable Navigation */}
+        <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+          
+          <Link to="/admin" className={`flex items-center gap-3 px-3 py-2.5 mb-2 rounded-md transition-all duration-200 text-[13px] font-medium border border-transparent ${isActive('/admin') ? 'bg-[#F7A400]/10 text-[#F7A400] border-[#F7A400]/30 shadow-sm' : 'text-gray-300 hover:bg-[#1a1a1a]'}`}>
+            <Activity size={16} className={isActive('/admin') ? 'text-[#F7A400]' : 'text-gray-500'} />
+            System Overview
           </Link>
 
-          <Link to="/admin/job-applications" className={`flex items-center gap-3 p-3 rounded-lg font-semibold transition-all text-white text-[12px] ${isActive('/admin/job-applications')}`}>
-            <span>📑</span> Job Applications
+          <SidebarGroup title="Home Page" icon={Home} isOpen={openMenus.home} toggle={() => toggleMenu('home')}>
+            <SidebarLink to="/admin/home/hero" isActive={isActive('/admin/home/hero')}>Header Section</SidebarLink>
+            <SidebarLink to="/admin/home/brands" isActive={isActive('/admin/home/brands')}>Brand Logos</SidebarLink>
+            <SidebarLink to="/admin/home/about" isActive={isActive('/admin/home/about')}>About/Campaign</SidebarLink>
+            <SidebarLink to="/admin/home/industries" isActive={isActive('/admin/home/industries')}>Industries Cards</SidebarLink>
+            <SidebarLink to="/admin/home/work-process" isActive={isActive('/admin/home/work-process')}>Work Process</SidebarLink>
+            <SidebarLink to="/admin/home/recent-projects" isActive={isActive('/admin/home/recent-projects')}>Recent Projects</SidebarLink>
+            <SidebarLink to="/admin/home/success-stories" isActive={isActive('/admin/home/success-stories')}>Success Stories</SidebarLink>
+            <SidebarLink to="/admin/home/faqs" isActive={isActive('/admin/home/faqs')}>Questions/FAQ</SidebarLink>
+            <SidebarLink to="/admin/home/footer" isActive={isActive('/admin/home/footer')}>Footer Management</SidebarLink>
+          </SidebarGroup>
+
+          <SidebarGroup title="About Page" icon={Info} isOpen={openMenus.about} toggle={() => toggleMenu('about')}>
+            <SidebarLink to="/admin/about/hero" isActive={isActive('/admin/about/hero')}>About Hero</SidebarLink>
+            <SidebarLink to="/admin/about/vision" isActive={isActive('/admin/about/vision')}>About Vision</SidebarLink>
+            <SidebarLink to="/admin/about/gallery" isActive={isActive('/admin/about/gallery')}>About Gallery</SidebarLink>
+            <SidebarLink to="/admin/about/mission" isActive={isActive('/admin/about/mission')}>Mission & Vision</SidebarLink>
+            <SidebarLink to="/admin/about/features" isActive={isActive('/admin/about/features')}>About Features</SidebarLink>
+            <SidebarLink to="/admin/about/recognition" isActive={isActive('/admin/about/recognition')}>Global Recognition</SidebarLink>
+            <SidebarLink to="/admin/about/team" isActive={isActive('/admin/about/team')}>CEO Message Edit</SidebarLink>
+          </SidebarGroup>
+
+          <SidebarGroup title="Mega Menu" icon={Layers} isOpen={openMenus.mega} toggle={() => toggleMenu('mega')}>
+            <SidebarLink to="/admin/mega-menu" isActive={isActive('/admin/mega-menu')}>Manage Mega Menu</SidebarLink>
+          </SidebarGroup>
+
+          <SidebarGroup title="Career Page" icon={Briefcase} isOpen={openMenus.career} toggle={() => toggleMenu('career')}>
+            <SidebarLink to="/admin/careers" isActive={isActive('/admin/careers')}>Manage Openings</SidebarLink>
+          </SidebarGroup>
+
+          <SidebarGroup title="Blog Page" icon={FileText} isOpen={openMenus.blog} toggle={() => toggleMenu('blog')}>
+            <SidebarLink to="/admin/blogs" isActive={isActive('/admin/blogs')}>Manage Blogs</SidebarLink>
+          </SidebarGroup>
+
+          <SidebarGroup title="Product Page" icon={Package} isOpen={openMenus.product} toggle={() => toggleMenu('product')}>
+            <SidebarLink to="/admin/product" isActive={isActive('/admin/product')}>Manage Products</SidebarLink>
+          </SidebarGroup>
+
+          <SidebarGroup title="Portfolio Page" icon={ScrollText} isOpen={openMenus.portfolio} toggle={() => toggleMenu('portfolio')}>
+            <SidebarLink to="/admin/projects" isActive={isActive('/admin/projects')}>Manage Projects</SidebarLink>
+          </SidebarGroup>
+
+          <SidebarGroup title="Pricing Strategy" icon={DollarSign} isOpen={openMenus.pricing} toggle={() => toggleMenu('pricing')}>
+            <SidebarLink to="/admin/pricing" isActive={isActive('/admin/pricing')}>Manage Pricing</SidebarLink>
+            <SidebarLink to="/admin/technical-edge" isActive={isActive('/admin/technical-edge')}>Technical Edge</SidebarLink>
+            <SidebarLink to="/admin/service-ecosystem" isActive={isActive('/admin/service-ecosystem')}>Service Ecosystem</SidebarLink>
+            <SidebarLink to="/admin/agency-comparison" isActive={isActive('/admin/agency-comparison')}>Agency Comparison</SidebarLink>
+          </SidebarGroup>
+
+          <div className="my-3 border-t border-[#151515]"></div>
+
+          <SidebarGroup title="SEO Dynamic" icon={Globe} isOpen={openMenus.seo} toggle={() => toggleMenu('seo')}>
+            <SidebarLink to="/admin/other-pages" isActive={isActive('/admin/other-pages')}>Manage SEO Pages</SidebarLink>
+          </SidebarGroup>
+
+          <SidebarGroup title="Settings & Setup" icon={Settings2} isOpen={openMenus.settings} toggle={() => toggleMenu('settings')}>
+            <SidebarLink to="/admin/gtm-management" isActive={isActive('/admin/gtm-management')}>GTM Tracking</SidebarLink>
+            <SidebarLink to="/admin/seo-management" isActive={isActive('/admin/seo-management')}>Search Console</SidebarLink>
+            <SidebarLink to="/admin/settings/change-password" isActive={isActive('/admin/settings/change-password')}>Change Credentials</SidebarLink>
+          </SidebarGroup>
+
+          <div className="my-3 border-t border-[#151515]"></div>
+
+          <Link to="/admin/home/floating-contact" className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 text-[13px] font-medium border border-transparent ${isActive('/admin/home/floating-contact') ? 'bg-[#F7A400]/10 text-[#F7A400] border-[#F7A400]/30 shadow-sm' : 'text-gray-300 hover:bg-[#1a1a1a]'}`}>
+            <PhoneCall size={16} className={isActive('/admin/home/floating-contact') ? 'text-[#F7A400]' : 'text-gray-500'} />
+            Floating Contact
+          </Link>
+          
+          <Link to="/admin/home/contacts" className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 text-[13px] font-medium border border-transparent ${isActive('/admin/home/contacts') ? 'bg-[#F7A400]/10 text-[#F7A400] border-[#F7A400]/30 shadow-sm' : 'text-gray-300 hover:bg-[#1a1a1a]'}`}>
+            <MessageSquare size={16} className={isActive('/admin/home/contacts') ? 'text-[#F7A400]' : 'text-gray-500'} />
+            Client Messages
           </Link>
 
-          <Link to="/admin/services" className={`flex items-center gap-3 p-3 rounded-lg font-semibold transition-all text-white text-[12px] ${isActive('/admin/services')}`}>
-            <span>🛠️</span> All Services
+          <Link to="/admin/job-applications" className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 text-[13px] font-medium border border-transparent ${isActive('/admin/job-applications') ? 'bg-[#F7A400]/10 text-[#F7A400] border-[#F7A400]/30 shadow-sm' : 'text-gray-300 hover:bg-[#1a1a1a]'}`}>
+            <Users size={16} className={isActive('/admin/job-applications') ? 'text-[#F7A400]' : 'text-gray-500'} />
+            Job Applications
+          </Link>
+
+          <Link to="/admin/services" className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 text-[13px] font-medium border border-transparent ${isActive('/admin/services') ? 'bg-[#F7A400]/10 text-[#F7A400] border-[#F7A400]/30 shadow-sm' : 'text-gray-300 hover:bg-[#1a1a1a]'}`}>
+            <Zap size={16} className={isActive('/admin/services') ? 'text-[#F7A400]' : 'text-gray-500'} />
+            All Modules
           </Link>
           
         </nav>
 
-        <button 
-          onClick={handleLogout}
-          className="mt-auto flex items-center gap-3 p-3 text-[#00f746] hover:bg-red-500/10 rounded-lg transition-all font-bold text-[14px]"
-        >
-          <span>🚪</span> Logout Session
-        </button>
+        {/* Footer / Logout */}
+        <div className="p-4 border-t border-[#151515] shrink-0">
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#111] hover:bg-red-500/10 text-gray-400 hover:text-red-500 rounded-md transition-all duration-300 text-[13px] font-medium border border-[#222] hover:border-red-500/30 group"
+          >
+            <LogOut size={16} className="group-hover:text-red-500 transition-colors" />
+            End Session
+          </button>
+        </div>
       </aside>
 
-      {/* মেইন কন্টেন্ট এরিয়া */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header className="bg-[#050910]/80 backdrop-blur-md border-b border-gray-800 p-5 flex justify-between items-center">
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col h-screen overflow-hidden bg-[#fafafa]">
+        <header className="bg-white border-b border-gray-200 p-4 px-6 flex justify-between items-center shrink-0 shadow-sm z-10">
           <div className="flex items-center gap-2">
-            <span className="text-gray-500">Dashboard /</span>
-            <span className="text-[#F7A400] capitalize">
-              {location.pathname.split('/').pop().replace('-', ' ') || 'Overview'}
+            <span className="text-gray-400 text-sm font-medium">Console /</span>
+            <span className="text-black text-sm font-bold capitalize">
+              {location.pathname.split('/').pop().replace(/-/g, ' ') || 'Overview'}
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="text-sm font-bold">Admin User</p>
-              <p className="text-[10px] text-green-500">Active Now</p>
+              <p className="text-sm font-bold text-gray-800 tracking-tight">System Admin</p>
+              <div className="flex items-center justify-end gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <p className="text-[10px] text-green-600 font-semibold uppercase tracking-wider">Online</p>
+              </div>
             </div>
-            <div className="w-10 h-10 bg-[#F7A400] rounded-full flex items-center justify-center text-black font-bold">A</div>
+            <img 
+              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" 
+              alt="Admin Profile" 
+              className="w-10 h-10 rounded-lg shadow-md border border-[#222] object-cover"
+            />
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto bg-gray-50 p-0"> 
-          <div className="w-full min-h-screen text-black">
+        <div className="flex-1 overflow-y-auto p-0"> 
+          <div className="w-full min-h-full h-auto text-black">
             <Outlet /> 
           </div>
         </div>

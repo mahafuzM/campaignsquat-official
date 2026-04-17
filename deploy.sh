@@ -34,7 +34,6 @@ rsync -azP -e "ssh -p $PORT -o StrictHostKeyChecking=no" \
 echo "⚙️ Uploading Backend Files to nodejs/server..."
 rsync -azP -e "ssh -p $PORT -o StrictHostKeyChecking=no" \
   --exclude 'node_modules' \
-  --exclude '.env' \
   --exclude 'uploads' \
   server/ $USER@$HOST:$BACKEND_DIR/
 

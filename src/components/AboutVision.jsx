@@ -39,7 +39,7 @@ const AboutVision = () => {
   }, []);
 
   return (
-    <section className="w-full bg-[#02050A] py-12 md:py-24 font-poppins overflow-hidden pt-4 md:pt-6">
+    <section className="w-full bg-[#02050A] py-8 md:py-14 font-poppins overflow-hidden pt-4 md:pt-6">
       <div className="max-w-[1445px] mx-auto px-2 md:px-16 lg:px-24">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-20">
           {/* LEFT SIDE: Image */}

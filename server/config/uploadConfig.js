@@ -7,8 +7,28 @@ const fs = require("fs");
  * Saves images to public_html/uploads for direct LiteSpeed serving
  */
 
-// Absolute path to the public_html/uploads directory
-const uploadDir = path.resolve(__dirname, "../../../public_html/uploads");
+/**
+ * Bulletproof Multi-Server Upload Directory Resolution (Lifetime Fix)
+ */
+let uploadDir;
+
+if (process.env.UPLOAD_DIR_PATH) {
+  // 1. Highest Priority: Explicit .env path (Works for AWS/VPS/Custom)
+  uploadDir = path.resolve(process.env.UPLOAD_DIR_PATH);
+} else {
+  // 2. Probing for Shared Hosting (Hostinger / cPanel Architecture)
+  // Backtracking from `nodejs/server/config` -> `nodejs/server` -> `nodejs` -> `domain_root`
+  const sharedHostingRoot = path.resolve(__dirname, "../../../public_html");
+  
+  if (fs.existsSync(sharedHostingRoot)) {
+    // If public_html exists exactly 3 levels up, use it automatically!
+    uploadDir = path.join(sharedHostingRoot, "uploads");
+  } else {
+    // 3. Fallback: Local Development / Standard Docker Environment
+    // Saves to `server/uploads`
+    uploadDir = path.resolve(__dirname, "../uploads");
+  }
+}
 
 // Ensure the directory exists
 if (!fs.existsSync(uploadDir)) {
@@ -46,3 +66,5 @@ const upload = multer({
 });
 
 module.exports = upload;
+module.exports.upload = upload;
+module.exports.uploadDir = uploadDir;

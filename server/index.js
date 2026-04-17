@@ -142,20 +142,10 @@ if (admin) {
 });
 
 // ৪. স্ট্যাটিক ফোল্ডার ও আপলোড কনফিগারেশন
-// Hostinger এর জন্য সরাসরি public_html/uploads এ সেভ করা হবে যাতে LiteSpeed সরাসরি সার্ভ করতে পারে
-const uploadDir = path.resolve(__dirname, "../../public_html/uploads");
+const { uploadDir, upload } = require("./config/uploadConfig");
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
 app.use("/uploads", express.static(uploadDir));
-app.use("/api/uploads", express.static(uploadDir)); // Fix for Vite proxy requests
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname.replace(/\s/g, "_")),
-});
-const upload = multer({ storage });
+app.use("/api/uploads", express.static(uploadDir));
 
 app.post("/api/upload", upload.single("file"), (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
@@ -186,6 +176,7 @@ app.use("/api/faqs", require("./routes/faqRoutes"));
 app.use("/api/contacts", require("./routes/contactRoutes"));
 app.use("/api/about-content", require("./routes/aboutContentRoutes"));
 app.use("/api/about-vision", require("./routes/aboutvisionRoutes"));
+app.use("/api/about-vision-m", require("./routes/aboutVisionRouterM"));
 app.use("/api/about-gallery", require("./routes/aboutGalleryRoutes"));
 app.use("/api/about-mission", require("./routes/aboutMissionRoutes"));
 app.use("/api/about-features", require("./routes/aboutFeatureRoutes"));
@@ -201,6 +192,7 @@ app.use("/api/footer", require("./routes/footerRoutes"));
 app.use("/api/contact-menu", require("./routes/contactMenuRoutes"));
 app.use("/api/other-pages", require("./routes/otherPageRouter"));
 app.use('/api/admin', require('./routes/adminRoute'));
+app.use('/api/auth', require('./routes/authRoutes'));
 app.use("/api/pricing", require("./routes/pricingRoutes")); 
 app.use("/api/creative-services", require("./routes/creativeServiceRoutes"));
 app.use('/api/technical-edge', require('./routes/technicalEdgeRoutes'));

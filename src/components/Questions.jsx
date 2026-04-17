@@ -31,14 +31,15 @@ const Questions = () => {
   if (loading) return null;
 
   return (
-    <section className="w-full bg-[#02050A] py-8 md:py-10 overflow-hidden font-poppins">
-      <div className="max-w-[1445px] mx-auto px-4 sm:px-10 md:px-16">
+    <section className="w-full bg-[#000000] py-16 md:py-24 font-['Poppins'] overflow-hidden border-t border-white/5 relative">
+      <div className="max-w-[1350px] mx-auto px-4 sm:px-6 relative z-10">
         {/* Header Section */}
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-[26px] md:text-[32px] lg:text-[40px] font-semibold text-white mb-4 md:mb-8 leading-[1.2]">
-            Just Ask Us Some Questions
+        <div className="flex flex-col items-center text-center mb-12 md:mb-20 px-2">
+          <h2 className="text-[32px] md:text-[45px] lg:text-[50px] font-extrabold tracking-tight leading-tight text-white mb-2">
+            Just Ask Us <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F7A400] via-[#ffd670] to-[#00ffd1] animate-text-shimmer bg-[length:200%_auto]">Some Questions</span>
           </h2>
-          <p className="text-white text-[16px] md:text-[20px] max-w-2xl mx-auto font-light">
+          <div className="w-24 h-1 bg-[#F7A400] mt-4 rounded-full shadow-[0_0_10px_#F7A400]"></div>
+          <p className="text-white/60 text-[15px] sm:text-[16px] md:text-[18px] mt-6 max-w-[95%] md:max-w-3xl leading-relaxed font-medium">
             Quick answers to your most frequent inquiries
           </p>
         </div>
@@ -101,6 +102,14 @@ const Questions = () => {
           ))}
         </div>
       </div>
+      
+      <style>{`
+        @keyframes textShimmer {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
+        }
+        .animate-text-shimmer { animation: textShimmer 4s linear infinite; }
+      `}</style>
     </section>
   );
 };

@@ -3,14 +3,10 @@ const router = express.Router();
 const megaMenuController = require('../controllers/megaMenuController');
 const upload = require('../config/uploadConfig');
 
-// --- ✅ মাল্টি-আপলোড লজিক ---
+// Multi-upload middleware — multer is handled inside uploadConfig
 const multiUpload = (req, res, next) => {
     upload.any()(req, res, function (err) {
-        if (err instanceof multer.MulterError) {
-            // মাল্টার স্পেসিফিক এরর (যেমন: ফাইল সাইজ বড়)
-            return res.status(400).json({ message: "Multer Error: " + err.message });
-        } else if (err) {
-            // কাস্টম এরর (যেমন: ভুল ফাইল টাইপ)
+        if (err) {
             return res.status(400).json({ message: err.message });
         }
         next();

@@ -52,7 +52,7 @@ const ApplyjobPage = () => {
       // ১. ব্যাকএন্ডে ডেটা পাঠানো (Dynamic (axios.defaults.baseURL || "") use kora hoyeche)
       await axios.post(`/api/applications/apply`, formDataObj, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          
         },
       });
 
