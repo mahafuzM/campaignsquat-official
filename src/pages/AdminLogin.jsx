@@ -20,20 +20,14 @@ const AdminLogin = () => {
     }
   }, [navigate]);
 
-  const handleLogin = async (e) => {
+const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    // --- 🌍 Dynamic API URL Logic ---
-    // Local-e thakle 5000 port-e call hobe, hosting-e thakle api sub-domain-e
-    const API_BASE_URL =
-      window.location.hostname === "localhost"
-        ? "http://localhost:5000"
-        : "/api";
-
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/admin-login`, {
+      // ✅ এখানে আলাদা করে URL দেওয়ার দরকার নেই, baseURL অটোমেটিক বসে যাবে
+      const response = await axios.post("/admin-login", {
         email: email.trim().toLowerCase(),
         password: password,
       });
@@ -42,17 +36,13 @@ const AdminLogin = () => {
         const token = response.data.token;
         localStorage.setItem("adminToken", token);
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-        // Use window.location for a clean redirect on both local/hosting
         window.location.href = "/admin";
       } else {
         setError("Invalid response from server.");
       }
     } catch (err) {
       console.error("Login Error:", err);
-      // Detailed error message handling
-      const msg =
-        err.response?.data?.message || "Login failed. Server is unreachable!";
+      const msg = err.response?.data?.message || "Login failed. Server is unreachable!";
       setError(msg);
     } finally {
       setLoading(false);
