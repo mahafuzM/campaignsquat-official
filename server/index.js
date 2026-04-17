@@ -1,13 +1,11 @@
-const result = require("dotenv").config(); // <--- Eita ekdom shuru-te thakbe
+const result = require("dotenv").config();
 
 if (result.error) {
   console.error("❌ .env load korte error hochche:", result.error);
 } else {
-  // Terminal-e dekhabe ki ki load holo
   console.log("✅ .env theke variable load hoyeche:", Object.keys(result.parsed));
 }
 
-require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -19,7 +17,7 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-// ১. মিডলওয়্যার কনফিগারেশন (Optimized for Production & Local)
+// ১. মিডলওয়্যার কনফিগারেশন
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
@@ -31,14 +29,13 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // লোকাল এবং প্রোডাকশন উভয় ক্ষেত্রে এলাউ করার জন্য
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
       return callback(new Error("CORS policy error"), false);
     },
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // X-Requested-With যোগ করা হলো
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     credentials: true,
   })
 );
@@ -63,7 +60,7 @@ const authenticateAdmin = (req, res, next) => {
   }
 };
 
-// --- 🔑 Admin Login Route (Database + ENV Hybrid) ---
+// --- 🔑 Admin Login Route ---
 app.post("/api/admin-login", async (req, res) => {
   try {
     const inputEmail = req.body.email?.trim().toLowerCase();
@@ -73,49 +70,32 @@ app.post("/api/admin-login", async (req, res) => {
       return res.status(400).json({ success: false, message: "Email and password are required!" });
     }
 
-    // প্রথমে ডাটাবেসে চেক করবে
     let admin = await Admin.findOne({ email: inputEmail });
-
     let isMatch = false;
     if (admin) {
-      // যদি ডাটাবেসে অ্যাডমিন থাকে, পাসওয়ার্ড ম্যাচ করবে
       isMatch = await bcrypt.compare(inputPassword, admin.password);
     } else {
-      // যদি ডাটাবেসে না থাকে, তবে .env এর সাথে চেক করবে
       const envEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
       const envPass = process.env.ADMIN_PASSWORD?.trim();
-
       if (envEmail && envPass && inputEmail === envEmail && inputPassword === envPass) {
         isMatch = true;
       }
     }
 
     if (isMatch) {
-      // Security Check: Ensure JWT_SECRET exists to avoid 500 error
       if (!process.env.JWT_SECRET) {
-        console.error("❌ Error: JWT_SECRET is not defined in .env file!");
         return res.status(500).json({ success: false, message: "Server Configuration Error: Missing Secret." });
       }
-
       const token = jwt.sign(
         { role: "admin", email: inputEmail },
         process.env.JWT_SECRET,
-        { expiresIn: "24h" } // Hosting-er jonno time ektu bariye 24h kora holo
+        { expiresIn: "24h" }
       );
-
-      return res.json({
-        success: true,
-        token,
-        message: "Access Granted! Welcome Back.",
-      });
+      return res.json({ success: true, token, message: "Access Granted! Welcome Back." });
     } else {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid Email or Security Key!",
-      });
+      return res.status(401).json({ success: false, message: "Invalid Email or Security Key!" });
     }
   } catch (err) {
-    console.error("🔥 Login Error:", err);
     res.status(500).json({ success: false, message: "Internal Server Error: " + err.message });
   }
 });
@@ -129,8 +109,7 @@ app.use("/uploads", express.static(uploadDir));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) =>
-    cb(null, Date.now() + "-" + file.originalname.replace(/\s/g, "_")),
+  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname.replace(/\s/g, "_")),
 });
 const upload = multer({ storage });
 
@@ -139,7 +118,7 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
   res.status(200).json({ url: `/uploads/${req.file.filename}` });
 });
 
-// ৪. রাউট ইম্পোর্টস (সবগুলো এখানে আছে)
+// ৪. এপিআই রাউট ইম্পোর্টস
 app.use("/api/hero", require("./routes/heroRoutes"));
 app.use("/api/gtm-config", require("./routes/gtmRoutes"));
 app.use("/api/seo-settings", require("./routes/seoRoutes"));
@@ -174,16 +153,29 @@ app.use('/api/technical-edge', require('./routes/technicalEdgeRoutes'));
 app.use('/api/projects', require('./routes/projectAllruter'));
 app.use("/api/agency-comparison", require("./routes/agencyComparisonRoutes"));
 
-// ৫. ডাটাবেস কানেকশন (With timeout for hosting)
+// --- ৫. ফ্রন্টএন্ড সার্ভ করার লজিক (নতুন যোগ করা হয়েছে) ---
+// আপনার ফাইল স্ট্রাকচার অনুযায়ী 'dist' ফোল্ডারটি 'server' এর এক লেভেল উপরে আছে।
+const frontendDistPath = path.join(__dirname, "../dist");
+app.use(express.static(frontendDistPath));
+
+// সব রুটকে index.html এ পাঠানো (SPA Routing এর জন্য)
+app.get("*", (req, res) => {
+  // যদি API রিকোয়েস্ট না হয়, তবেই ইন্ডেক্স ফাইল পাঠাবে
+  if (!req.path.startsWith("/api")) {
+    res.sendFile(path.join(frontendDistPath, "index.html"));
+  }
+});
+
+// ৬. ডাটাবেস কানেকশন
 mongoose.set("strictQuery", false);
 mongoose
   .connect(process.env.MONGO_URI, {
-    serverSelectionTimeoutMS: 10000, // 10 seconds timeout
+    serverSelectionTimeoutMS: 10000,
   })
   .then(() => console.log("✅ MongoDB Connected!"))
   .catch((err) => console.error("❌ DB Error:", err));
 
-// ৬. এরর হ্যান্ডলিং
+// ৭. এরর হ্যান্ডলিং
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ success: false, message: "Something went wrong!" });
@@ -192,7 +184,7 @@ app.use((err, req, res, next) => {
 process.on("uncaughtException", (err) => console.error("Uncaught Error:", err));
 process.on("unhandledRejection", (reason) => console.error("Unhandled Rejection:", reason));
 
-// ৭. সার্ভার লিসেনিং (Optimized for Production)
+// ৮. সার্ভার লিসেনিং
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, "0.0.0.0", () => {
