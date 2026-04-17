@@ -24,9 +24,9 @@ import { Toaster } from "react-hot-toast";
 // // ✅ বিকল্প পদ্ধতি (সবচেয়ে সেফ)
 axios.defaults.baseURL =
   window.location.hostname === "localhost" 
-    ? "http://localhost:5000" // লোকাল ব্যাকএন্ড পোর্ট
-    : "https://campaignsquat.com"; // এখানে /api দেওয়ার দরকার নেই যদি আপনার রাউটগুলো app.use("/api/...") দিয়ে শুরু হয়।
-
+    ? "http://localhost:5000/api" 
+    : "https://campaignsquat.com/api";
+    
 // 🛡️ Axios Interceptor
 axios.interceptors.request.use((config) => {
   const token = localStorage.getItem("adminToken");
