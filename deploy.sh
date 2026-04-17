@@ -6,9 +6,10 @@ echo "🚀 Starting Deployment to Hostinger..."
 USER="u263673950"
 HOST="212.85.30.245"
 PORT="65002"
-REMOTE_DIR="/home/u263673950/domains/campaignsquat.com/nodejs/server"
-NVM_PATH="\$HOME/.nvm/nvm.sh"
-NODE_PATH="\$HOME/node-v20.12.2-linux-x64/bin"
+
+# Destination directories on server
+FRONTEND_DIR="/home/u263673950/domains/campaignsquat.com/public_html"
+BACKEND_DIR="/home/u263673950/domains/campaignsquat.com/nodejs/server"
 
 # 1. Build the frontend
 echo "📦 Building Frontend (React)..."
@@ -21,41 +22,28 @@ if [ $? -ne 0 ]; then
 fi
 echo "✅ Frontend built successfully."
 
-# 2. Upload Frontend (dist folder) - preserve server-side files
-echo "🌐 Uploading Frontend Files..."
-rsync -az -e "ssh -p $PORT -o StrictHostKeyChecking=no" \
+# 2. Upload Frontend (dist/* to public_html/)
+echo "🌐 Uploading Frontend Files to public_html..."
+rsync -azP -e "ssh -p $PORT -o StrictHostKeyChecking=no" \
   --exclude '.htaccess' \
-  --exclude 'proxy.php' \
   --exclude 'uploads' \
-  --exclude 'server' \
-  dist/ $USER@$HOST:$REMOTE_DIR/
+  --exclude 'nodejs' \
+  dist/ $USER@$HOST:$FRONTEND_DIR/
 
-# 3. Upload Backend (server folder) - exclude uploads to preserve images
-echo "⚙️ Uploading Backend Files..."
-rsync -az -e "ssh -p $PORT -o StrictHostKeyChecking=no" \
+# 3. Upload Backend (server/* to nodejs/server/)
+echo "⚙️ Uploading Backend Files to nodejs/server..."
+rsync -azP -e "ssh -p $PORT -o StrictHostKeyChecking=no" \
   --exclude 'node_modules' \
   --exclude '.env' \
   --exclude 'uploads' \
-  server/ $USER@$HOST:$REMOTE_DIR/server/
+  server/ $USER@$HOST:$BACKEND_DIR/
 
-# 4. Install dependencies & restart server via PM2
-echo "🔄 Restarting Backend Server..."
-ssh -p $PORT -o StrictHostKeyChecking=no $USER@$HOST << 'ENDSSH'
-  export PATH=$HOME/node-v20.12.2-linux-x64/bin:$PATH
-  cd /home/u263673950/domains/campaignsquat.com/public_html/server
-  npm install --production --silent
-  if PM2_HOME=$HOME/.pm2 pm2 list | grep -q "campaignsquat"; then
-    PM2_HOME=$HOME/.pm2 pm2 restart campaignsquat
-    echo "🔄 PM2 process restarted."
-  else
-    PM2_HOME=$HOME/.pm2 pm2 start index.js --name "campaignsquat"
-    PM2_HOME=$HOME/.pm2 pm2 save
-    echo "🆕 PM2 process started fresh."
-  fi
-ENDSSH
-
+# 4. Success message & calling restart script
 echo ""
 echo "✅ ============================="
-echo "✅  Deployment Successful! 🎉"
-echo "✅  Live at: https://campaignsquat.com"
+echo "✅  Files Uploaded Successfully!"
+echo "🔄  Triggering Server Restart..."
 echo "✅ ============================="
+
+./restart-server.sh
+

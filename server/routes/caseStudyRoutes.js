@@ -1,23 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
 const caseStudyController = require('../controllers/caseStudyController');
-
-// ১. ইমেজ স্টোরেজ কনফিগারেশন
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, '../uploads/'); 
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-
-const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 } 
-});
+const upload = require('../config/uploadConfig');
 
 /**
  * 🛣️ Routes Definition

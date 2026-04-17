@@ -1,17 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
 const processController = require('../controllers/processController');
-
-// ইমেজ আপলোড কনফিগারেশন
-const storage = multer.diskStorage({
-    destination: 'uploads/',
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-const upload = multer({ storage });
+const upload = require('../config/uploadConfig');
 
 // এপিআই রুটস
 router.get('/', processController.getSteps); // সব ডাটা দেখা

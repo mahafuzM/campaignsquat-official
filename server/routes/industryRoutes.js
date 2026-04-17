@@ -1,18 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
 const industryController = require('../controllers/industryController');
-
-// ইমেজ সেভ করার কনফিগারেশন
-const storage = multer.diskStorage({
-    destination: 'uploads/',
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-
-const upload = multer({ storage });
+const upload = require('../config/uploadConfig');
 
 // ১. নতুন ডাটা অ্যাড করার রুট
 router.post('/', upload.fields([

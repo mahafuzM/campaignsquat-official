@@ -1,22 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
 const projectAllcontrollers = require('../controllers/projectAllcontrollers');
-
-// Multer Storage Setup
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // নিশ্চিত করুন আপনার রুট ডিরেক্টরিতে 'uploads' নামে একটি ফোল্ডার আছে
-    cb(null, '../uploads/'); 
-  },
-  filename: (req, file, cb) => {
-    // ফাইলের নাম ইউনিক করার জন্য টাইমস্ট্যাম্প + অরিজিনাল এক্সটেনশন
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ storage: storage });
+const upload = require('../config/uploadConfig');
 
 // --- Routes ---
 

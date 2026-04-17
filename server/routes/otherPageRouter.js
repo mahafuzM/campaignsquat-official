@@ -1,20 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const otherPageController = require('../controllers/otherPageController');
-const multer = require('multer');
-const fs = require('fs');
-
-// আপলোড ফোল্ডার না থাকলে তৈরি করা
-if (!fs.existsSync('uploads/')) {
-    fs.mkdirSync('uploads/');
-}
-
-// ইমেজ আপলোড কনফিগারেশন
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, '../uploads/'),
-    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname.replace(/\s/g, "_"))
-});
-const upload = multer({ storage });
+const upload = require('../config/uploadConfig');
 
 // ✅ ইমেজ কনফিগারেশন (সেকশন ১-৭ পর্যন্ত ইমেজ আছে, ৮ এবং ৯ এ শুধু টেক্সট)
 const multiUpload = upload.fields([

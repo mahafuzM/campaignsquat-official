@@ -1,14 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
-const multer = require('multer');
-
-// ইমেজ আপলোড কনফিগারেশন
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, '../uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
-});
-const upload = multer({ storage });
+const upload = require('../config/uploadConfig');
 
 // --- 🛠️ Data Parsing Middleware (এটি যোগ করা হয়েছে) ---
 // এটি স্ট্রিং হিসেবে আসা contentSections এবং testimonials-কে অবজেক্টে রূপান্তর করবে
