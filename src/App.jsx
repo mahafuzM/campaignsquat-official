@@ -21,10 +21,12 @@ import TagManager from "react-gtm-module";
 import "react-quill/dist/quill.snow.css";
 import { Toaster } from "react-hot-toast";
 
-// ✅ এটি হুবহু কপি করে বসান
+// // ✅ বিকল্প পদ্ধতি (সবচেয়ে সেফ)
 axios.defaults.baseURL =
-  window.location.hostname === "localhost" ? "http://localhost:5000" : "/api";
-
+  window.location.hostname === "localhost" 
+    ? "http://localhost:5000/api" 
+    : "https://campaignsquat.com/api";
+    
 // 🛡️ Axios Interceptor
 axios.interceptors.request.use((config) => {
   const token = localStorage.getItem("adminToken");
