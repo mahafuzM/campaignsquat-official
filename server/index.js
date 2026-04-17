@@ -29,6 +29,18 @@ console.log("🔗 DB URI status:", !!process.env.MONGO_URI);
 
 const app = express();
 
+// ৭. ডাটাবেস কানেকশন (সবার আগে কানেক্ট হবে)
+mongoose.set("strictQuery", false);
+mongoose
+  .connect(process.env.MONGO_URI, {
+    serverSelectionTimeoutMS: 20000, 
+    socketTimeoutMS: 45000, 
+    connectTimeoutMS: 30000, 
+    family: 4 
+  })
+  .then(() => console.log("✅ MongoDB Connected!"))
+  .catch((err) => console.error("❌ DB Error:", err));
+
 // ২. মিডলওয়্যার কনফিগারেশন (CORS Error Fix)
 const allowedOrigins = [
   "http://localhost:5173",
@@ -204,18 +216,6 @@ app.get("*", (req, res) => {
     res.status(404).json({ success: false, message: "API route not found" });
   }
 });
-
-// ৭. ডাটাবেস কানেকশন
-mongoose.set("strictQuery", false);
-mongoose
-  .connect(process.env.MONGO_URI, {
-    serverSelectionTimeoutMS: 20000, // Increase to 20s
-    socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
-    connectTimeoutMS: 30000, // Give up initial connection after 30s
-    family: 4 // Force IPv4 to avoid hostinger DNS/IPv6 issues if any
-  })
-  .then(() => console.log("✅ MongoDB Connected!"))
-  .catch((err) => console.error("❌ DB Error:", err));
 
 // ৮. এরর হ্যান্ডলিং
 app.use((err, req, res, next) => {

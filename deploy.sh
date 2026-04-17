@@ -6,7 +6,7 @@ echo "🚀 Starting Deployment to Hostinger..."
 USER="u263673950"
 HOST="212.85.30.245"
 PORT="65002"
-REMOTE_DIR="/home/u263673950/domains/campaignsquat.com/public_html"
+REMOTE_DIR="/home/u263673950/domains/campaignsquat.com/nodejs/server"
 NVM_PATH="\$HOME/.nvm/nvm.sh"
 NODE_PATH="\$HOME/node-v20.12.2-linux-x64/bin"
 
