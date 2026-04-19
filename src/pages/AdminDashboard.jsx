@@ -51,6 +51,12 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
+  // User Profile State
+  const [user, setUser] = useState({
+    name: "System Admin",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+  });
+
   // Menu Open States
   const [openMenus, setOpenMenus] = useState({
     home: true,
@@ -76,6 +82,13 @@ const AdminDashboard = () => {
       if (token) {
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
+
+          // Update user state from token payload
+          setUser({
+            name: payload.name || "System Admin",
+            avatar: payload.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+          });
+
           const expiryTime = payload.exp * 1000; 
           const currentTime = Date.now();
 
@@ -100,6 +113,7 @@ const AdminDashboard = () => {
       }
     };
 
+    checkTokenExpiration(); // Initial check
     const interval = setInterval(checkTokenExpiration, 10000); 
     return () => clearInterval(interval);
   }, [navigate]);
@@ -245,16 +259,16 @@ const AdminDashboard = () => {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="text-sm font-bold text-gray-800 tracking-tight">System Admin</p>
+              <p className="text-sm font-bold text-gray-800 tracking-tight">{user.name}</p>
               <div className="flex items-center justify-end gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                 <p className="text-[10px] text-green-600 font-semibold uppercase tracking-wider">Online</p>
               </div>
             </div>
             <img 
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" 
+              src={user.avatar} 
               alt="Admin Profile" 
-              className="w-10 h-10 rounded-lg shadow-md border border-[#222] object-cover"
+              className="w-10 h-10 rounded-lg shadow-md border border-[#eee] object-cover bg-gray-100"
             />
           </div>
         </header>

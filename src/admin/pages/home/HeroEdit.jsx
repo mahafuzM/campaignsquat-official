@@ -14,7 +14,7 @@ const HeroEdit = () => {
     badge: "",
     heading: "",
     paragraph: "",
-    vimeoId: "",
+    videoUrl: "",
     imageUrl: "",
   });
 
@@ -28,7 +28,7 @@ const HeroEdit = () => {
             badge: heroData.badge || "",
             heading: heroData.heading || "",
             paragraph: heroData.paragraph || "",
-            vimeoId: heroData.vimeoId || "",
+            videoUrl: heroData.videoUrl || heroData.vimeoId || "",
             imageUrl: heroData.imageUrl || "",
           });
 
@@ -93,7 +93,7 @@ const HeroEdit = () => {
     formData.append("badge", content.badge);
     formData.append("heading", content.heading);
     formData.append("paragraph", content.paragraph);
-    formData.append("vimeoId", content.vimeoId);
+    formData.append("videoUrl", content.videoUrl);
     if (selectedFile) formData.append("heroImage", selectedFile);
 
     try {
@@ -162,17 +162,17 @@ const HeroEdit = () => {
               />
             </div>
 
-            {/* Vimeo Config */}
+            {/* Video Link Config */}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Vimeo Integration ID</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Video Link (YouTube / Vimeo)</label>
               <input
                 type="text"
                 className="w-full p-3 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#F7A400] text-sm text-gray-900 transition-colors shadow-sm font-mono"
-                value={content.vimeoId}
-                placeholder="e.g. 845942363"
-                onChange={(e) => setContent({ ...content, vimeoId: e.target.value })}
+                value={content.videoUrl}
+                placeholder="e.g. https://www.youtube.com/watch?v=..."
+                onChange={(e) => setContent({ ...content, videoUrl: e.target.value })}
               />
-              <p className="text-xs text-gray-400 mt-1">Numerical ID of the video displayed on the play button popup.</p>
+              <p className="text-xs text-gray-400 mt-1">Full link of the video to be displayed below the Start Project button.</p>
             </div>
             
           </div>

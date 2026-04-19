@@ -1,50 +1,57 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../../axiosConfig";
+import toast from "react-hot-toast";
 import {
-  FaTrash,
-  FaEye,
-  FaFilePdf,
-  FaPhoneAlt,
-  FaSearch,
-  FaCalendarAlt,
-  FaClock,
-  FaBriefcase,
-  FaDownload,
-} from "react-icons/fa";
+  Trash2,
+  Eye,
+  FileText,
+  Phone,
+  Search,
+  Calendar,
+  Clock,
+  Briefcase,
+  Download,
+  Loader2,
+  CheckSquare,
+  Square,
+  Filter,
+  Users,
+  CheckCircle,
+  MoreVertical,
+  ChevronRight
+} from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const AdminApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [deletingId, setDeletingId] = useState(null);
 
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const searchTerm = queryParams.get("search") || "";
 
-  // ✅ Local vs Production Dynamic API URL
-  
+  useEffect(() => {
+    fetchApplications();
+  }, []);
 
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/applications/all`);
-      // Data safety parsing
+      const response = await axios.get("/api/applications/all");
       const actualData = Array.isArray(response.data)
         ? response.data
         : response.data.data || [];
       setApplications(actualData);
     } catch (error) {
-      console.error("Fetch Error:", error.response?.data || error.message);
+      console.error("Fetch Error:", error);
+      toast.error("Failed to load applications");
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchApplications();
-  }, []);
 
   const handleDownloadCSV = () => {
     const dataToExport =
@@ -52,7 +59,7 @@ const AdminApplications = () => {
         ? applications.filter((app) => selectedIds.includes(app._id))
         : filteredApplications;
 
-    if (dataToExport.length === 0) return alert("No data to export!");
+    if (dataToExport.length === 0) return toast.error("No data to export!");
 
     const headers = [
       "Name",
@@ -84,17 +91,22 @@ const AdminApplications = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    toast.success("CSV Exported successfully!");
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this candidate?")) {
-      try {
-        await axios.delete(`/api/applications/${id}`);
-        setApplications(applications.filter((app) => app._id !== id));
-        setSelectedIds(selectedIds.filter((sid) => sid !== id));
-      } catch (error) {
-        alert("Failed to delete.");
-      }
+    if (!window.confirm("Are you sure you want to delete this candidate?")) return;
+
+    setDeletingId(id);
+    try {
+      await axios.delete(`/api/applications/${id}`);
+      setApplications(applications.filter((app) => app._id !== id));
+      setSelectedIds(selectedIds.filter((sid) => sid !== id));
+      toast.success("Candidate deleted!");
+    } catch (error) {
+      toast.error("Failed to delete.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -117,11 +129,11 @@ const AdminApplications = () => {
     );
   });
 
-  const toggleSelectAll = (e) => {
-    if (e.target.checked) {
-      setSelectedIds(filteredApplications.map((app) => app._id));
-    } else {
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredApplications.length && filteredApplications.length > 0) {
       setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredApplications.map((app) => app._id));
     }
   };
 
@@ -131,219 +143,209 @@ const AdminApplications = () => {
     );
   };
 
+  const inputClass = "w-full border border-gray-200 outline-none focus:border-[#F7A400] transition-colors bg-gray-50 focus:bg-white text-gray-900 shadow-sm text-[13px] p-2 rounded";
+  const labelClass = "text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50/30 flex flex-col items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#F7A400] mb-2" />
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Scanning Database...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-4 md:p-8 bg-white min-h-screen text-black font-poppins">
-      {/* Header Section */}
-      <div className="flex flex-col gap-6 mb-10 border-b border-gray-100 pb-8">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-black text-black tracking-tighter">
-              JOB <span className="text-[#F7A400]">APPLICATIONS</span>
-            </h1>
-            <p className="text-blacl text-[12px] mt-2">
-              Campaignsquat Ltd. Management
-            </p>
+    <div className="w-full max-w-7xl mx-auto p-4 md:p-6 font-sans">
+      
+      {/* Compact Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-100 pb-4 mb-6 sticky top-0 bg-white/90 backdrop-blur z-50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#F7A400]/10 flex items-center justify-center shrink-0 border border-[#F7A400]/20">
+            <Users className="text-[#F7A400]" size={16} />
           </div>
-          {/* --- এক্সপোর্ট বাটন যোগ করা হয়েছে --- */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleDownloadCSV}
-              className={`flex items-center gap-2 px-6 py-2 rounded-[5px] font-bold text-sm transition-all shadow-md active:scale-95 ${selectedIds.length > 0 ? "bg-[#F7A400] text-black" : "bg-black text-white"}`}
-            >
-              <FaDownload />{" "}
-              {selectedIds.length > 0
-                ? `Export (${selectedIds.length})`
-                : "Export CSV"}
-            </button>
-            <div className="bg-black text-[#F7A400] px-5 py-2 rounded-[5px] font-bold text-sm shadow-lg">
-              Total: {filteredApplications.length}
-            </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight leading-none">Job Applications</h1>
+            <p className="text-xs text-gray-500 mt-1">Review and manage candidate submissions</p>
           </div>
         </div>
+        <div className="flex items-center gap-2 mt-4 md:mt-0">
+          <button
+            onClick={handleDownloadCSV}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded font-bold text-[11px] transition-colors shadow-sm border ${selectedIds.length > 0 ? "bg-[#F7A400] text-black border-transparent" : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"}`}
+          >
+            <Download size={14} />
+            {selectedIds.length > 0 ? `Export (${selectedIds.length})` : "Export CSV"}
+          </button>
+          <div className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight">
+            {filteredApplications.length} Candidates
+          </div>
+        </div>
+      </div>
 
-        <div className="relative w-full max-w-3xl">
-          <FaSearch
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-            size={18}
-          />
+      {/* Search & Filter Bar */}
+      <div className="mb-6">
+        <div className="relative group max-w-xl">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#F7A400] transition-colors" size={16} />
           <input
             type="text"
-            placeholder="Search name, email or position..."
-            className="w-full pl-12 pr-4 py-4 border-2 border-gray-100 rounded-[5px] text-base focus:outline-none focus:border-[#F7A400] transition-all shadow-sm placeholder:text-gray-300"
+            placeholder="Quick search: name, email, or position..."
+            className="w-full bg-white border border-gray-100 p-2.5 pl-10 rounded-lg text-sm shadow-sm outline-none focus:border-[#F7A400] transition-all placeholder:text-gray-300"
             value={searchTerm}
             onChange={handleSearchChange}
           />
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-[5px] shadow-sm overflow-hidden">
+      {/* Data Grid */}
+      <div className="bg-white border border-gray-100 shadow-sm rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full border-collapse min-w-[1100px]">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200 text-[12px]  text-black font-bold ">
-                {/* --- সিলেক্ট অল চেকবক্স --- */}
-                <th className="px-6 py-4 w-10">
-                  <input
-                    type="checkbox"
-                    onChange={toggleSelectAll}
-                    checked={
-                      selectedIds.length === filteredApplications.length &&
-                      filteredApplications.length > 0
-                    }
-                    className="accent-[#F7A400] cursor-pointer"
-                  />
+              <tr className="bg-gray-50/50 border-b border-gray-100">
+                <th className="px-4 py-3 w-10 text-center">
+                  <button onClick={toggleSelectAll} className="text-[#F7A400] hover:scale-110 transition-transform">
+                    {selectedIds.length === filteredApplications.length && filteredApplications.length > 0 ? (
+                      <CheckSquare size={16} />
+                    ) : (
+                      <Square size={16} className="text-gray-300" />
+                    )}
+                  </button>
                 </th>
-                <th className="px-6 py-4">Candidate & Contact</th>
-                <th className="px-6 py-4 text-center">Applied Position</th>
-                <th className="px-6 py-4">Applied Date & Time</th>
-                <th className="px-6 py-4">Experience</th>
-                <th className="px-6 py-4">Salary (Current/Exp)</th>
-                <th className="px-6 py-4">Cover Letter</th>
-                <th className="px-6 py-4 text-center">Resume</th>
-                <th className="px-6 py-4 text-center">Action</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Candidate Details</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Position</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Experience</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Salary (Curr/Exp)</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Documents</th>
+                <th className="px-4 py-3 text-right text-[10px] font-bold text-gray-400 uppercase tracking-wider w-24">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {loading ? (
-                <tr>
-                  <td
-                    colSpan="9"
-                    className="px-6 py-20 text-center text-gray-400 animate-pulse font-medium text-lg"
-                  >
-                    Searching Database...
-                  </td>
-                </tr>
-              ) : filteredApplications.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="9"
-                    className="px-6 py-20 text-center text-gray-500 bg-gray-50/30 font-medium"
-                  >
-                    No candidates found matching "{searchTerm}"
-                  </td>
-                </tr>
-              ) : (
+            <tbody className="divide-y divide-gray-50 text-[13px]">
+              {filteredApplications.length > 0 ? (
                 filteredApplications.map((app) => (
                   <tr
                     key={app._id}
-                    className={`hover:bg-gray-50/80 transition-all ${selectedIds.includes(app._id) ? "bg-[#F7A400]/5" : ""}`}
+                    className={`hover:bg-gray-50/30 transition-colors group ${selectedIds.includes(app._id) ? "bg-[#F7A400]/5" : ""}`}
                   >
-                    {/* --- একক চেকবক্স --- */}
-                    <td className="px-6 py-5">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(app._id)}
-                        onChange={() => toggleSelectOne(app._id)}
-                        className="accent-[#F7A400] cursor-pointer"
-                      />
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="font-bold text-gray-900 text-base">
-                        {app.full_name}
-                      </div>
-                      <div className="text-gray-500 text-xs flex items-center gap-2 mt-1 lowercase">
-                        <span className="text-gray-400">📧</span> {app.email}
-                      </div>
-                      <div className="text-gray-500 text-xs flex items-center gap-2">
-                        <FaPhoneAlt size={10} className="text-[#F7A400]" />{" "}
-                        {app.phone}
-                      </div>
-                    </td>
-                    <td className="px-6 py-5 text-center">
-                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-900 text-[#F7A400] rounded-[5px] text-[11px] font-black uppercase tracking-tighter">
-                        <FaBriefcase size={12} />
-                        {app.applied_for || app.jobTitle || "GENERAL"}
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col gap-1">
-                        <div className="text-xs text-gray-700 flex items-center gap-2">
-                          <FaCalendarAlt className="text-[#F7A400]" />
-                          {app.createdAt
-                            ? new Date(app.createdAt).toLocaleDateString(
-                                "en-GB",
-                              )
-                            : "Date N/A"}
-                        </div>
-                        <div className="text-[10px] text-gray-400 flex items-center gap-2 ml-1">
-                          <FaClock size={10} />
-                          {app.createdAt
-                            ? new Date(app.createdAt).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })
-                            : "Time N/A"}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-[5px] text-[11px] font-bold shadow-sm">
-                        {app.total_exp}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col gap-1">
-                        <div className="text-xs text-gray-600 flex items-center gap-1">
-                          <span className="font-semibold text-red-500 uppercase">
-                            Current:
-                          </span>{" "}
-                          {app.current_salary}
-                        </div>
-                        <div className="text-xs text-gray-600 flex items-center gap-1">
-                          <span className="font-semibold text-green-600 uppercase">
-                            Expect:
-                          </span>{" "}
-                          {app.expected_salary}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <button
-                        onClick={() =>
-                          alert(`COVER LETTER:\n\n${app.cover_letter}`)
-                        }
-                        className="flex items-center gap-2 text-xs font-bold text-gray-700 hover:text-white hover:bg-black transition-all bg-gray-100 px-4 py-2 rounded-[5px] shadow-sm"
-                      >
-                        <FaEye size={14} /> View Letter
+                    <td className="px-4 py-4 text-center">
+                      <button onClick={() => toggleSelectOne(app._id)} className="transition-transform active:scale-95">
+                        {selectedIds.includes(app._id) ? (
+                          <CheckSquare size={16} className="text-[#F7A400]" />
+                        ) : (
+                          <Square size={16} className="text-gray-300 group-hover:text-gray-400" />
+                        )}
                       </button>
                     </td>
-                    <td className="px-6 py-5 text-center">
-                      <a
-                        href={app.cv_file}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 bg-black text-white hover:bg-[#F7A400] hover:text-black px-4 py-2 rounded-lg text-[11px] font-bold transition-all shadow-md active:scale-95"
-                      >
-                        <FaFilePdf size={14} /> PDF CV
-                      </a>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-gray-900 group-hover:text-[#F7A400] transition-colors">{app.full_name || app.fullName}</span>
+                        <div className="flex flex-col gap-0.5 mt-1">
+                          <span className="text-[10px] text-gray-500 flex items-center gap-1 lowercase italic">
+                             <span className="text-gray-400 select-none">@</span> {app.email}
+                          </span>
+                          <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                            <Phone size={10} className="text-gray-300" /> {app.phone}
+                          </span>
+                        </div>
+                      </div>
                     </td>
-                    <td className="px-6 py-5 text-center">
-                      <div className="flex items-center justify-center gap-3">
+                    <td className="px-4 py-4">
+                      <div className="flex flex-col gap-1.5">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-900 text-[#F7A400] text-[9px] font-bold w-fit uppercase tracking-tighter shadow-sm">
+                          <Briefcase size={8} /> {app.applied_for || app.jobTitle || "GENERAL"}
+                        </span>
+                        <div className="flex items-center gap-2 text-[10px] text-gray-400">
+                           <Calendar size={10} /> {app.createdAt ? new Date(app.createdAt).toLocaleDateString() : "N/A"}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                       <span className={`inline-block px-3 py-0.5 rounded text-[11px] font-bold border ${app.total_exp ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-gray-50 text-gray-400 border-gray-100'}`}>
+                        {app.total_exp || "N/A"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] text-gray-500 flex items-center gap-1">
+                          <span className="text-red-500 font-bold uppercase select-none w-8">Curr:</span> {app.current_salary}
+                        </span>
+                        <span className="text-[10px] text-gray-700 flex items-center gap-1 font-bold">
+                          <span className="text-emerald-500 font-bold uppercase select-none w-8">Exp:</span> {app.expected_salary}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-2">
                         <button
-                          onClick={() =>
-                            navigate(`/admin/application/${app._id}`)
-                          }
-                          className="p-2 bg-gray-100 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg transition-all shadow-sm"
-                          title="View Profile"
+                          onClick={() => toast((t) => (
+                            <div className="text-xs p-2">
+                              <p className="font-bold border-b border-gray-100 mb-2 pb-1 uppercase tracking-widest text-[#F7A400]">Cover Letter Preview</p>
+                              <p className="leading-relaxed text-gray-600 italic whitespace-pre-wrap max-h-40 overflow-y-auto">"{app.cover_letter}"</p>
+                              <button onClick={() => toast.dismiss(t.id)} className="mt-3 text-[10px] font-bold text-gray-400 hover:text-gray-900 border border-gray-100 px-2 py-1 rounded">CLOSE</button>
+                            </div>
+                          ), { duration: 6000 })}
+                          className="flex items-center gap-1 text-[11px] font-bold text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-white border border-gray-200 px-3 py-1 rounded transition-all"
                         >
-                          <FaEye size={16} />
+                          <FileText size={12} /> Letter
+                        </button>
+                        <a
+                          href={app.cv_file}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-1 bg-gray-900 text-white hover:bg-[#F7A400] hover:text-black px-3 py-1 rounded-[5px] text-[11px] font-bold transition-all shadow-sm active:scale-95"
+                        >
+                          <MoreVertical size={12} className="rotate-90 select-none opacity-40" /> CV
+                        </a>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1 translate-x-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                        <button
+                          onClick={() => navigate(`/admin/application/${app._id}`)}
+                          className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded transition-all"
+                          title="View Details"
+                        >
+                          <Eye size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(app._id)}
-                          className="p-2 bg-gray-100 text-red-500 hover:bg-red-500 hover:text-white rounded-[5px] transition-all shadow-sm"
-                          title="Delete Application"
+                          disabled={deletingId === app._id}
+                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
+                          title="Delete Candidate"
                         >
-                          <FaTrash size={16} />
+                          {deletingId === app._id ? <Loader2 size={16} className="animate-spin text-red-500" /> : <Trash2 size={16} />}
                         </button>
+                        <div className="w-1 h-8 bg-[#F7A400] rounded-l ml-2" />
                       </div>
                     </td>
                   </tr>
                 ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="px-4 py-20 text-center">
+                    <div className="flex flex-col items-center justify-center opacity-20">
+                      <Users size={48} className="text-gray-400" />
+                      <p className="text-xs font-bold uppercase tracking-widest mt-2">No candidates found</p>
+                    </div>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Footer Meta */}
+      <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-4">
+        <div className="flex items-center gap-2">
+          <CheckCircle size={14} className="text-emerald-500" />
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">HR System Connected</span>
+        </div>
+        <div className="flex items-center gap-4">
+           <span className="text-[10px] font-bold text-gray-300 uppercase italic">v2.8.0-TALENT-CORE</span>
+        </div>
+      </div>
+
     </div>
   );
 };

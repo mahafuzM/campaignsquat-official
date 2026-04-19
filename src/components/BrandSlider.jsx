@@ -85,7 +85,7 @@ const BrandSlider = () => {
                     alt={brand.name || "Brand"}
                     loading="lazy"
                     onError={(e) => { e.target.src = defaultBrandLogo; }}
-                    className="w-full h-full object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-500 cursor-pointer scale-90 hover:scale-100"
+                    className="w-full h-full object-contain transition-all duration-500 cursor-pointer scale-90 hover:scale-100"
                   />
                 </div>
               ))}
@@ -105,7 +105,7 @@ const BrandSlider = () => {
                     alt={brand.name || "Brand"}
                     loading="lazy"
                     onError={(e) => { e.target.src = defaultBrandLogo; }}
-                    className="w-full h-full object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-500 cursor-pointer scale-90 hover:scale-100"
+                    className="w-full h-full object-contain transition-all duration-500 cursor-pointer scale-90 hover:scale-100"
                   />
                 </div>
               ))}

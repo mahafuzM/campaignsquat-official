@@ -14,9 +14,9 @@ import {
   X,
   Plus,
   Loader2,
-  Sparkles,
   Link,
   MousePointerClick,
+  Sparkles
 } from "lucide-react";
 
 const ProductManager = () => {
@@ -40,8 +40,7 @@ const ProductManager = () => {
   const getImgUrl = (imagePath) => {
     if (!imagePath) return "";
     if (imagePath.startsWith("http")) return imagePath;
-    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
-    return cleanPath;
+    return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
   };
 
   const fetchProducts = async () => {
@@ -98,7 +97,7 @@ const ProductManager = () => {
     if (file) {
       setFormData({ ...formData, image: file });
       setPreviewUrl(URL.createObjectURL(file));
-      toast.success("Image selected! ✅");
+      toast.success("Image selected");
     }
   };
 
@@ -118,16 +117,16 @@ const ProductManager = () => {
     try {
       if (isEditing) {
         await axios.put(`/api/products/${currentId}`, data);
-        toast.success("Product Updated! ✅");
+        toast.success("Product Updated!");
       } else {
         await axios.post("/api/products/add", data);
-        toast.success("Product Added! 🚀");
+        toast.success("Product Added!");
       }
       resetForm();
       fetchProducts();
     } catch (err) {
       console.error("Submission Error:", err);
-      toast.error("Action failed! Check console for errors. ❌");
+      toast.error("Action failed.");
     } finally {
       setLoading(false);
     }
@@ -146,17 +145,15 @@ const ProductManager = () => {
     setSections(product.contentSections || []);
     setPreviewUrl(getImgUrl(product.image));
     window.scrollTo({ top: 0, behavior: "smooth" });
-    toast("Editing mode enabled", { icon: "📝" });
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this product?")) return;
     try {
       await axios.delete(`/api/products/${id}`);
-      toast.success("Product deleted! 🗑️");
+      toast.success("Product deleted");
       fetchProducts();
     } catch (err) {
-      console.error("Error deleting product:", err);
       toast.error("Delete failed!");
     }
   };
@@ -169,282 +166,202 @@ const ProductManager = () => {
     setCurrentId(null);
   };
 
-  const inputClass = "w-full bg-gray-50/50 border border-gray-200 p-3 rounded-md text-gray-900 outline-none focus:ring-2 focus:ring-[#F7A400]/20 transition-all text-sm";
-  const labelClass = "text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block";
+  const inputClass = "w-full border border-gray-200 outline-none focus:border-[#F7A400] transition-colors bg-gray-50 focus:bg-white text-gray-900 shadow-sm text-sm p-2 rounded";
+  const labelClass = "text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block";
 
   return (
-    <div className="min-h-screen bg-gray-50/30 font-poppins pb-20">
-
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm px-8 py-4 flex justify-between items-center">
+    <div className="w-full max-w-7xl mx-auto p-4 md:p-6 font-sans">
+      
+      {/* Compact Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-100 pb-4 mb-6 sticky top-0 bg-white/90 backdrop-blur z-50">
         <div className="flex items-center gap-3">
-          <div className="bg-[#F7A400]/10 p-2 rounded-md">
-            <Package className="text-[#F7A400]" size={22} />
+          <div className="w-8 h-8 rounded-lg bg-[#F7A400]/10 flex items-center justify-center shrink-0 border border-[#F7A400]/20">
+            <Package className="text-[#F7A400]" size={16} />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-gray-900">Product Manager</h1>
-            <p className="text-xs text-gray-400">{isEditing ? `Editing: ${formData.name}` : "Add a new product listing"}</p>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight leading-none">Product Manager</h1>
+            <p className="text-xs text-gray-500 mt-1">{isEditing ? `Editing: ${formData.name}` : "Product catalog & details"}</p>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex items-center gap-2 mt-4 md:mt-0">
           {isEditing && (
-            <button type="button" onClick={resetForm} className="px-5 py-2.5 rounded-md font-semibold text-sm border border-gray-200 hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-600">
-              <X size={16} /> Cancel
+            <button type="button" onClick={resetForm} className="px-3 py-1.5 rounded text-xs font-bold border border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center gap-1">
+              <X size={14} /> Cancel
             </button>
           )}
           <button
-            type="submit"
-            form="product-form"
+            onClick={handleSubmit}
             disabled={loading}
-            className="flex items-center gap-2 bg-[#F7A400] text-white px-7 py-2.5 rounded-md font-bold text-sm hover:bg-[#d98f00] transition-all shadow-sm disabled:opacity-70"
+            className="flex items-center gap-1.5 bg-[#F7A400] text-black px-4 py-1.5 rounded font-bold text-xs hover:bg-[#e59800] transition-colors shadow-sm disabled:opacity-50 border border-transparent"
           >
-            {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-            {loading ? "Processing..." : isEditing ? "Update Product" : "Add Product"}
+            {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+            {isEditing ? "Save Changes" : "Create Product"}
           </button>
         </div>
-      </header>
+      </div>
 
-      <div className="max-w-[1400px] mx-auto px-6 pt-8">
-        <form id="product-form" onSubmit={handleSubmit}>
-          <div className="flex flex-col lg:flex-row gap-8">
-
-            {/* Left Sidebar: Product Info */}
-            <aside className="w-full lg:w-[320px] shrink-0 space-y-6">
-              <div className="bg-white rounded-lg border border-gray-100 shadow-sm p-6">
-                <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] pb-3 border-b border-gray-100 mb-6">
-                  Product Info
-                </h3>
-                <div className="space-y-5">
-                  <div>
-                    <label className={labelClass}>Product Name</label>
-                    <input
-                      type="text"
-                      className={inputClass}
-                      value={formData.name}
-                      placeholder="e.g. Digital Marketing Toolkit"
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>Short Description</label>
-                    <textarea
-                      className={`${inputClass} resize-none h-24`}
-                      value={formData.description}
-                      placeholder="Describe this product briefly..."
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>Product Image {isEditing && "(Optional)"}</label>
-                    <div className="relative group border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/30 hover:border-[#F7A400] transition-all cursor-pointer overflow-hidden">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                        onChange={handleImageChange}
-                        required={!isEditing}
-                      />
-                      {previewUrl ? (
-                        <img src={previewUrl} alt="Preview" className="w-full h-40 object-cover" />
-                      ) : (
-                        <div className="py-8 text-center">
-                          <Upload className="mx-auto text-gray-300 mb-2" size={28} />
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Upload Product Image</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className={labelClass}><MousePointerClick size={10} className="inline mr-1" />Button Text</label>
-                      <input type="text" placeholder="Buy Now" className={inputClass} value={formData.buttonText}
-                        onChange={(e) => setFormData({ ...formData, buttonText: e.target.value })} />
-                    </div>
-                    <div>
-                      <label className={labelClass}><Link size={10} className="inline mr-1" />Button URL</label>
-                      <input type="text" placeholder="/order" className={inputClass} value={formData.buttonUrl}
-                        onChange={(e) => setFormData({ ...formData, buttonUrl: e.target.value })} />
-                    </div>
-                  </div>
-                </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        {/* Left Col: Setup */}
+        <div className="lg:col-span-4 space-y-4">
+          <div className="bg-white border border-gray-100 shadow-sm rounded-lg p-4 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-[#F7A400]" />
+            <h3 className="text-[11px] font-bold text-gray-900 uppercase tracking-wider mb-4 border-b border-gray-50 pb-2">Core Product Setup</h3>
+            
+            <div className="space-y-3">
+              <div>
+                <label className={labelClass}>Product Name</label>
+                <input type="text" className={inputClass} value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} placeholder="e.g. ERP System" required />
               </div>
-            </aside>
+              
+              <div>
+                <label className={labelClass}>Short Description</label>
+                <textarea className={`${inputClass} resize-none h-16`} value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} placeholder="Brief overview..." required />
+              </div>
 
-            {/* Right: Content Builder */}
-            <main className="flex-grow space-y-4">
-              <div className="bg-white rounded-lg border border-gray-100 shadow-sm p-6">
-                <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
-                  <div>
-                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                      <Layout size={18} className="text-[#F7A400]" /> Content Builder
-                    </h3>
-                    <p className="text-xs text-gray-400 mt-0.5">Build rich product description blocks</p>
-                  </div>
-                  <div className="flex gap-2 bg-gray-50 p-1.5 rounded-lg border border-gray-100">
-                    {[
-                      { type: "heading", icon: FileText, label: "Heading" },
-                      { type: "text", icon: Type, label: "Text" },
-                      { type: "list", icon: ListIcon, label: "List" },
-                    ].map(({ type, icon: Icon, label }) => (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => addSection(type)}
-                        title={`Add ${label} Block`}
-                        className="flex items-center gap-1.5 px-3 py-2 bg-white shadow-sm rounded-md text-xs font-bold text-gray-600 hover:bg-gray-50 hover:text-[#F7A400] transition-all border border-gray-100"
-                      >
-                        <Icon size={14} /> {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {sections.map((section, sIndex) => (
-                    <div key={sIndex} className="group relative bg-gray-50/50 p-5 rounded-lg border border-gray-100 hover:border-[#F7A400]/30 transition-all">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${
-                          section.type === "heading" ? "text-[#F7A400]" :
-                          section.type === "text" ? "text-blue-500" : "text-green-600"
-                        }`}>
-                          {section.type === "heading" ? "📌 Heading" : section.type === "text" ? "✏️ Text Block" : "📋 Bullet List"}
-                        </span>
-                        <button type="button" onClick={() => removeSection(sIndex)} className="p-1 text-gray-300 hover:text-red-500 transition-colors">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-
-                      {section.type !== "list" ? (
-                        <textarea
-                          value={section.value}
-                          className={`w-full bg-white border border-gray-100 p-3 rounded-md outline-none resize-none transition-all focus:border-[#F7A400]/30 ${
-                            section.type === "heading" ? "text-xl font-bold text-gray-900" : "text-sm text-gray-700 leading-relaxed"
-                          }`}
-                          rows={section.type === "heading" ? 2 : 5}
-                          placeholder={`Write your ${section.type} here...`}
-                          onChange={(e) => handleSectionChange(sIndex, "value", e.target.value)}
-                        />
-                      ) : (
-                        <div className="space-y-3">
-                          <input
-                            type="text"
-                            value={section.value}
-                            placeholder="List Section Title..."
-                            className="w-full bg-transparent border-b border-dashed border-gray-200 pb-2 font-bold text-gray-900 outline-none focus:border-[#F7A400] transition-all"
-                            onChange={(e) => handleSectionChange(sIndex, "value", e.target.value)}
-                          />
-                          <div className="space-y-2 mt-3">
-                            {section.items.map((item, iIndex) => (
-                              <div key={iIndex} className="flex items-center gap-2 bg-white p-2.5 px-3 rounded-md border border-gray-100 group/item">
-                                <div className="w-1.5 h-1.5 bg-[#F7A400] rounded-full shrink-0" />
-                                <input
-                                  type="text"
-                                  value={item}
-                                  placeholder="Bullet point..."
-                                  className="flex-1 bg-transparent outline-none text-sm text-gray-700"
-                                  onChange={(e) => handleListItemChange(sIndex, iIndex, e.target.value)}
-                                />
-                                <button type="button" onClick={() => removeListItem(sIndex, iIndex)} className="text-gray-200 hover:text-red-500 opacity-0 group-hover/item:opacity-100 transition-all">
-                                  <X size={14} />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                          <button type="button" onClick={() => addListItem(sIndex)} className="text-xs font-bold text-[#F7A400] hover:underline flex items-center gap-1 mt-2">
-                            <Plus size={12} /> Add point
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-
-                  {sections.length === 0 && (
-                    <div className="text-center py-16 border-2 border-dashed border-gray-100 rounded-lg">
-                      <Sparkles className="mx-auto text-gray-200 mb-3" size={36} strokeWidth={1} />
-                      <p className="text-gray-400 text-sm">Add content blocks to build your product description</p>
+              <div>
+                <label className={labelClass}>Thumbnail Image</label>
+                <div className="relative group border border-dashed border-gray-300 rounded bg-gray-50 hover:border-[#F7A400] transition-colors cursor-pointer overflow-hidden p-2">
+                  <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={handleImageChange} required={!isEditing} />
+                  {previewUrl ? (
+                    <img src={previewUrl} alt="Preview" className="w-full h-24 object-cover rounded-sm border border-gray-200" />
+                  ) : (
+                    <div className="h-24 flex flex-col items-center justify-center text-center">
+                      <Upload className="text-gray-400 mb-1" size={20} />
+                      <span className="text-[10px] text-gray-500 font-medium">Click to upload</span>
                     </div>
                   )}
                 </div>
               </div>
-            </main>
+
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className={labelClass}>Waitlist/Btn Text</label>
+                  <input type="text" className={inputClass} value={formData.buttonText} onChange={(e) => setFormData({...formData, buttonText: e.target.value})} placeholder="Get Demo" />
+                </div>
+                <div>
+                  <label className={labelClass}>Button URL</label>
+                  <input type="text" className={inputClass} value={formData.buttonUrl} onChange={(e) => setFormData({...formData, buttonUrl: e.target.value})} placeholder="/contact" />
+                </div>
+              </div>
+            </div>
           </div>
-        </form>
-
-        {/* Products Table */}
-        <div className="mt-10 bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-50 flex justify-between items-center">
-            <div>
-              <h3 className="font-bold text-gray-900 text-lg">Live Products</h3>
-              <p className="text-xs text-gray-400 mt-0.5">All published product listings</p>
-            </div>
-            <span className="bg-[#F7A400]/10 text-[#F7A400] border border-[#F7A400]/20 px-3 py-1 rounded-full text-xs font-bold">
-              {products.length} Products
-            </span>
-          </div>
-
-          {fetching ? (
-            <div className="py-20 flex flex-col items-center justify-center text-gray-400">
-              <Loader2 className="animate-spin mb-2" size={28} />
-              <p className="text-xs font-medium uppercase tracking-widest">Loading products...</p>
-            </div>
-          ) : (
-            <table className="w-full text-left">
-              <thead className="bg-gray-50/80">
-                <tr>
-                  <th className="px-6 py-4 text-[10px] uppercase font-black text-gray-400 tracking-widest">Thumbnail</th>
-                  <th className="px-6 py-4 text-[10px] uppercase font-black text-gray-400 tracking-widest">Product Details</th>
-                  <th className="px-6 py-4 text-[10px] uppercase font-black text-gray-400 tracking-widest text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {products.map((p) => (
-                  <tr key={p._id} className="hover:bg-gray-50/50 transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border border-gray-100 flex items-center justify-center">
-                        {p.image ? (
-                          <img src={getImgUrl(p.image)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt={p.name} />
-                        ) : (
-                          <Package size={20} className="text-gray-300" />
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="font-bold text-gray-900">{p.name}</div>
-                      <div className="text-xs text-gray-400 mt-1 line-clamp-1">{p.description}</div>
-                      {p.buttonText && (
-                        <span className="inline-flex items-center gap-1 mt-2 text-[10px] font-bold text-[#F7A400] bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">
-                          <MousePointerClick size={9} /> {p.buttonText}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                        <button onClick={() => handleEdit(p)} className="flex items-center gap-1.5 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-md font-bold text-xs hover:bg-blue-600 hover:text-white transition-all">
-                          <Edit3 size={13} /> Edit
-                        </button>
-                        <button onClick={() => handleDelete(p._id)} className="flex items-center gap-1.5 bg-red-50 text-red-500 px-3 py-1.5 rounded-md font-bold text-xs hover:bg-red-500 hover:text-white transition-all">
-                          <Trash2 size={13} /> Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-
-          {products.length === 0 && !fetching && (
-            <div className="p-20 text-center border-t border-gray-50">
-              <Package className="mx-auto text-gray-200 mb-3" size={40} strokeWidth={1} />
-              <p className="text-gray-400 text-sm italic">No products listed yet. Add your first product above!</p>
-            </div>
-          )}
         </div>
+
+        {/* Middle Col: Builder */}
+        <div className="lg:col-span-8 space-y-4">
+          <div className="bg-white border border-gray-100 shadow-sm rounded-lg p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-gray-50 pb-3">
+              <h3 className="text-[11px] font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
+                <Layout size={14} className="text-[#F7A400]" /> Content Blocks
+              </h3>
+              <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 p-1 rounded-md">
+                {[ { type: "heading", icon: FileText, label: "H3" }, { type: "text", icon: Type, label: "Text" }, { type: "list", icon: ListIcon, label: "List" } ].map(({ type, icon: Icon, label }) => (
+                  <button key={type} type="button" onClick={() => addSection(type)} className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 shadow-sm rounded text-[10px] font-bold text-gray-600 hover:text-[#F7A400] transition-colors">
+                    <Icon size={12} /> {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {sections.length === 0 ? (
+                <div className="py-8 text-center bg-gray-50 border border-dashed border-gray-200 rounded text-gray-400">
+                  <Sparkles size={24} className="mx-auto mb-2 opacity-30" />
+                  <p className="text-xs">No content blocks. Build the detailed view here.</p>
+                </div>
+              ) : (
+                sections.map((section, sIndex) => (
+                  <div key={sIndex} className="bg-gray-50 border border-gray-100 rounded-md p-3 relative group">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${section.type === 'heading' ? 'bg-amber-100 text-amber-700' : section.type === 'text' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                        {section.type} block
+                      </span>
+                      <button type="button" onClick={() => removeSection(sIndex)} className="text-gray-400 hover:text-red-500 bg-white border border-gray-200 rounded p-1 shadow-sm">
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+
+                    {section.type !== "list" ? (
+                      <textarea
+                        value={section.value}
+                        onChange={(e) => handleSectionChange(sIndex, "value", e.target.value)}
+                        placeholder={`Input your ${section.type}...`}
+                        className={`w-full outline-none border border-gray-200 p-2 text-sm rounded bg-white focus:border-[#F7A400] min-h-[40px] resize-y ${section.type === 'heading' ? 'font-bold' : ''}`}
+                        rows={section.type === 'heading' ? 1 : 3}
+                      />
+                    ) : (
+                      <div className="space-y-2 bg-white border border-gray-200 p-2 rounded">
+                        <input type="text" value={section.value} onChange={(e) => handleSectionChange(sIndex, "value", e.target.value)} placeholder="List Title (Optional)" className="w-full text-xs font-bold border-b border-gray-100 pb-1 mb-1 outline-none focus:border-[#F7A400]" />
+                        {section.items.map((item, iIndex) => (
+                          <div key={iIndex} className="flex items-center gap-1.5">
+                            <div className="w-1 h-1 bg-[#F7A400] rounded-full shrink-0"/>
+                            <input type="text" value={item} onChange={(e) => handleListItemChange(sIndex, iIndex, e.target.value)} placeholder={`Item ${iIndex + 1}`} className="flex-1 text-xs outline-none bg-gray-50 border border-gray-100 p-1.5 rounded focus:border-[#F7A400] transition-colors" />
+                            <button type="button" onClick={() => removeListItem(sIndex, iIndex)} className="text-gray-300 hover:text-red-500">
+                              <X size={14} />
+                            </button>
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => addListItem(sIndex)} className="text-[10px] text-[#F7A400] font-bold mt-1 flex items-center gap-0.5 hover:underline decoration-[#F7A400]">
+                          <Plus size={10} /> Add Item
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+          
+          {/* Active Products List (Compact Table) */}
+          <div className="bg-white border border-gray-100 shadow-sm rounded-lg p-4">
+            <h3 className="text-[11px] font-bold text-gray-900 uppercase tracking-wider mb-4 border-b border-gray-50 pb-2">Published Products Registry</h3>
+            
+            {fetching ? (
+              <div className="py-10 text-center"><Loader2 size={20} className="animate-spin text-[#F7A400] mx-auto mb-2" /><span className="text-xs text-gray-500 font-medium">Loading...</span></div>
+            ) : products.length === 0 ? (
+              <div className="py-6 text-center text-xs text-gray-400">Database empty.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left whitespace-nowrap">
+                  <thead>
+                    <tr className="bg-gray-50/80 border-y border-gray-100">
+                      <th className="py-2.5 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Image</th>
+                      <th className="py-2.5 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-full">Product Entry</th>
+                      <th className="py-2.5 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {products.map((p) => (
+                      <tr key={p._id} className="hover:bg-gray-50/50 group transition-colors">
+                        <td className="py-2 px-3 align-middle">
+                          <div className="w-9 h-9 bg-gray-100 rounded overflow-hidden border border-gray-200 flex items-center justify-center shrink-0">
+                            {p.image ? <img src={getImgUrl(p.image)} alt="IMG" className="w-full h-full object-cover" /> : <Package size={14} className="text-gray-300"/>}
+                          </div>
+                        </td>
+                        <td className="py-2 px-3 align-middle">
+                          <div className="text-xs font-bold text-gray-900">{p.name}</div>
+                          <div className="text-[10px] text-gray-500 truncate w-[200px] sm:w-[300px]">{p.description}</div>
+                        </td>
+                        <td className="py-2 px-3 align-middle text-right">
+                          <div className="flex justify-end gap-1.5">
+                            <button onClick={() => handleEdit(p)} className="p-1.5 border border-gray-200 text-gray-500 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 rounded transition-colors shadow-sm bg-white" title="Edit">
+                              <Edit3 size={14} />
+                            </button>
+                            <button onClick={() => handleDelete(p._id)} className="p-1.5 border border-gray-200 text-gray-500 hover:text-red-600 hover:bg-red-50 hover:border-red-200 rounded transition-colors shadow-sm bg-white" title="Delete">
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );

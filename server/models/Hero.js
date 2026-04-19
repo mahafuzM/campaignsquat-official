@@ -26,9 +26,9 @@ const HeroSchema = new mongoose.Schema({
     required: [true, "Paragraph content is required"],
     trim: true
   },
-  vimeoId: {
+  videoUrl: {
     type: String,
-    default: "1153559168", // আপনার ডিফল্ট ভিডিও আইডি
+    default: "", // আপনার ডিফল্ট ভিডিও লিংক বা আইডি
     trim: true
   },
   imageUrl: {

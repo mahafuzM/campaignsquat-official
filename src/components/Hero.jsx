@@ -9,7 +9,7 @@ const Hero = () => {
     heading: "Transforming Ideas into Elite Digital Products",
     paragraph:
       "Elite MERN, PHP, Laravel, Python & Digital Marketing solutions—crafted to scale your business with premium UI/UX.",
-    vimeoId: "1153559168",
+    videoUrl: "",
     imageUrl: "",
   });
 
@@ -44,7 +44,7 @@ const Hero = () => {
           setContent({
             heading: res.data.heading || content.heading,
             paragraph: res.data.paragraph || content.paragraph,
-            vimeoId: res.data.vimeoId || content.vimeoId,
+            videoUrl: res.data.videoUrl || res.data.vimeoId || content.videoUrl,
             imageUrl: finalImageUrl,
           });
         }
@@ -66,6 +66,30 @@ const Hero = () => {
     { name: "laravel", color: "#FF2D20" },
     { name: "nodejs", color: "#68A063" },
   ];
+
+  const getEmbedUrl = (url) => {
+    if (!url) return '';
+    if (url.includes('youtube.com/watch') || url.includes('youtu.be/')) {
+      let videoId = '';
+      if (url.includes('v=')) {
+        videoId = url.split('v=')[1];
+        const ampersandPosition = videoId.indexOf('&');
+        if (ampersandPosition !== -1) videoId = videoId.substring(0, ampersandPosition);
+      } else if (url.includes('youtu.be/')) {
+        videoId = url.split('youtu.be/')[1];
+        const questionPosition = videoId.indexOf('?');
+        if (questionPosition !== -1) videoId = videoId.substring(0, questionPosition);
+      }
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    if (url.includes('vimeo.com/')) {
+      let videoId = url.split('vimeo.com/')[1];
+      const questionPosition = videoId.indexOf('?');
+      if (questionPosition !== -1) videoId = videoId.substring(0, questionPosition);
+      return `https://player.vimeo.com/video/${videoId}`;
+    }
+    return url; // Assume it's already an embed link
+  };
 
   return (
     <section 
@@ -273,6 +297,21 @@ const Hero = () => {
             </button>
           </Link>
         </div>
+
+        {/* NEW: Video Embed Display Below the Button */}
+        {content.videoUrl && (
+          <div className="w-full max-w-4xl mx-auto mt-12 md:mt-16 fade-in-up relative z-30" style={{ animationDelay: "1.3s" }}>
+            <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 shadow-[0_0_40px_rgba(247,164,0,0.15)] bg-black/50 backdrop-blur-sm aspect-video">
+              <iframe
+                src={getEmbedUrl(content.videoUrl)}
+                title="Video platform embed"
+                className="absolute top-0 left-0 w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

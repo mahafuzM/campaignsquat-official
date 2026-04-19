@@ -29,10 +29,13 @@ const googleLoginService = async (credential) => {
       avatar: picture,
       role: "user", // Default role per requirement
     });
-  } else if (!user.googleId) {
-    // If user existed manually, link google account safely
-    user.googleId = googleId;
-    if (!user.avatar) user.avatar = picture;
+  } else {
+    // Sync Google ID if missing
+    if (!user.googleId) user.googleId = googleId;
+    
+    // Always sync/update avatar from Google to keep it fresh
+    user.avatar = picture || user.avatar;
+    
     await user.save();
   }
 
@@ -46,7 +49,8 @@ const googleLoginService = async (credential) => {
       id: user._id, 
       role: user.role, 
       email: user.email,
-      name: user.name
+      name: user.name,
+      avatar: user.avatar
     },
     process.env.JWT_SECRET,
     { expiresIn: "7d" } // User sessions can last longer safely

@@ -284,55 +284,57 @@ const OtherPageManager = () => {
 
   if (!mounted) return null;
 
-  const inputClass = "w-full bg-gray-50/50 border border-gray-200 p-3 rounded-md text-gray-900 outline-none focus:ring-2 focus:ring-[#F7A400]/20 transition-all text-sm";
-  const labelClass = "text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block";
+  const inputClass = "w-full border border-gray-200 outline-none focus:border-[#F7A400] transition-colors bg-gray-50 focus:bg-white text-gray-900 shadow-sm text-sm p-2 rounded";
+  const labelClass = "text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block";
 
   const SectionCard = ({ icon: Icon, number, title, children }) => (
     <div className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-      <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-50">
-        <div className="bg-[#F7A400]/10 p-2 rounded-md"><Icon size={16} className="text-[#F7A400]" /></div>
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-50 bg-gray-50/30">
+        <div className="w-6 h-6 rounded bg-[#F7A400]/10 flex items-center justify-center border border-[#F7A400]/20">
+          <Icon size={12} className="text-[#F7A400]" />
+        </div>
         <div>
-          <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest block">Section {number}</span>
-          <h3 className="font-bold text-gray-900 text-sm">{title}</h3>
+          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block leading-none mb-0.5">Section {number}</span>
+          <h3 className="font-bold text-gray-900 text-xs uppercase">{title}</h3>
         </div>
       </div>
-      <div className="p-6">{children}</div>
+      <div className="p-4">{children}</div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50/30 font-poppins pb-20">
-
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm px-8 py-4 flex justify-between items-center">
+    <div className="w-full max-w-7xl mx-auto p-4 md:p-6 font-sans">
+      
+      {/* Compact Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-100 pb-4 mb-6 sticky top-0 bg-white/90 backdrop-blur z-50">
         <div className="flex items-center gap-3">
-          <div className="bg-[#F7A400]/10 p-2 rounded-md">
-            <FileText className="text-[#F7A400]" size={22} />
+          <div className="w-8 h-8 rounded-lg bg-[#F7A400]/10 flex items-center justify-center shrink-0 border border-[#F7A400]/20">
+            <FileText className="text-[#F7A400]" size={16} />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-gray-900">Page Manager</h1>
-            <p className="text-xs text-gray-400">{editId ? `Editing: ${formData.pageTitle}` : "Create dynamic service & landing pages"}</p>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight leading-none">Page Manager</h1>
+            <p className="text-xs text-gray-500 mt-1">{editId ? `Editing: ${formData.pageTitle}` : "Create dynamic service & landing pages"}</p>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="mt-4 md:mt-0 flex gap-2">
           {editId && (
-            <button type="button" onClick={resetForm} className="px-5 py-2.5 rounded-md font-semibold text-sm border border-gray-200 hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-600">
-              <X size={16} /> Cancel
+            <button type="button" onClick={resetForm} className="flex items-center gap-1.5 bg-gray-100 text-gray-600 px-4 py-1.5 rounded font-bold text-xs hover:bg-gray-200 transition-colors shadow-sm">
+              <X size={14} /> Cancel
             </button>
           )}
           <button
             type="submit"
             form="page-form"
             disabled={loading}
-            className="flex items-center gap-2 bg-[#F7A400] text-white px-7 py-2.5 rounded-md font-bold text-sm hover:bg-[#d98f00] transition-all shadow-sm disabled:opacity-70"
+            className="flex items-center gap-1.5 bg-[#F7A400] text-black px-4 py-1.5 rounded font-bold text-xs hover:bg-[#e59800] transition-colors shadow-sm disabled:opacity-50 border border-transparent"
           >
-            {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             {loading ? "Saving..." : editId ? "Update Page" : "Deploy Page"}
           </button>
         </div>
-      </header>
+      </div>
 
-      <div className="max-w-[1200px] mx-auto px-6 pt-8">
+      <div className="space-y-6">
         <form id="page-form" onSubmit={handleSubmit} className="space-y-6">
 
           {/* ── SECTION 1: Core Identity + Hero Content ── */}
@@ -733,45 +735,61 @@ const OtherPageManager = () => {
         </form>
 
         {/* ── Page Registry ── */}
-        <div className="mt-10 bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-50 flex justify-between items-center">
+        <div className="bg-white border border-gray-100 shadow-sm rounded-lg p-4">
+          <div className="flex items-center justify-between mb-4 border-b border-gray-50 pb-2">
             <div>
-              <h3 className="font-bold text-gray-900 text-lg">Page Registry</h3>
-              <p className="text-xs text-gray-400 mt-0.5">All deployed service & landing pages</p>
+              <h3 className="text-[11px] font-bold text-gray-900 uppercase tracking-wider">Page Registry</h3>
+              <p className="text-[10px] text-gray-500 mt-0.5">All deployed service & landing pages</p>
             </div>
-            <span className="bg-[#F7A400]/10 text-[#F7A400] border border-[#F7A400]/20 px-3 py-1 rounded-full text-xs font-bold">
+            <span className="bg-[#F7A400]/10 text-[#F7A400] px-2 py-0.5 rounded text-[10px] font-bold border border-[#F7A400]/20">
               {pages.length} Pages
             </span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 p-6">
-            {pages.map((page) => (
-              <div key={page._id} className="bg-white border border-gray-100 rounded-lg p-4 hover:border-[#F7A400]/30 hover:shadow-sm transition-all group relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-0.5 bg-[#F7A400] translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300" />
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shrink-0" />
-                  <h4 className="font-bold text-sm text-gray-900 line-clamp-2 leading-tight group-hover:text-[#F7A400] transition-colors">{page.pageTitle}</h4>
-                </div>
-                <p className="text-[10px] font-mono text-gray-400 mb-4 truncate">/{page.slug}</p>
-                <div className="flex gap-2">
-                  <a href={`/p/${page.slug}`} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[10px] font-bold text-blue-500 hover:text-blue-600 transition-colors">
-                    <Eye size={11} /> View
-                  </a>
-                  <button type="button" onClick={() => startEdit(page)} className="flex items-center gap-1 text-[10px] font-bold text-[#F7A400] hover:text-[#d98f00] transition-colors ml-2">
-                    <Edit3 size={11} /> Edit
-                  </button>
-                  <button type="button" onClick={() => handleDelete(page._id)} className="flex items-center gap-1 text-[10px] font-bold text-red-400 hover:text-red-600 transition-colors ml-auto">
-                    <Trash2 size={11} /> Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-            {pages.length === 0 && (
-              <div className="col-span-4 py-16 text-center">
-                <Globe className="mx-auto text-gray-200 mb-3" size={40} strokeWidth={1} />
-                <p className="text-gray-400 text-sm italic">No pages deployed yet.</p>
-              </div>
-            )}
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left whitespace-nowrap">
+              <thead>
+                <tr className="bg-gray-50/80 border-y border-gray-100">
+                  <th className="py-2 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Page Title</th>
+                  <th className="py-2 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Slug</th>
+                  <th className="py-2 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {pages.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="py-8 text-center text-xs text-gray-400 italic">No pages deployed yet.</td>
+                  </tr>
+                ) : (
+                  pages.map((page) => (
+                    <tr key={page._id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="py-2 px-3 align-middle">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="font-bold text-xs text-gray-900">{page.pageTitle}</span>
+                        </div>
+                      </td>
+                      <td className="py-2 px-3 align-middle">
+                        <span className="text-[10px] font-mono text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">/{page.slug}</span>
+                      </td>
+                      <td className="py-2 px-3 align-middle text-right">
+                        <div className="flex justify-end gap-2 text-[10px]">
+                          <a href={`/p/${page.slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors font-semibold">
+                            <Eye size={12} /> View
+                          </a>
+                          <button type="button" onClick={() => startEdit(page)} className="flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-700 rounded hover:bg-amber-100 transition-colors font-semibold">
+                            <Edit3 size={12} /> Edit
+                          </button>
+                          <button type="button" onClick={() => handleDelete(page._id)} className="flex items-center gap-1 px-2 py-1 bg-rose-50 text-rose-600 rounded hover:bg-rose-100 transition-colors font-semibold">
+                            <Trash2 size={12} /> Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

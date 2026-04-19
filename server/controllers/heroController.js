@@ -16,7 +16,7 @@ exports.getHero = async (req, res) => {
         iconHistory: [{ name: "zap" }],
         heading: "Custom Software Engineering & High-End UI/UX Solutions",
         paragraph: "Campaignsquat Ltd delivers high-performance solutions.",
-        vimeoId: "1153559168",
+        videoUrl: "",
         imageUrl: "",
       });
     }
@@ -32,14 +32,14 @@ exports.getHero = async (req, res) => {
 // ২. Update Hero Content
 exports.updateHero = async (req, res) => {
   try {
-    const { badge, heading, paragraph, vimeoId } = req.body;
+    const { badge, heading, paragraph, videoUrl } = req.body;
     const currentHero = await Hero.findOne();
 
     let updateData = {
       badge: badge ? badge.toLowerCase().trim() : "zap",
       heading,
       paragraph,
-      vimeoId,
+      videoUrl,
     };
 
     // ইমেজ আপলোড হ্যান্ডলিং
