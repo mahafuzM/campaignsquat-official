@@ -4,7 +4,7 @@ import processImg from '../assets/images/process-img.png';
 const Agency = () => {
   return (
     /* pt-0 use kora hoyeche jate upore gap na thake, ebong -mt (negative margin) diye arektu upore tola hoyeche */
-    <section className="w-full bg-[#02050A] pt-0 pb-12 md:pb-24 -mt-4 md:-mt-8 flex justify-center items-center overflow-hidden">
+    <section className="w-full bg-[#02050A] pt-0 pb-8 md:pb-16 -mt-2 md:-mt-4 flex justify-center items-center overflow-hidden">
       
       {/* Container */}
       <div className="max-w-[1445px] w-full mx-auto px-8 sm:px-14 md:px-20 lg:px-24 flex justify-center">

@@ -78,7 +78,7 @@ const Contact = () => {
   ];
 
   return (
-    <section className="w-full bg-[#050505] py-12 md:py-18 font-poppins text-white overflow-hidden relative">
+    <section className="w-full bg-[#050505] py-8 md:py-12 font-poppins text-white overflow-hidden relative">
       {/* ----------------------------------------------------------- */}
       {/* 🌟 SUCCESS POP-UP MODAL (Screen Shot অনুসারী ডিজাইন) 🌟 */}
       {/* ----------------------------------------------------------- */}

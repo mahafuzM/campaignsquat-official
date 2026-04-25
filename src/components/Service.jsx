@@ -84,7 +84,7 @@ const Services = () => {
   }, [currentIndex, direction, isPaused, services.length, visibleCount]);
 
   return (
-    <section className="relative w-full bg-[#000000] py-16 md:py-24 font-poppins overflow-hidden border-t border-white/5">
+    <section className="relative w-full bg-[#000000] py-10 md:py-16 font-poppins overflow-hidden border-t border-white/5">
       
       {/* Background Ambient Glowing Orbs */}
       <div className="absolute inset-0 pointer-events-none flex justify-center items-center z-0">

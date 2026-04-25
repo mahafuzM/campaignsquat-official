@@ -67,7 +67,7 @@ const BrandSlider = () => {
   };
 
   return (
-    <section className="relative w-full bg-[#000000] pt-0 md:pt-4 pb-8 md:pb-16 overflow-hidden font-poppins">
+    <section className="relative w-full bg-[#000000] pt-0 pb-6 md:pb-12 overflow-hidden font-poppins">
 
       <div className="relative z-10 w-full">
         <div className="relative w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_15%,_black_85%,transparent_100%)] flex flex-col gap-6 md:gap-12">
@@ -78,14 +78,14 @@ const BrandSlider = () => {
               {[...firstRow, ...firstRow].map((brand, index) => (
                 <div
                   key={`row1-${brand._id || index}`}
-                  className="flex-shrink-0 w-[140px] md:w-[180px] lg:w-[250px] h-16 md:h-24 flex items-center justify-center px-3 md:px-12"
+                  className="flex-shrink-0 w-[100px] sm:w-[120px] md:w-[150px] lg:w-[190px] h-14 md:h-24 flex items-center justify-center px-1 md:px-2"
                 >
                   <img
                     src={getImageUrl(brand)}
                     alt={brand.name || "Brand"}
                     loading="lazy"
                     onError={(e) => { e.target.src = defaultBrandLogo; }}
-                    className="w-full h-full object-contain transition-all duration-500 cursor-pointer scale-90 hover:scale-100"
+                    className="w-full h-full object-contain transition-all duration-500 cursor-pointer scale-95 hover:scale-105"
                   />
                 </div>
               ))}
@@ -98,14 +98,14 @@ const BrandSlider = () => {
               {[...secondRow, ...secondRow].map((brand, index) => (
                 <div
                   key={`row2-${brand._id || index}`}
-                  className="flex-shrink-0 w-[140px] md:w-[180px] lg:w-[250px] h-16 md:h-24 flex items-center justify-center px-3 md:px-12"
+                  className="flex-shrink-0 w-[100px] sm:w-[120px] md:w-[150px] lg:w-[190px] h-14 md:h-24 flex items-center justify-center px-1 md:px-2"
                 >
                   <img
                     src={getImageUrl(brand)}
                     alt={brand.name || "Brand"}
                     loading="lazy"
                     onError={(e) => { e.target.src = defaultBrandLogo; }}
-                    className="w-full h-full object-contain transition-all duration-500 cursor-pointer scale-90 hover:scale-100"
+                    className="w-full h-full object-contain transition-all duration-500 cursor-pointer scale-95 hover:scale-105"
                   />
                 </div>
               ))}

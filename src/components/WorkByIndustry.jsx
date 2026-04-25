@@ -256,7 +256,7 @@ useEffect(() => {
   }, []);
 
   return (
-    <section className="w-full bg-[#000000] relative overflow-clip pt-12 md:pt-16 pb-20 font-poppins">
+    <section className="w-full bg-[#000000] relative overflow-clip pt-8 md:pt-10 pb-14 font-poppins">
       <div className="max-w-[1440px] px- sm:px-10 md:px-16 mx-auto">
         <div className="text-center mb-16 space-y-3 px-4">
           <h2 className="text-white text-[32px] md:text-[40px] lg:text-[46px] font-extrabold tracking-tight leading-[1.2] md:leading-[1.3]">

@@ -32,6 +32,10 @@ ssh -p $PORT -o StrictHostKeyChecking=no $USER@$HOST << 'ENDSSH'
     PM2_HOME=$HOME/.pm2 pm2 start index.js --name "campaignsquat"
     PM2_HOME=$HOME/.pm2 pm2 save
     
+    # ٤. Passenger restart signal
+    mkdir -p ../tmp
+    touch ../tmp/restart.txt
+    
     echo "✅ Backend updated and LiteSpeed signal sent!"
   else
     echo "❌ Error: nodejs/server directory not found!"

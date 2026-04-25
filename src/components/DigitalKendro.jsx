@@ -38,7 +38,7 @@ const DigitalKendro = () => {
   ];
 
   return (
-    <section className="relative w-full bg-[#000000] text-white py-16 md:py-24 overflow-hidden font-poppins border-t border-white/5">
+    <section className="relative w-full bg-[#000000] text-white py-10 md:py-16 overflow-hidden font-poppins border-t border-white/5">
       {/* Background Ambient Glowing Orbs */}
       <div className="absolute inset-0 pointer-events-none flex justify-center items-center z-0">
         <div className="absolute top-[30%] left-[-10%] w-[400px] h-[400px] bg-[#00ffd1]/10 rounded-full blur-[140px] opacity-40"></div>

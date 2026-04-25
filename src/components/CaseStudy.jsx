@@ -68,7 +68,7 @@ const CaseStudy = () => {
   if (!loading && dbData.length === 0) return null;
 
   return (
-    <section className="w-full bg-[#000000] py-16 md:py-24 font-['Poppins'] overflow-x-hidden border-t border-white/5 relative">
+    <section className="w-full bg-[#000000] py-10 md:py-16 font-['Poppins'] overflow-x-hidden border-t border-white/5 relative">
       {/* Background Ambient Glowing Orbs */}
       <div className="absolute inset-0 pointer-events-none flex justify-center items-center z-0">
         <div className="absolute top-[10%] left-[-10%] w-[500px] h-[500px] bg-[#F7A400]/10 rounded-full blur-[140px] opacity-30"></div>

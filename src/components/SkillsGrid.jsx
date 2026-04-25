@@ -21,7 +21,7 @@ const SkillsGrid = () => {
   const displayStack = [...techStack, ...techStack];
 
   return (
-    <section className="relative w-full bg-[#000000] py-8 md:py-12 lg:py-16 overflow-hidden font-poppins">
+    <section className="relative w-full bg-[#000000] pt-0 pb-6 md:pb-10 overflow-hidden font-poppins">
       <style>
         {`
           @keyframes marqueeLeft {

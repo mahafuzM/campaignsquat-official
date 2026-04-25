@@ -584,13 +584,21 @@ const MegaMenuAdmin = () => {
               </div>
               <div className="space-y-4">
                 {processSteps.map((item, index) => (
-                  <div key={index} className="flex items-start gap-4 p-4 bg-gray-50/50 border border-gray-100 rounded-lg group">
-                    <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">{index+1}</div>
-                    <div className="flex-grow space-y-2">
-                      <input value={item.title} onChange={(e) => handleProcessChange(index, "title", e.target.value)} placeholder="Step Title" className="w-full bg-transparent border-b border-gray-200 font-bold text-sm outline-none" />
-                      <textarea value={item.desc} onChange={(e) => handleProcessChange(index, "desc", e.target.value)} placeholder="Step description" className="w-full bg-transparent text-xs outline-none h-12 resize-none" />
+                  <div key={index} className="p-4 bg-gray-50/50 border border-gray-100 rounded-lg relative group">
+                    <button type="button" onClick={() => removeProcessStep(index)} className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all z-20"><Trash2 size={12} /></button>
+                    <div className="flex gap-4">
+                      <div className="w-16 h-16 shrink-0 border border-gray-200 rounded-md bg-white relative flex items-center justify-center overflow-hidden">
+                        <input type="file" onChange={(e) => handleProcessFile(index, e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
+                        {item.preview ? <img src={item.preview} className="w-full h-full object-cover" alt="PS" /> : <ImageIcon className="text-gray-200" size={24} />}
+                      </div>
+                      <div className="flex-grow space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black text-[#F7A400]">STEP {index+1}</span>
+                          <input value={item.title} onChange={(e) => handleProcessChange(index, "title", e.target.value)} placeholder="Step Title" className="w-full bg-transparent border-b border-gray-200 font-bold text-sm outline-none" />
+                        </div>
+                        <textarea value={item.desc} onChange={(e) => handleProcessChange(index, "desc", e.target.value)} placeholder="Step description" className="w-full bg-transparent text-xs outline-none h-12 resize-none" />
+                      </div>
                     </div>
-                    <button type="button" onClick={() => removeProcessStep(index)} className="p-2 text-red-500 hover:bg-red-50 rounded-md transition-colors"><Trash2 size={16} /></button>
                   </div>
                 ))}
               </div>

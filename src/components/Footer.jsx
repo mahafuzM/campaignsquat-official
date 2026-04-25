@@ -41,6 +41,33 @@ const RunningIcons = () => (
   </div>
 );
 
+const AIGridBackground = () => (
+  <div className="absolute bottom-0 left-0 right-0 h-[450px] z-0 overflow-hidden pointer-events-none">
+    <div 
+      className="absolute inset-0 opacity-[0.5] transition-all duration-1000"
+      style={{
+        backgroundImage: `
+          radial-gradient(ellipse at bottom, rgba(247, 164, 0, 0.2) 0%, transparent 80%),
+          linear-gradient(to right, rgba(247, 164, 0, 0.3) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(247, 164, 0, 0.3) 1px, transparent 1px)
+        `,
+        backgroundSize: '100% 100%, 15px 15px, 15px 15px',
+        transform: 'perspective(400px) rotateX(60deg) scale(2.2) translateY(40px)',
+        transformOrigin: 'top center'
+      }}
+    ></div>
+    <div 
+      className="absolute inset-0 z-0 pointer-events-none"
+      style={{ 
+        background: `
+          linear-gradient(to bottom, #0A0A0A 0%, #0A0A0A 10%, transparent 70%, transparent 90%, #0A0A0A 100%),
+          linear-gradient(to right, #0A0A0A 0%, transparent 15%, transparent 85%, #0A0A0A 100%)
+        ` 
+      }}
+    ></div>
+  </div>
+);
+
 const Footer = () => {
   const CACHE_KEY = "footer_data_cached";
   const [footerData, setFooterData] = useState(() => {
@@ -110,10 +137,17 @@ const Footer = () => {
   return (
     <footer className="w-full bg-[#0A0A0A] text-white pt-12 md:pt-20 pb-10 font-poppins border-t border-white/5">
       <style>
-        {`@keyframes arrowNoGap { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }`}
+        {`
+          @keyframes arrowNoGap { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }
+          @keyframes sweep { 0% { transform: translateX(-100%) skewX(-12deg); } 100% { transform: translateX(200%) skewX(-12deg); } }
+        `}
       </style>
 
-      <div className="max-w-[1445px] mx-auto px-2 sm:px-10 md:px-12 lg:px-16">
+      <div className="relative w-full overflow-hidden">
+        {/* AI Background Section - Extracted */}
+        <AIGridBackground />
+
+        <div className="max-w-[1445px] mx-auto px-2 sm:px-10 md:px-12 lg:px-16 relative z-10">
         <div className="flex flex-col lg:flex-row justify-between gap-12 mb-16 md:mb-20">
           {/* Column 1: Brand Info */}
           <div className="flex-[1.5] space-y-6 md:space-y-8">
@@ -246,25 +280,44 @@ const Footer = () => {
           </div>
         </div>
       </div>
+    </div>
 
-      {/* Payment Gateways Banner */}
-      <div className="w-full border-t border-white/5 pt-6 pb-6 flex items-center justify-center overflow-hidden">
-        <div className="max-w-[1445px] mx-auto px-4 w-full flex justify-center">
-          <img 
-            src="https://securepay.sslcommerz.com/public/image/SSLCommerz-Pay-With-logo-All-Size-01.png" 
-            alt="Payment Methods" 
-            className="w-full max-w-[85%] sm:max-w-[65%] md:max-w-[450px] lg:max-w-[550px] h-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = "https://shop.sslwireless.com/wp-content/uploads/2020/05/SSLCommerz-Pay-With-logo-All-Size-01.png";
-            }}
-          />
+      {/* Career Section Banner Replacement */}
+      <div className="w-full border-t border-white/5 py-12 md:py-16 bg-[#0c0c0c] relative overflow-hidden">
+        {/* Subtle background highlight */}
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-[#F7A400]/5 to-[#00ffd1]/5 pointer-events-none"></div>
+        
+        <div className="max-w-[1445px] mx-auto px-6 sm:px-10 md:px-12 lg:px-16 flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
+            <div className="flex items-center gap-3 mb-4">
+               <span className="text-white font-bold text-[20px] md:text-[24px]">Careers</span>
+               <div className="flex items-center gap-1.5 bg-[#00ffd1]/10 text-[#00ffd1] text-[12px] md:text-[13px] font-bold px-3 py-1.5 rounded-full border border-[#00ffd1]/20">
+                 <span className="w-2 h-2 bg-[#00ffd1] rounded-full animate-pulse"></span>
+                 We Are Hiring!
+               </div>
+            </div>
+            <p className="text-white/80 text-[16px] md:text-[18px] lg:text-[22px] font-medium leading-relaxed max-w-2xl">
+              Shape the future with us! Join our innovative team.
+            </p>
+          </div>
+          
+          <div className="shrink-0">
+            <Link 
+              to="/careers" 
+              className="group relative flex items-center gap-2 bg-[#f7a400] text-black font-extrabold py-4 px-10 rounded-full transition-all duration-300 hover:shadow-[0_0_30px_rgba(247,164,0,0.5)] hover:-translate-y-1 active:scale-95 shadow-xl overflow-hidden"
+            >
+              <span className="relative z-10">Explore Opportunities</span>
+              <ChevronsRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+              {/* Shine effect - now correctly hidden by overflow-hidden */}
+              <div className="absolute inset-0 h-full w-full bg-white/20 -translate-x-full group-hover:animate-[sweep_0.75s_forwards] skew-x-12 z-0"></div>
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Footer Bottom Bar with AI Pattern */}
       <div className="w-full relative border-t border-white/5 py-8 text-center overflow-hidden bg-[#0A0A0A]">
-        {/* AI Network Grid Pattern */}
+        {/* AI Network Grid Pattern - Restored Sharp Perspective */}
         <div 
           className="absolute inset-0 z-0 opacity-[0.6] pointer-events-none transition-all duration-1000"
           style={{

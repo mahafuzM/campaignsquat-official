@@ -138,10 +138,11 @@ const Navbar = () => {
               </svg>
             </Link>
 
+            {/* Mega Menu - Full Width Container */}
+            {/* Mega Menu - Centered Container */}
             {isServiceHovered && (
               <div
-                className="absolute top-full left-1/2 -translate-x-1/2 pt-1 animate-fade-in-custom z-[120]"
-                style={{ width: "calc(100vw - 48px)", maxWidth: "1445px" }}
+                className="fixed top-[80px] md:top-[96px] left-1/2 -translate-x-1/2 w-full max-w-[1445px] px-4 pt-1 animate-fade-in-custom z-[120]"
               >
                 <div className="pointer-events-auto">
                   <MegaMenu />
@@ -155,6 +156,12 @@ const Navbar = () => {
             className="text-[15px] lg:text-[16px] xl:text-[18px] font-medium text-white hover:text-[#F7A400] transition-colors whitespace-nowrap"
           >
             Our Project
+          </Link>
+          <Link
+            to="/our-product"
+            className="text-[15px] lg:text-[16px] xl:text-[18px] font-medium text-white hover:text-[#F7A400] transition-colors whitespace-nowrap"
+          >
+            Our Product
           </Link>
           {/* Pricing link added after Our Project */}
           <Link
@@ -291,6 +298,7 @@ const Navbar = () => {
 
           {[
             "Our Project",
+            "Our Product",
             "Pricing",
             "Contact",
           ].map((item) => (

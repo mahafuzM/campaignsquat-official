@@ -31,7 +31,7 @@ const Questions = () => {
   if (loading) return null;
 
   return (
-    <section className="w-full bg-[#000000] py-16 md:py-24 font-['Poppins'] overflow-hidden border-t border-white/5 relative">
+    <section className="w-full bg-[#000000] py-10 md:py-16 font-['Poppins'] overflow-hidden border-t border-white/5 relative">
       <div className="max-w-[1350px] mx-auto px-4 sm:px-6 relative z-10">
         {/* Header Section */}
         <div className="flex flex-col items-center text-center mb-12 md:mb-20 px-2">

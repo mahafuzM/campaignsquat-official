@@ -20,7 +20,7 @@ const Recent = () => {
   }, []);
 
   return (
-    <section className="relative w-full bg-[#000000] py-16 md:py-24 font-poppins overflow-hidden border-t border-white/5">
+    <section className="relative w-full bg-[#000000] py-10 md:py-16 font-poppins overflow-hidden border-t border-white/5">
       {/* Background Ambient Glowing Orbs */}
       <div className="absolute inset-0 pointer-events-none flex justify-center items-center z-0">
         <div className="absolute top-[20%] left-[-5%] w-[450px] h-[450px] bg-[#00ffd1]/10 rounded-full blur-[150px] opacity-30"></div>

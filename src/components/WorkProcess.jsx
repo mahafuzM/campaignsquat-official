@@ -18,7 +18,7 @@ const WorkProcess = () => {
   }, []);
 
   return (
-    <section className="relative w-full bg-[#000000] py-16 md:py-24 font-poppins overflow-hidden border-t border-white/5">
+    <section className="relative w-full bg-[#000000] py-10 md:py-16 font-poppins overflow-hidden border-t border-white/5">
       {/* Background Ambient Glowing Orbs */}
       <div className="absolute inset-0 pointer-events-none flex justify-center items-center z-0">
         <div className="absolute top-[20%] left-[10%] w-[350px] h-[350px] bg-[#00ffd1]/10 rounded-full blur-[140px] opacity-40"></div>
@@ -62,7 +62,7 @@ const WorkProcess = () => {
                         : `${axios.defaults.baseURL || ''}${step.image}`
                     }
                     alt={step.title}
-                    className="w-10 h-10 md:w-16 lg:w-20 object-contain brightness-0 invert transition-all duration-500 group-hover:scale-110 z-20 group-hover:sepia group-hover:hue-rotate-[180deg]"
+                    className="w-14 h-14 md:w-24 lg:w-28 object-contain brightness-0 invert transition-all duration-500 group-hover:scale-110 z-20 group-hover:sepia group-hover:hue-rotate-[180deg]"
                   />
                 </div>
               </div>

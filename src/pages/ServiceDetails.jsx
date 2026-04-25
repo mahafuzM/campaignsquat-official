@@ -196,10 +196,8 @@ const ServiceDetails = () => {
                         loading="lazy"
                         className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 origin-left"
                         // এই ফিল্টারটি আপনার আইকনকে গোল্ডেন/অরেঞ্জ কালার দিবে হোভার করলে
-                        style={{
-                          filter:
-                            "invert(71%) sepia(85%) saturate(945%) hue-rotate(354deg) brightness(102%) contrast(101%)",
-                        }}
+                        // Removed fixed color filter to show actual colors at user's request
+                        style={{ opacity: 1 }}
                         onError={(e) => {
                           e.target.style.opacity = "0";
                         }}
@@ -265,53 +263,76 @@ const ServiceDetails = () => {
         </section>
       )}
 
-      {/* 4. Process Section */}
+      {/* 4. Process Section - Enriched Premium Design */}
       {service.processSteps && service.processSteps.length > 0 && (
-        <section className="w-full bg-[#02050A] py-12 md:py-20">
-          <div className="max-w-[1445px] mx-auto px-6 sm:px-10 md:px-12 lg:px-16">
+        <section className="w-full bg-[#02050A] py-16 md:py-32 relative overflow-hidden">
+          {/* Background Ambient Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#F7A400]/5 blur-[150px] rounded-full pointer-events-none"></div>
+
+          <div className="max-w-[1445px] mx-auto px-6 sm:px-10 md:px-12 lg:px-20 relative z-10">
             {/* Section Heading */}
-            <div className="flex flex-col items-center text-center mb-20 md:mb-28 pt-4 md:pt-4">
-              <h2 className="text-white text-[26px] md:text-[32px] lg:text-[40px] font-bold tracking-tight mb-6">
-                {service.sec4Title || "Our Process"}
+            <div className="flex flex-col items-center text-center mb-24 md:mb-32">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-[#F7A400]"></div>
+                <span className="text-[#F7A400] text-[10px] md:text-[12px] font-black uppercase tracking-[0.3em]">Execution Path</span>
+                <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-[#F7A400]"></div>
+              </div>
+              <h2 className="text-white text-[28px] md:text-[36px] lg:text-[48px] font-bold tracking-tight mb-8">
+                {service.sec4Title || "Our Production Workflow"}
               </h2>
-              <p className="text-white text-[16px] md:text-[18px] max-w-5xl mx-auto font-light">
-                {service.sec4Desc}
+              <p className="text-white/70 text-[16px] md:text-[19px] max-w-4xl mx-auto font-light leading-relaxed">
+                {service.sec4Desc || "A structured development cycle designed to launch and scale your business with precision."}
               </p>
             </div>
 
             {/* Process Steps Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-10 -mt-6 md:-mt-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-16 md:gap-12">
               {service.processSteps.map((step, index) => (
                 <div
                   key={index}
-                  className="flex flex-col items-center text-center group cursor-pointer"
+                  className="flex flex-col items-center text-center group cursor-pointer relative"
                 >
-                  {/* Circle & Image Container */}
-                  <div className="relative mb-10 w-40 h-40 md:w-44 lg:w-48 md:h-44 lg:h-48 flex items-center justify-center">
-                    {/* Rotating Border */}
-                    <div className="absolute top-0 left-[-15px] w-full h-full rounded-full border-[3px] border-[#F7A400] transition-all duration-700 ease-in-out group-hover:left-0 group-hover:rotate-[360deg] z-0"></div>
+                  {/* Step Number Label */}
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-white/10 text-[60px] font-black pointer-events-none group-hover:text-[#F7A400]/10 transition-colors duration-500">
+                    0{index + 1}
+                  </div>
 
-                    {/* Inner Circle */}
-                    <div className="relative w-full h-full rounded-full bg-[#0A0A0A] border border-white/10 flex items-center justify-center z-10 transition-all duration-500 group-hover:border-[#F7A400]/50 shadow-xl">
+                  {/* Circular Container with Enriched Effects */}
+                  <div className="relative mb-12 w-44 h-44 md:w-48 md:h-48 flex items-center justify-center">
+                    {/* Outer Orbiting Ring - Enriched */}
+                    <div className="absolute inset-[-10px] rounded-full border-2 border-[#F7A400]/20 transition-all duration-700 ease-out group-hover:inset-[-5px] group-hover:border-[#F7A400]/60 group-hover:rotate-[180deg]"></div>
+                    
+                    {/* Orbiting Dot */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#F7A400] rounded-full shadow-[0_0_15px_#F7A400] opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:top-[-5px]" 
+                         style={{ transformOrigin: 'center 100px', transform: `rotate(${index * 90}deg)` }}>
+                    </div>
+
+                    {/* Rotating Dashed Border */}
+                    <div className="absolute inset-0 rounded-full border-2 border-dashed border-white/5 group-hover:border-[#F7A400]/30 animate-[spin_10s_linear_infinite] pointer-events-none"></div>
+
+                    {/* Master Inner Circle */}
+                    <div className="relative w-full h-full rounded-full bg-[#0A0A0A] border border-white/10 flex items-center justify-center z-10 transition-all duration-500 group-hover:border-[#F7A400]/50 group-hover:shadow-[0_0_40px_rgba(247,164,0,0.2)] overflow-hidden">
+                      {/* Inner Glow */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-[#F7A400]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      
                       <img
                         src={getFullImageUrl(step.img)}
                         alt={step.title}
                         loading="lazy"
-                        className="w-16 h-16 md:w-20 lg:w-24 object-contain brightness-0 invert transition-all duration-500 group-hover:scale-110 z-20"
+                        className="w-16 h-16 md:w-20 lg:w-22 object-contain transition-all duration-500 group-hover:scale-110 z-20"
                         onError={(e) => {
-                          e.target.src =
-                            "https://via.placeholder.com/100?text=Icon";
+                          e.target.src = "https://via.placeholder.com/100?text=Icon";
                         }}
                       />
                     </div>
                   </div>
 
                   {/* Step Text Content */}
-                  <div className="w-full flex flex-col items-center -mt-4">
-                    <h3 className="text-white text-[22px] md:text-[24px] lg:text-[26px] font-bold mb-4 group-hover:text-[#F7A400] transition-colors">
+                  <div className="relative z-10 w-full flex flex-col items-center">
+                    <h3 className="text-white text-[22px] md:text-[25px] font-bold mb-4 group-hover:text-[#F7A400] transition-colors duration-300">
                       {step.title}
                     </h3>
-                    <p className="text-white text-[15px] md:text-[16px] leading-relaxed font-light max-w-[280px]">
+                    <p className="text-white/60 text-[15px] md:text-[16px] leading-relaxed font-light max-w-[280px] group-hover:text-white/90 transition-colors duration-300">
                       {step.desc}
                     </p>
                   </div>

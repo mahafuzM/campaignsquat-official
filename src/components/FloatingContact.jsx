@@ -45,20 +45,20 @@ const FloatingContact = () => {
       <div className="mx-auto px-[24px] md:px-[48px] lg:px-[72px] flex justify-end">
         <div className="flex flex-col items-end pointer-events-auto">
           {isOpen && (
-            <div className="flex flex-col items-end gap-[14px] mb-[20px]">
+            <div className="flex flex-col items-end gap-[10px] mb-[15px]">
               {menuItems.map((item, index) => (
                 <a
                   key={index}
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-[14px] bg-white/90 backdrop-blur-md px-[20px] py-[10px] rounded-[10px] shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgba(247,164,0,0.15)] transition-all border border-white/20 group animate-in fade-in slide-in-from-bottom-4 duration-500"
+                  className="flex items-center gap-[10px] bg-white/90 backdrop-blur-md px-[14px] py-[6px] rounded-[8px] shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgba(247,164,0,0.15)] transition-all border border-white/20 group animate-in fade-in slide-in-from-bottom-4 duration-500"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <span className="text-[#02050A] font-bold text-[11px] md:text-[13px] tracking-wide whitespace-nowrap">
+                  <span className="text-[#02050A] font-bold text-[10px] md:text-[12px] tracking-wide whitespace-nowrap">
                     {item.text}
                   </span>
-                  <div className="flex items-center justify-center p-2 bg-gray-50 rounded-full group-hover:scale-110 group-hover:bg-[#F7A400]/10 transition-all duration-300">
+                  <div className="flex items-center justify-center p-1.5 bg-gray-50 rounded-full group-hover:scale-110 group-hover:bg-[#F7A400]/10 transition-all duration-300">
                     {renderIcon(item.icon)}
                   </div>
                 </a>

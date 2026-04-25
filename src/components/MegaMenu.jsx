@@ -58,9 +58,9 @@ const MegaMenu = () => {
   }, []);
 
   return (
-    <div className="md:top-full lg:top-full md:-right-[175px] max-w-full lg:xl:left-[195px] relative w-full pointer-events-auto flex justify-center z-[50]">
-      <div className="w-full lg:max-w-[1400px] px-2 md:px-8 lg:px-10">
-        <div className="bg-[#0A0A0A] border-[1px] lg:border-[2px] border-[#8C9096]/30 rounded-[5px] p-4 md:p-8 lg:p-6 shadow-2xl">
+    <div className="w-full pointer-events-auto z-[50]">
+      <div className="w-full">
+        <div className="bg-[#0A0A0A] border-[1px] lg:border-[2px] border-[#8C9096]/30 rounded-[12px] p-4 md:p-8 lg:p-6 shadow-2xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {categories.map((cat, index) => (
               <div

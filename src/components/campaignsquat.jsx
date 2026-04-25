@@ -32,6 +32,7 @@ const CampaignSquat = () => {
     description:
       "Campaignsquat Ltd is a premier tech agency where technical complexity meets aesthetic excellence. We specialize in Software Development, UI/UX Design, and scalable Website Design & Development.",
   });
+  const [features, setFeatures] = useState([]);
 
   useEffect(() => {
     const fetchAbout = async () => {
@@ -42,7 +43,20 @@ const CampaignSquat = () => {
         console.error("About data fetch error", err);
       }
     };
+
+    const fetchFeatures = async () => {
+      try {
+        const res = await axios.get(`/api/about-features`);
+        if (res.data && Array.isArray(res.data)) {
+          setFeatures(res.data);
+        }
+      } catch (err) {
+        console.error("Features fetch error", err);
+      }
+    };
+
     fetchAbout();
+    fetchFeatures();
   }, []);
 
   const stats = [
@@ -79,7 +93,7 @@ const CampaignSquat = () => {
   ];
 
   return (
-    <section className="relative w-full bg-[#000000] py-16 md:py-24 lg:py-32 overflow-hidden font-poppins">
+    <section className="relative w-full bg-[#000000] pt-12 md:pt-16 pb-6 md:pb-8 overflow-hidden font-poppins">
       
       {/* Refined Brand Color Ambient Blobs */}
       <div className="absolute inset-0 pointer-events-none flex justify-center items-center z-0">
@@ -180,10 +194,10 @@ const CampaignSquat = () => {
 
             {/* Service Highlight Boxes */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">
-              {[
-                { t: "Future-Proof Tech", d: "Scalable solutions only." },
-                { t: "User-First Design", d: "UI that converts." },
-              ].map((item, i) => (
+              {(features.length > 0 ? features : [
+                { title: "Future-Proof Tech", desc: "Scalable solutions only." },
+                { title: "User-First Design", desc: "UI that converts." },
+              ]).map((item, i) => (
                 <div
                   key={i}
                   className="group relative flex flex-col gap-3 p-6 rounded-[20px] bg-[#050505]/60 backdrop-blur-xl border border-white/10 hover:border-[#00ffd1]/40 transition-all duration-500 shadow-xl overflow-hidden"
@@ -192,11 +206,11 @@ const CampaignSquat = () => {
                   <div className="flex items-center gap-4 relative z-10">
                     <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#F7A400] to-[#00ffd1] font-black text-2xl drop-shadow-sm">0{i + 1}.</span>
                     <h4 className="text-white text-[17px] font-extrabold tracking-wide">
-                      {item.t}
+                      {item.title || item.t}
                     </h4>
                   </div>
                   <p className="text-white/60 text-[14px] md:text-[15px] relative z-10 leading-relaxed font-medium">
-                    {item.d}
+                    {item.desc || item.d}
                   </p>
                 </div>
               ))}

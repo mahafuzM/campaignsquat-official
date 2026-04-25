@@ -24,8 +24,7 @@ echo "✅ Frontend built successfully."
 
 # 2. Upload Frontend (dist/* to public_html/)
 echo "🌐 Uploading Frontend Files to public_html..."
-rsync -azP -e "ssh -p $PORT -o StrictHostKeyChecking=no" \
-  --exclude '.htaccess' \
+rsync -azP --delete -e "ssh -p $PORT -o StrictHostKeyChecking=no" \
   --exclude 'uploads' \
   --exclude 'nodejs' \
   dist/ $USER@$HOST:$FRONTEND_DIR/
