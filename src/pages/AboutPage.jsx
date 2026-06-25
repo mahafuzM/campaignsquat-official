@@ -22,7 +22,7 @@ const About = () => {
   return (
     <main className="bg-[#02050A]">
       <DynamicSchema />
-      {/* ২. SEO Meta Tags for About Page */}
+      {/* ২. SEO Meta Tags for About Page for google ranking */}
       <Helmet>
         <title>About Us | Campaignsquat Ltd - Your Innovation Partner</title>
         <meta name="description" content="Discover Campaignsquat Ltd's journey, our mission to drive digital excellence, and the expert team building next-gen UI/UX, web, and software solutions." />
